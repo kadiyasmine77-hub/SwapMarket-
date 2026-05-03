@@ -10,7 +10,7 @@ class ObjetImageFactory extends Factory
     {
         return [
             'image_url' => fake()->imageUrl(800, 600, 'objects'),
-            'id_objet'  => Objet::inRandomOrder()->first()->id_objet,
+            'id_objet' => Objet::inRandomOrder()->first()?->id_objet ?? Objet::factory(),
         ];
     }
 }

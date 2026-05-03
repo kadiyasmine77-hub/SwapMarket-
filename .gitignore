@@ -1,9 +1,24 @@
-/node_modules
-/public/build
+# ==============================================================================
+# Laravel Backend
+# ==============================================================================
+/vendor/
 /public/hot
 /public/storage
 /storage/*.key
-/vendor
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+/storage/logs/*
+!storage/logs/.gitignore
+!storage/framework/cache/data/.gitignore
+!storage/framework/sessions/.gitignore
+!storage/framework/testing/.gitignore
+!storage/framework/views/.gitignore
+/bootstrap/cache/*
+!bootstrap/cache/.gitignore
+
+# Environment & Auth
 .env
 .env.backup
 .env.production
@@ -11,8 +26,56 @@
 Homestead.json
 Homestead.yaml
 auth.json
+
+# ==============================================================================
+# React Frontend (swapmarket-frontend)
+# ==============================================================================
+/swapmarket-frontend/node_modules/
+/swapmarket-frontend/dist/
+/swapmarket-frontend/build/
+/swapmarket-frontend/coverage/
+
+# Frontend Environment
+/swapmarket-frontend/.env
+/swapmarket-frontend/.env.local
+/swapmarket-frontend/.env.*.local
+
+# NPM/Yarn Logs
+/swapmarket-frontend/npm-debug.log*
+/swapmarket-frontend/yarn-debug.log*
+/swapmarket-frontend/yarn-error.log*
+/swapmarket-frontend/.pnpm-debug.log*
+node_modules/
 npm-debug.log
 yarn-error.log
-/.fleet
-/.idea
-/.vscode
+
+# ==============================================================================
+# OS & System Files
+# ==============================================================================
+# Mac OS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ==============================================================================
+# IDEs & Editors
+# ==============================================================================
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# ==============================================================================
+# Miscellaneous Temporary Files
+# ==============================================================================
+*.log
+*.sqlite

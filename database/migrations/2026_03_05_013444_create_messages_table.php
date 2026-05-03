@@ -16,10 +16,14 @@ return new class extends Migration
         Schema::create('messages', function (Blueprint $table) {
             $table->id('id_message');
             $table->text('contenu');
-            $table->enum('lu', ['oui', 'non'])->default('non');
-            $table->foreignId('id_expediteur')->constrained('users', 'id_user');
-            $table->foreignId('id_destinataire')->constrained('users', 'id_user');
+            $table->boolean('lu')->default(false);
+            $table->foreignId('id_expediteur')->constrained('users', 'id_user')->onDelete('cascade');
+            $table->foreignId('id_destinataire')->constrained('users', 'id_user')->onDelete('cascade');
             $table->foreignId('id_echange')->constrained('echanges', 'id_echange')->onDelete('cascade');
+
+            // Index pour améliorer les performances
+            $table->index(['id_expediteur', 'id_destinataire']);
+            $table->index('id_echange');
             $table->timestamps();
         });
     }

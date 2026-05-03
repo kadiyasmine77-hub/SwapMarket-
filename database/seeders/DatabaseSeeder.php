@@ -14,9 +14,16 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        //m1
         // 1. D'abord les tables sans dépendances
-        User::factory(10)->create();
-        Categorie::factory(5)->create();
+        // User::factory(10)->create();
+        // Categorie::factory(5)->create();
+
+        // 1. Données fixes (important pour PFE)
+        $this->call([
+            CategorieSeeder::class,
+            UserSeeder::class,
+        ]);
 
         // 2. Ensuite les tables qui dépendent de User + Categorie
         Objet::factory(20)->create();

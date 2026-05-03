@@ -10,7 +10,16 @@ class EchangeFactory extends Factory
     public function definition(): array
     {
         $objets = Objet::inRandomOrder()->take(2)->get();
-        $users  = User::inRandomOrder()->take(2)->get();
+        // إلا ما كانوش 2 objets، نصايبهم
+        if ($objets->count() < 2) {
+            $objets = Objet::factory()->count(2)->create();
+        }
+
+        $users = User::inRandomOrder()->take(2)->get();
+        // إلا ما كانوش 2 users، نصايبهم
+        if ($users->count() < 2) {
+            $users = User::factory()->count(2)->create();
+        }
 
         return [
             'date_demande'    => fake()->dateTimeBetween('-1 month', 'now'),

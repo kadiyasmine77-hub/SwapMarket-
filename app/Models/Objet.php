@@ -39,4 +39,11 @@ class Objet extends Model
         return $this->hasMany(Echange::class, 'id_objet2');
     }
 
+    // Moyenne des notes d’un objet 
+    // tilisé pour afficher le rating et aider les utilisateurs à évaluer la qualité
+    public function moyenneNotes()
+    {
+        return $this->avis()->avg('note');
+    }
+
 }

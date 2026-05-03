@@ -15,10 +15,17 @@ return new class extends Migration
     {
         Schema::create('avis', function (Blueprint $table) {
             $table->id('id_avis');
-            $table->integer('note');
+            $table->tinyInteger('note');
             $table->text('commentaire');
+
             $table->foreignId('id_user')->constrained('users', 'id_user')->onDelete('cascade');
             $table->foreignId('id_objet')->constrained('objets', 'id_objet')->onDelete('cascade');
+
+            // Un utilisateur ne peut noter qu'une seule fois un objet
+            $table->unique(['id_user', 'id_objet']);
+            // Index pour performance
+            $table->index('id_objet');
+
             $table->timestamps();
         });
     }

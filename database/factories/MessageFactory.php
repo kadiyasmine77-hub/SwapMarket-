@@ -10,11 +10,11 @@ class MessageFactory extends Factory
     public function definition(): array
     {
         $users   = User::inRandomOrder()->take(2)->get();
-        $echange = Echange::inRandomOrder()->first();
+        $echange = Echange::inRandomOrder()->first() ?? Echange::factory()->create();
 
         return [
             'contenu'         => fake()->paragraph(),
-            'lu'              => fake()->randomElement(['oui', 'non']),
+            'lu' => fake()->boolean(),
             'id_expediteur'   => $users[0]->id_user,
             'id_destinataire' => $users[1]->id_user,
             'id_echange'      => $echange->id_echange,

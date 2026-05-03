@@ -17,6 +17,12 @@ return new class extends Migration
             $table->id('id_image');
             $table->string('image_url');
             $table->foreignId('id_objet')->constrained('objets', 'id_objet')->onDelete('cascade');
+
+            // Performance
+            $table->index('id_objet');
+            // Empêche duplication de la même image pour le même objet
+            $table->unique(['id_objet', 'image_url']);
+            
             $table->timestamps();
         });
     }

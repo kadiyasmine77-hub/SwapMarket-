@@ -16,19 +16,17 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id('id_user');
-            $table->string('nom');
-            $table->string('prenom');
+            $table->string('nom_complet', 200);
             $table->string('email')->unique();
             $table->string('mot_de_passe');
-            $table->string('telephone')->nullable();
+            $table->string('telephone', 20)->nullable();
             $table->string('photo_profil')->nullable();
-            $table->string('ville')->nullable();
-            $table->string('pays')->nullable();
+            $table->string('ville', 100);
             $table->date('date_naissance')->nullable();
             $table->boolean('is_verifie')->default(false);
-            $table->date('date_inscription')->useCurrent();
             $table->enum('role', ['admin', 'user'])->default('user');
             $table->enum('statut_compte', ['actif', 'suspendu', 'desactive'])->default('actif');
+            $table->rememberToken();
             $table->timestamps();
         });
     }

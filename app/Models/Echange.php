@@ -34,4 +34,8 @@ class Echange extends Model
     public function messages() {
         return $this->hasMany(Message::class, 'id_echange');
     }
+
+    public function historique() {
+    return $this->hasMany(HistoriqueEchange::class, 'id_echange');
+}
 }

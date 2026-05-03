@@ -15,7 +15,7 @@ class ObjetFactory extends Factory
             'image'         => fake()->imageUrl(640, 480, 'objects'),
             'etat'          => fake()->randomElement(['neuf', 'bon', 'moyen', 'mauvais']),
             'disponibilite' => fake()->randomElement(['disponible', 'reserve', 'echange']),
-            'id_user'       => User::inRandomOrder()->first()->id_user,
+            'id_user' => User::inRandomOrder()->first()?->id_user ?? User::factory(),
             'id_categorie'  => Categorie::inRandomOrder()->first()->id_categorie,
         ];
     }
