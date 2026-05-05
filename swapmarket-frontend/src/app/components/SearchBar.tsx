@@ -1,4 +1,5 @@
 import { Search } from 'lucide-react';
+import { useLanguage } from '../LanguageContext';
 
 interface SearchBarProps {
   placeholder?: string;
@@ -9,18 +10,21 @@ interface SearchBarProps {
 }
 
 export function SearchBar({
-  placeholder = 'Search for items...',
+  placeholder,
   value,
   onChange,
   onSearch,
   className = '',
 }: SearchBarProps) {
+  const { t } = useLanguage();
+  const displayPlaceholder = placeholder || t('common.search');
+
   return (
     <div className={`relative ${className}`}>
       <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
       <input
         type="text"
-        placeholder={placeholder}
+        placeholder={displayPlaceholder}
         value={value}
         onChange={(e) => onChange?.(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && onSearch?.()}

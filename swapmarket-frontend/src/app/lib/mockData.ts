@@ -34,39 +34,7 @@ export const mockAdminStats = {
   activeItems: 2156,
   totalExchanges: 834,
   completedExchanges: 721,
-  pendingReports: 12,
-  resolvedReports: 145,
 };
-
-export const mockReports = [
-  {
-    id: "1",
-    type: "item",
-    reason: "Contenu inapproprié",
-    reportedBy: "User #234",
-    target: "Annonce #4521",
-    date: "2026-04-12",
-    status: "pending",
-  },
-  {
-    id: "2",
-    type: "user",
-    reason: "Comportement suspect",
-    reportedBy: "User #567",
-    target: "User #891",
-    date: "2026-04-11",
-    status: "pending",
-  },
-  {
-    id: "3",
-    type: "message",
-    reason: "Harcèlement",
-    reportedBy: "User #123",
-    target: "Conversation #789",
-    date: "2026-04-10",
-    status: "under_review",
-  },
-];
 
 export const mockUsers = [
   {
@@ -116,32 +84,5 @@ export const mockUsers = [
     trustScore: 5.0,
     exchanges: 0,
     joinedAt: "2025-01-01",
-  },
-];
-
-export const mockActivityLogs = [
-  {
-    id: "1",
-    admin: "Admin System",
-    action: "Suspendu utilisateur",
-    target: "Julie Bernard",
-    timestamp: "2026-04-12 14:30",
-    details: "Raison: Signalements multiples",
-  },
-  {
-    id: "2",
-    admin: "Admin System",
-    action: "Supprimé annonce",
-    target: "Annonce #4521",
-    timestamp: "2026-04-12 10:15",
-    details: "Raison: Contenu inapproprié",
-  },
-  {
-    id: "3",
-    admin: "Admin System",
-    action: "Créé catégorie",
-    target: "Catégorie: Art & Décoration",
-    timestamp: "2026-04-11 16:45",
-    details: "Nouvelle catégorie ajoutée",
   },
 ];

@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "../../components/ui/avatar";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Badge } from "../../components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import {
   Table,
   TableBody,
@@ -18,58 +17,101 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu";
-import { Search, MoreVertical, Eye, Trash2, Flag } from "lucide-react";
-import { mockItems } from "../../lib/mockData";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../../components/ui/alert-dialog";
+import { Search, MoreVertical, Eye, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { API_BASE_URL, getStorageUrl } from "../../config";
+import { Link } from "react-router";
+import { useLanguage } from "../../LanguageContext";
 
 export function ManageItems() {
+  const { t } = useLanguage();
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [deleteTarget, setDeleteTarget] = useState<any>(null);
 
-  const filteredItems = mockItems.filter((item) => {
-    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = categoryFilter === "all" || item.category === categoryFilter;
-    return matchesSearch && matchesCategory;
-  });
+  const getToken = () => localStorage.getItem("token");
 
-  const handleAction = (action: string, itemTitle: string) => {
-    toast.success(`${action} appliqué à "${itemTitle}"`);
+  const fetchItems = () => {
+    setLoading(true);
+    const token = getToken();
+    fetch(`${API_BASE_URL}/admin/objets`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        setItems(Array.isArray(data) ? data : []);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    const token = getToken();
+    const res = await fetch(`${API_BASE_URL}/admin/objets/${deleteTarget.id_objet}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.ok) {
+      toast.success(t('items.success_delete', { title: deleteTarget.titre }));
+      setItems((prev) => prev.filter((i) => i.id_objet !== deleteTarget.id_objet));
+    } else {
+      toast.error(t('admin.update_error'));
+    }
+    setDeleteTarget(null);
+  };
+
+  const filtered = items.filter((item) =>
+    item.titre?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.user?.nom_complet?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const getDispobadge = (dispo: string) => {
+    switch (dispo) {
+      case "disponible":
+        return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">{t('common.available')}</Badge>;
+      case "echange":
+        return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">{t('common.exchanged')}</Badge>;
+      case "reserve":
+        return <Badge variant="outline">{t('common.reserved')}</Badge>;
+      default:
+        return <Badge variant="outline">{dispo}</Badge>;
+    }
   };
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="mb-2 text-3xl font-bold">Gestion des annonces</h1>
-        <p className="text-neutral-600">
-          {filteredItems.length} annonce{filteredItems.length > 1 ? "s" : ""} trouvée
-          {filteredItems.length > 1 ? "s" : ""}
-        </p>
+        <h1 className="mb-2 text-3xl font-bold">{t('admin.manage_items')}</h1>
+        <p className="text-neutral-600">{filtered.length} {t('items.objects_count', { count: filtered.length })}</p>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col gap-4 rounded-xl border bg-white p-4 sm:flex-row">
+      {/* Search */}
+      <div className="flex gap-4 rounded-xl border bg-white p-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
           <Input
-            placeholder="Rechercher une annonce..."
+            placeholder={t('admin_dashboard.table.search_items')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
           />
         </div>
-        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-full sm:w-48">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Toutes catégories</SelectItem>
-            <SelectItem value="Électronique">Électronique</SelectItem>
-            <SelectItem value="Vêtements">Vêtements</SelectItem>
-            <SelectItem value="Livres">Livres</SelectItem>
-            <SelectItem value="Maison">Maison</SelectItem>
-            <SelectItem value="Sports">Sports</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
 
       {/* Table */}
@@ -77,81 +119,118 @@ export function ManageItems() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Annonce</TableHead>
-              <TableHead>Propriétaire</TableHead>
-              <TableHead>Catégorie</TableHead>
-              <TableHead>État</TableHead>
-              <TableHead>Localisation</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="w-64">{t('admin_dashboard.table.item')}</TableHead>
+              <TableHead>{t('admin_dashboard.table.owner')}</TableHead>
+              <TableHead>{t('admin_dashboard.table.category')}</TableHead>
+              <TableHead>{t('publish_edit.condition_label').replace('*', '').trim()}</TableHead>
+              <TableHead>{t('admin.status')}</TableHead>
+              <TableHead>{t('profile.city')}</TableHead>
+              <TableHead>{t('admin_dashboard.table.date')}</TableHead>
+              <TableHead className="text-right">{t('common.actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredItems.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={item.images[0]}
-                      alt={item.title}
-                      className="h-12 w-12 rounded-lg object-cover"
-                    />
-                    <div>
-                      <p className="font-medium line-clamp-1">{item.title}</p>
-                      <p className="text-sm text-neutral-600 line-clamp-1">
-                        {item.description}
-                      </p>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={item.userAvatar} alt={item.userName} />
-                      <AvatarFallback>{item.userName[0]}</AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm">{item.userName}</span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="secondary">{item.category}</Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline">{item.condition}</Badge>
-                </TableCell>
-                <TableCell className="text-neutral-600">{item.location}</TableCell>
-                <TableCell className="text-neutral-600">{item.publishedAt}</TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreVertical className="h-5 w-5" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleAction("Consultation", item.title)}>
-                        <Eye className="mr-2 h-4 w-4" />
-                        Voir détails
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleAction("Signalement", item.title)}>
-                        <Flag className="mr-2 h-4 w-4" />
-                        Marquer comme signalé
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleAction("Suppression", item.title)}
-                        className="text-red-600"
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Supprimer
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+            {loading ? (
+              Array.from({ length: 6 }).map((_, i) => (
+                <TableRow key={i}>
+                  {Array.from({ length: 8 }).map((_, j) => (
+                    <TableCell key={j}>
+                      <div className="h-4 bg-neutral-100 rounded animate-pulse" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : filtered.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-12 text-neutral-400">
+                  {t('admin_dashboard.management.no_items')}
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              filtered.map((item) => (
+                <TableRow key={item.id_objet}>
+                  <TableCell>
+                    <div className="flex items-center gap-3 max-w-[240px]">
+                      {item.image ? (
+                        <img
+                          src={getStorageUrl(item.image) || ""}
+                          alt={item.titre}
+                          className="h-10 w-10 flex-shrink-0 rounded-lg object-cover"
+                        />
+                      ) : (
+                        <div className="h-10 w-10 flex-shrink-0 rounded-lg bg-neutral-100 flex items-center justify-center text-neutral-400 text-xs">N/A</div>
+                      )}
+                      <p className="font-medium line-clamp-1 text-sm">{item.titre}</p>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-7 w-7">
+                        <AvatarImage src={getStorageUrl(item.user?.photo_profil) || undefined} />
+                        <AvatarFallback>{item.user?.nom_complet?.[0] || "?"}</AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm">{item.user?.nom_complet || "—"}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">{item.categorie?.nom || "—"}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{item.etat}</Badge>
+                  </TableCell>
+                  <TableCell>{getDispobadge(item.disponibilite)}</TableCell>
+                  <TableCell className="text-neutral-600">{item.user?.ville || "—"}</TableCell>
+                  <TableCell className="text-neutral-600">
+                    {new Date(item.created_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <MoreVertical className="h-5 w-5" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem asChild>
+                          <Link to={`/user/item/${item.id_objet}`}>
+                            <Eye className="mr-2 h-4 w-4" />
+                            {t('items.view_annonce')}
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-red-600"
+                          onClick={() => setDeleteTarget(item)}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          {t('common.delete')}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
+
+      {/* Confirm Delete Dialog */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('items.confirm_delete_title')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('items.confirm_delete_desc', { title: deleteTarget?.titre })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+              {t('common.delete')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

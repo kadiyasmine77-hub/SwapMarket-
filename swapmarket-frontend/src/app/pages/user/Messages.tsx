@@ -15,8 +15,10 @@ import {
   DialogDescription,
 } from "../../components/ui/dialog";
 import { ArrowRightLeft } from "lucide-react";
+import { useLanguage } from "../../LanguageContext";
 
 export function Messages() {
+  const { t } = useLanguage();
   const [searchParams] = useSearchParams();
   const echangeIdFromUrl = searchParams.get("echange_id");
 
@@ -66,11 +68,10 @@ export function Messages() {
         headers: { "Authorization": `Bearer ${token}` }
       });
       const data = await response.json();
-      // On garde uniquement les échanges acceptés ou terminés (ou en attente si on veut)
       setConversations(data);
     } catch (error) {
       console.error("Error fetching conversations:", error);
-      toast.error("Impossible de charger les conversations.");
+      toast.error(t('auth.error_server'));
     } finally {
       setLoading(false);
     }
@@ -115,14 +116,14 @@ export function Messages() {
       } else {
         const errorData = await response.json();
         if (selectedChat.statut === 'refuse') {
-          toast.error("Messagerie désactivée — demande refusée");
+          toast.error(t('messages_page.input_disabled'));
         } else {
-          toast.error(errorData.message || "Erreur lors de l'envoi.");
+          toast.error(errorData.message || t('auth.error_server'));
         }
       }
     } catch (error) {
       console.error("Error sending message:", error);
-      toast.error("Erreur de connexion.");
+      toast.error(t('auth.error_server'));
     } finally {
       setIsSending(false);
     }
@@ -135,19 +136,19 @@ export function Messages() {
   return (
     <div className="space-y-6 h-[calc(100vh-120px)] flex flex-col">
       <div>
-        <h1 className="mb-2 text-3xl font-bold">Messagerie</h1>
-        <p className="text-neutral-600">Discutez avec les autres membres pour finaliser vos échanges</p>
+        <h1 className="mb-2 text-3xl font-bold">{t('messages_page.title')}</h1>
+        <p className="text-neutral-600">{t('messages_page.desc')}</p>
       </div>
 
       <div className="flex-1 flex overflow-hidden rounded-xl border bg-white shadow-sm relative">
         {/* Conversations List */}
         <div className={`w-full md:w-[320px] lg:w-[350px] shrink-0 border-r flex-col ${selectedChat ? 'hidden md:flex' : 'flex'}`}>
           <div className="border-b p-4 bg-neutral-50/50">
-            <Input placeholder="Rechercher une conversation..." className="bg-white" />
+            <Input placeholder={t('messages_page.search')} className="bg-white" />
           </div>
           <div className="overflow-y-auto flex-1">
             {loading ? (
-              <p className="p-8 text-center text-sm text-neutral-500 italic">Chargement...</p>
+              <p className="p-8 text-center text-sm text-neutral-500 italic">{t('common.loading')}</p>
             ) : conversations.length > 0 ? (
               conversations.map((conv) => {
                 const other = getOtherUser(conv);
@@ -166,7 +167,7 @@ export function Messages() {
                     </Avatar>
                     <div className="flex-1 overflow-hidden">
                       <div className="flex items-center justify-between">
-                        <p className="font-semibold text-sm truncate">{other?.nom_complet || "Utilisateur"}</p>
+                        <p className="font-semibold text-sm truncate">{other?.nom_complet || t('common.user')}</p>
                         <span className="text-[10px] text-neutral-400">
                           {new Date(conv.created_at).toLocaleDateString()}
                         </span>
@@ -181,7 +182,7 @@ export function Messages() {
             ) : (
               <div className="p-8 text-center">
                 <MessageSquare className="mx-auto h-8 w-8 text-neutral-300 mb-2" />
-                <p className="text-sm text-neutral-500">Aucune conversation.</p>
+                <p className="text-sm text-neutral-500">{t('messages_page.no_conv')}</p>
               </div>
             )}
           </div>
@@ -201,7 +202,7 @@ export function Messages() {
                 <AvatarFallback>{getOtherUser(selectedChat)?.nom_complet?.charAt(0) || "?"}</AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <p className="font-bold">{getOtherUser(selectedChat)?.nom_complet || "Utilisateur"}</p>
+                <p className="font-bold">{getOtherUser(selectedChat)?.nom_complet || t('common.user')}</p>
                 <div className="flex items-center gap-1.5">
                     <span className={`h-2 w-2 rounded-full ${
                       selectedChat.statut === 'refuse' ? 'bg-red-500' : 
@@ -210,16 +211,16 @@ export function Messages() {
                       'bg-green-500'
                     }`}></span>
                     <p className="text-xs font-medium text-neutral-500">
-                      {selectedChat.statut === 'refuse' ? 'Échange refusé' : 
-                       selectedChat.statut === 'en_attente' ? 'En attente' : 
-                       selectedChat.statut === 'termine' ? 'Échange terminé' :
-                       'Discussion en cours'}
+                      {selectedChat.statut === 'refuse' ? t('messages_page.status_refused') : 
+                       selectedChat.statut === 'en_attente' ? t('messages_page.status_pending') : 
+                       selectedChat.statut === 'termine' ? t('messages_page.status_completed') :
+                       t('messages_page.status_ongoing')}
                     </p>
                 </div>
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" className="hidden sm:flex" onClick={() => setShowDetailsDialog(true)}>
-                    Détails échange
+                    {t('messages_page.details')}
                 </Button>
               </div>
             </div>
@@ -228,9 +229,9 @@ export function Messages() {
             <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
               <DialogContent className="sm:max-w-[600px]">
                 <DialogHeader>
-                  <DialogTitle>Détails de l'échange</DialogTitle>
+                  <DialogTitle>{t('messages_page.details_title')}</DialogTitle>
                   <DialogDescription>
-                    Objets concernés par cette discussion
+                    {t('messages_page.details_desc')}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="flex flex-col gap-6 py-6">
@@ -246,7 +247,7 @@ export function Messages() {
                     <div className="flex-1 min-w-0">
                       <p className="font-bold text-base truncate">{selectedChat.objet1?.titre}</p>
                       <Badge variant="secondary" className="mt-1 text-[10px]">
-                        {selectedChat.id_demandeur === currentUser?.id_user ? "Votre objet" : "Son objet"}
+                        {selectedChat.id_demandeur === currentUser?.id_user ? t('messages_page.your_item') : t('messages_page.their_item')}
                       </Badge>
                     </div>
                   </div>
@@ -269,18 +270,18 @@ export function Messages() {
                     <div className="flex-1 min-w-0">
                       <p className="font-bold text-base truncate">{selectedChat.objet2?.titre}</p>
                       <Badge variant="secondary" className="mt-1 text-[10px]">
-                        {selectedChat.id_destinataire === currentUser?.id_user ? "Votre objet" : "Son objet"}
+                        {selectedChat.id_destinataire === currentUser?.id_user ? t('messages_page.your_item') : t('messages_page.their_item')}
                       </Badge>
                     </div>
                   </div>
                 </div>
                 <div className="bg-neutral-50 p-4 rounded-lg text-sm space-y-2">
                    <div className="flex justify-between">
-                     <span className="text-neutral-500">Statut:</span>
+                     <span className="text-neutral-500">{t('admin.status')}:</span>
                      <span className="font-medium capitalize">{selectedChat.statut.replace('_', ' ')}</span>
                    </div>
                    <div className="flex justify-between">
-                     <span className="text-neutral-500">Date de demande:</span>
+                     <span className="text-neutral-500">{t('messages_page.request_date')}:</span>
                      <span className="font-medium">{new Date(selectedChat.created_at).toLocaleDateString()}</span>
                    </div>
                 </div>
@@ -291,7 +292,7 @@ export function Messages() {
             <div className="flex-1 space-y-4 overflow-y-auto p-4 flex flex-col">
               {loadingMessages ? (
                 <div className="flex-1 flex items-center justify-center">
-                    <p className="text-sm text-neutral-400">Chargement des messages...</p>
+                    <p className="text-sm text-neutral-400">{t('messages_page.loading_msg')}</p>
                 </div>
               ) : messages.length > 0 ? (
                 messages.map((msg) => {
@@ -325,7 +326,7 @@ export function Messages() {
                     <div className="bg-neutral-100 p-4 rounded-full mb-3">
                         <MessageSquare className="h-8 w-8 text-neutral-400" />
                     </div>
-                    <p className="text-neutral-500 text-sm">Soyez le premier à envoyer un message !</p>
+                    <p className="text-neutral-500 text-sm">{t('messages_page.first_msg')}</p>
                 </div>
               )}
               <div ref={messagesEndRef} />
@@ -338,7 +339,7 @@ export function Messages() {
                     <Paperclip className="h-5 w-5" />
                 </Button>
                 <Input
-                  placeholder={selectedChat.statut === 'refuse' ? "Messagerie désactivée (demande refusée)" : "Écrivez votre message..."}
+                  placeholder={selectedChat.statut === 'refuse' ? t('messages_page.input_disabled') : t('messages_page.input_placeholder')}
                   className="bg-neutral-50 border-none focus-visible:ring-1 focus-visible:ring-neutral-200"
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
@@ -361,9 +362,9 @@ export function Messages() {
               <div className="bg-white p-6 rounded-full shadow-sm mb-4">
                   <MessageSquare className="h-12 w-12 text-neutral-200" />
               </div>
-              <h3 className="mb-2 text-xl font-bold">Vos messages</h3>
+              <h3 className="mb-2 text-xl font-bold">{t('messages_page.select_conv_title')}</h3>
               <p className="text-neutral-500 max-w-xs mx-auto">
-                Sélectionnez une conversation dans la liste pour commencer à discuter de vos échanges.
+                {t('messages_page.select_conv_desc')}
               </p>
             </div>
           )}

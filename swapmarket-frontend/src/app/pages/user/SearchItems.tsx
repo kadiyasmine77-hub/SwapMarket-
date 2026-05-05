@@ -9,8 +9,10 @@ import { Badge } from "../../components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { ImageSlider } from "../../components/ImageSlider";
 import { API_BASE_URL, getStorageUrl } from "../../config";
+import { useLanguage } from "../../LanguageContext";
 
 export function SearchItems() {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -77,7 +79,7 @@ export function SearchItems() {
       }
     } catch (error) {
       console.error("Error toggling favorite:", error);
-      toast.error("Une erreur est survenue.");
+      toast.error("Error");
     }
   };
 
@@ -85,9 +87,9 @@ export function SearchItems() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="mb-2 text-3xl font-bold">Rechercher des objets</h1>
+        <h1 className="mb-2 text-3xl font-bold">{t('search.title')}</h1>
         <p className="text-neutral-600">
-          Découvrez {items.length} objets disponibles à l'échange
+          {t('search.subtitle', { count: items.length })}
         </p>
       </div>
 
@@ -97,7 +99,7 @@ export function SearchItems() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
             <Input
-              placeholder="Rechercher un objet..."
+              placeholder={t('admin.search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -109,20 +111,20 @@ export function SearchItems() {
             className="gap-2"
           >
             <SlidersHorizontal className="h-5 w-5" />
-            <span className="hidden sm:inline">Filtres</span>
+            <span className="hidden sm:inline">{t('search.filters')}</span>
           </Button>
         </div>
 
         {showFilters && (
           <div className="grid gap-4 border-t pt-4 sm:grid-cols-3">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Catégorie</label>
+              <label className="text-sm font-medium">{t('search.category')}</label>
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Toutes les catégories</SelectItem>
+                  <SelectItem value="all">{t('search.all_categories')}</SelectItem>
                   {categories.map((cat) => (
                     <SelectItem key={cat.id_categorie} value={cat.id_categorie.toString()}>
                       {cat.nom}
@@ -133,32 +135,32 @@ export function SearchItems() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">État</label>
+              <label className="text-sm font-medium">{t('search.condition')}</label>
               <Select value={selectedStatus} onValueChange={setSelectedStatus}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Tous les états</SelectItem>
-                  <SelectItem value="neuf">Neuf</SelectItem>
-                  <SelectItem value="bon">Bon état</SelectItem>
-                  <SelectItem value="moyen">État moyen</SelectItem>
-                  <SelectItem value="mauvais">Mauvais état</SelectItem>
+                  <SelectItem value="all">{t('search.all_conditions')}</SelectItem>
+                  <SelectItem value="neuf">{t('common.new')}</SelectItem>
+                  <SelectItem value="bon">{t('common.good')}</SelectItem>
+                  <SelectItem value="moyen">{t('common.fair')}</SelectItem>
+                  <SelectItem value="mauvais">{t('common.fair')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Disponibilité</label>
+              <label className="text-sm font-medium">{t('search.availability')}</label>
               <Select value={selectedAvailability} onValueChange={setSelectedAvailability}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Toutes</SelectItem>
-                  <SelectItem value="disponible">Disponible</SelectItem>
-                  <SelectItem value="echange">En échange</SelectItem>
-                  <SelectItem value="reserve">Réservé</SelectItem>
+                  <SelectItem value="all">{t('search.all_availabilities')}</SelectItem>
+                  <SelectItem value="disponible">{t('common.available')}</SelectItem>
+                  <SelectItem value="echange">{t('common.exchanged')}</SelectItem>
+                  <SelectItem value="reserve">{t('common.reserved')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -173,7 +175,7 @@ export function SearchItems() {
           size="sm"
           onClick={() => setSelectedCategory("all")}
         >
-          Tous
+          {t('search.all_availabilities')}
         </Button>
         {categories.slice(0, 6).map((cat) => (
           <Button
@@ -190,12 +192,14 @@ export function SearchItems() {
       {/* Results */}
       <div>
         <p className="mb-4 text-sm text-neutral-600">
-          {filteredItems.length} résultat{filteredItems.length > 1 ? "s" : ""} trouvé{filteredItems.length > 1 ? "s" : ""}
+          {filteredItems.length > 1 
+            ? t('search.results_found_plural', { count: filteredItems.length })
+            : t('search.results_found', { count: filteredItems.length })}
         </p>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {loading ? (
-            <p className="col-span-full text-center py-12 text-neutral-500">Chargement des objets...</p>
+            <p className="col-span-full text-center py-12 text-neutral-500">{t('common.loading')}</p>
           ) : filteredItems.length > 0 ? (
             filteredItems.map((item) => (
               <div key={item.id_objet} className="group overflow-hidden rounded-xl border bg-white transition-shadow hover:shadow-lg">
@@ -223,9 +227,9 @@ export function SearchItems() {
                         'bg-green-500 hover:bg-green-600'
                       } text-white text-[10px] uppercase font-bold`}
                     >
-                      {item.disponibilite === 'echange' ? 'En échange' : 
-                       item.disponibilite === 'reserve' ? 'Réservé' : 
-                       item.disponibilite === 'disponible' ? 'Disponible' : item.disponibilite}
+                      {item.disponibilite === 'echange' ? t('common.exchanged') : 
+                       item.disponibilite === 'reserve' ? t('common.reserved') : 
+                       item.disponibilite === 'disponible' ? t('common.available') : item.disponibilite}
                     </Badge>
                   </div>
                 </div>
@@ -237,7 +241,7 @@ export function SearchItems() {
                   <p className="mb-3 text-sm text-neutral-600 line-clamp-2">{item.description}</p>
 
                   <div className="mb-3 flex items-center gap-2">
-                    <Badge variant="secondary">{item.categorie?.nom || "Catégorie"}</Badge>
+                    <Badge variant="secondary">{item.categorie?.nom || t('search.category')}</Badge>
                     <Badge variant="outline">{item.etat}</Badge>
                   </div>
 
@@ -247,15 +251,15 @@ export function SearchItems() {
                         <AvatarImage src={getStorageUrl(item.user?.photo_profil) || undefined} alt={item.user?.nom_complet} />
                         <AvatarFallback>{item.user?.nom_complet?.[0] || "?"}</AvatarFallback>
                       </Avatar>
-                      <span className="text-sm text-neutral-600">{item.user?.nom_complet || "Utilisateur"}</span>
+                      <span className="text-sm text-neutral-600">{item.user?.nom_complet || t('common.user')}</span>
                     </div>
-                    <span className="text-xs text-neutral-500">{item.user?.ville || "Ville"}</span>
+                    <span className="text-xs text-neutral-500">{item.user?.ville || t('profile.city')}</span>
                   </div>
                 </div>
               </div>
             ))
           ) : (
-            <p className="col-span-full text-center py-12 text-neutral-500">Aucun objet trouvé pour cette recherche.</p>
+            <p className="col-span-full text-center py-12 text-neutral-500">{t('search.no_results')}</p>
           )}
         </div>
       </div>

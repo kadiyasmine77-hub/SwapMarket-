@@ -5,18 +5,22 @@ import {
   Package,
   Tag,
   Flag,
-  Shield,
   FileText,
   Settings,
   LogOut,
+  ArrowLeft,
 } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "../components/ui/avatar";
 import { Button } from "../components/ui/button";
 import { mockCurrentUser } from "../lib/mockData";
 import logoImage from "../components/logo.png";
+import { useLanguage } from "../LanguageContext";
+import { LanguageSwitcher } from "../components/LanguageSwitcher";
+import { Footer } from "../components/Footer";
 
 export function AdminLayout() {
   const location = useLocation();
+  const { t } = useLanguage();
 
   const isActive = (path: string) => {
     if (path === "/admin") {
@@ -26,14 +30,13 @@ export function AdminLayout() {
   };
 
   const navItems = [
-    { path: "/admin", icon: LayoutDashboard, label: "Dashboard" },
-    { path: "/admin/users", icon: Users, label: "Utilisateurs" },
-    { path: "/admin/items", icon: Package, label: "Annonces" },
-    { path: "/admin/categories", icon: Tag, label: "Catégories" },
-    { path: "/admin/moderation", icon: Flag, label: "Modération" },
-    { path: "/admin/roles", icon: Shield, label: "Rôles" },
-    { path: "/admin/logs", icon: FileText, label: "Logs" },
-    { path: "/admin/settings", icon: Settings, label: "Paramètres" },
+    { path: "/admin", icon: LayoutDashboard, label: t('admin_nav.dashboard') },
+    { path: "/admin/users", icon: Users, label: t('admin_nav.users') },
+    { path: "/admin/items", icon: Package, label: t('admin_nav.items') },
+    { path: "/admin/categories", icon: Tag, label: t('admin_nav.categories') },
+    { path: "/admin/reports", icon: Flag, label: t('admin_nav.reports') },
+    { path: "/admin/logs", icon: FileText, label: t('admin_nav.logs') },
+    { path: "/admin/settings", icon: Settings, label: t('admin_nav.settings') },
   ];
 
   return (
@@ -41,8 +44,13 @@ export function AdminLayout() {
       {/* Sidebar */}
       <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r bg-white">
         <div className="flex h-full flex-col">
-          {/* Logo */}
-          <div className="flex h-16 items-center border-b px-6">
+          {/* Logo & Return Arrow */}
+          <div className="flex h-16 items-center gap-3 border-b px-6">
+            <Link to="/user" title={t('admin_nav.back')}>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-neutral-500 hover:text-neutral-900">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            </Link>
             <img src={logoImage} alt="SwapMarket" className="h-9 w-auto" />
           </div>
 
@@ -70,6 +78,11 @@ export function AdminLayout() {
             </div>
           </nav>
 
+          {/* Language Switcher */}
+          <div className="px-6 py-3 border-t">
+            <LanguageSwitcher />
+          </div>
+
           {/* User Profile */}
           <div className="border-t p-4">
             <div className="flex items-center gap-3">
@@ -79,11 +92,11 @@ export function AdminLayout() {
               </Avatar>
               <div className="flex-1 overflow-hidden">
                 <div className="truncate text-sm font-medium">{mockCurrentUser.name}</div>
-                <div className="truncate text-xs text-neutral-500">Administrateur</div>
+                <div className="truncate text-xs text-neutral-500">{t('admin.role_admin')}</div>
               </div>
               <Link to="/">
                 <Button variant="ghost" size="icon">
-                  <LogOut className="h-5 w-5" />
+                  <LogOut className="h-5 w-5" title={t('nav.logout')} />
                 </Button>
               </Link>
             </div>
@@ -96,6 +109,7 @@ export function AdminLayout() {
         <div className="mx-auto max-w-7xl p-8">
           <Outlet />
         </div>
+        <Footer />
       </main>
     </div>
   );

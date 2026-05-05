@@ -8,14 +8,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/ta
 import { Card } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Star, Package, TrendingUp, Settings, Camera, Eye, EyeOff } from "lucide-react";
-import { Link, useParams } from "react-router";
+import { Link, useParams, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { ImageSlider } from "../../components/ImageSlider";
 import { API_BASE_URL, getStorageUrl } from "../../config";
+import { useLanguage } from "../../LanguageContext";
 
 export function UserProfile() {
+  const { t } = useLanguage();
   const userStr = localStorage.getItem('user');
   const currentUser = userStr ? JSON.parse(userStr) : null;
+  const navigate = useNavigate();
 
   const { id } = useParams();
   const profileId = id ? Number(id) : (currentUser?.id_user || currentUser?.id);
@@ -143,21 +146,21 @@ export function UserProfile() {
       if (response.ok) {
         const updatedUser = await response.json();
         localStorage.setItem('user', JSON.stringify(updatedUser.user || updatedUser));
-        toast.success("Profil mis à jour avec succès !");
+        toast.success(t('profile.success_update'));
         setIsEditing(false);
         // Refresh page or state to show new data
         window.location.reload();
       } else {
-        toast.error("Erreur lors de la mise à jour du profil.");
+        toast.error(t('profile.error_update'));
       }
     } catch (error) {
       console.error("Error updating profile:", error);
-      toast.error("Erreur de connexion.");
+      toast.error(t('auth.error_server'));
     }
   };
 
   const handleDeleteItem = async (itemId: number) => {
-    if (!confirm("Voulez-vous vraiment supprimer cet objet ?")) return;
+    if (!confirm(t('publish_edit.confirm_delete'))) return;
 
     try {
       const token = localStorage.getItem('token');
@@ -171,13 +174,13 @@ export function UserProfile() {
 
       if (response.ok) {
         setMyItems(myItems.filter(item => item.id_objet !== itemId));
-        toast.success("Objet supprimé avec succès !");
+        toast.success(t('publish_edit.success_delete'));
       } else {
-        toast.error("Erreur lors de la suppression.");
+        toast.error(t('publish_edit.error_delete'));
       }
     } catch (error) {
       console.error("Error deleting item:", error);
-      toast.error("Erreur de connexion.");
+      toast.error(t('auth.error_server'));
     }
   };
 
@@ -186,15 +189,15 @@ export function UserProfile() {
   const handlePasswordUpdate = async () => {
     setPasswordErrors({});
     if (!currentPassword) {
-      setPasswordErrors({ current_password: "Le mot de passe actuel est requis." });
+      setPasswordErrors({ current_password: t('profile.error_current_password_required') });
       return;
     }
     if (newPassword.length < 8) {
-      setPasswordErrors({ new_password: "Le nouveau mot de passe doit faire au moins 8 caractères." });
+      setPasswordErrors({ new_password: t('profile.error_password_min') });
       return;
     }
     if (newPassword !== confirmPassword) {
-      setPasswordErrors({ new_password_confirmation: "Les mots de passe ne correspondent pas." });
+      setPasswordErrors({ new_password_confirmation: t('profile.error_passwords_match') });
       return;
     }
 
@@ -217,7 +220,7 @@ export function UserProfile() {
       const data = await response.json();
 
       if (response.ok) {
-        toast.success("Mot de passe mis à jour avec succès !");
+        toast.success(t('profile.success_password_update'));
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
@@ -232,13 +235,13 @@ export function UserProfile() {
           setPasswordErrors(formattedErrors);
         } else {
           // Custom error (like wrong current password)
-          setPasswordErrors({ form: data.message || "Erreur lors de la mise à jour." });
+          setPasswordErrors({ form: data.message || t('profile.error_update_password') });
         }
-        toast.error("Veuillez corriger les erreurs.");
+        toast.error(t('publish_edit.error_validation'));
       }
     } catch (error) {
       console.error("Error updating password:", error);
-      toast.error("Erreur de connexion au serveur.");
+      toast.error(t('auth.error_server'));
     } finally {
       setIsUpdatingPassword(false);
     }
@@ -284,21 +287,21 @@ export function UserProfile() {
             {isEditing ? (
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label>Nom</Label>
+                  <Label>{t('profile.name')}</Label>
                   <Input
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Téléphone</Label>
+                  <Label>{t('profile.phone')}</Label>
                   <Input
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Date de naissance</Label>
+                  <Label>{t('profile.birth_date')}</Label>
                   <Input
                     type="date"
                     value={formData.birthDate}
@@ -306,16 +309,16 @@ export function UserProfile() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Ville</Label>
+                  <Label>{t('profile.city')}</Label>
                   <Input
                     value={formData.city}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                   />
                 </div>
                 <div className="flex gap-2">
-                  <Button onClick={handleSave}>Enregistrer</Button>
+                  <Button onClick={handleSave}>{t('common.save')}</Button>
                   <Button variant="outline" onClick={() => setIsEditing(false)}>
-                    Annuler
+                    {t('common.cancel')}
                   </Button>
                 </div>
               </div>
@@ -323,19 +326,19 @@ export function UserProfile() {
               <>
                 <div className="mb-2 flex items-start justify-between">
                   <div>
-                    <h1 className="mb-1 text-2xl font-bold">{displayUser?.nom_complet || "Utilisateur"}</h1>
+                    <h1 className="mb-1 text-2xl font-bold">{displayUser?.nom_complet || t('common.user')}</h1>
                     <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-neutral-600">
                       <div className="flex items-center gap-1">
-                        <span className="font-medium">📞 Tél:</span> {displayUser?.telephone || "Non renseigné"}
+                        <span className="font-medium">📞 {t('profile.phone')}:</span> {displayUser?.telephone || "—"}
                       </div>
                       <div className="flex items-center gap-1">
-                        <span className="font-medium">📅 Né(e) le:</span> {displayUser?.date_naissance || "Non renseignée"}
+                        <span className="font-medium">📅 {t('profile.birth_date')}:</span> {displayUser?.date_naissance || "—"}
                       </div>
                     </div>
                   </div>
                   {isOwnProfile && (
                     <Button onClick={() => setIsEditing(true)} variant="outline" size="sm" className="border-olive text-olive hover:bg-olive/5">
-                      Modifier
+                      {t('common.edit')}
                     </Button>
                   )}
                 </div>
@@ -343,17 +346,17 @@ export function UserProfile() {
                   <div className="flex items-center gap-2">
                     <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                     <span className="font-medium">{displayUser?.avg_rating || "0.0"}</span>
-                    <span className="text-sm text-neutral-600">Score de confiance</span>
+                    <span className="text-sm text-neutral-600">{t('profile.trust_score')}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <TrendingUp className="h-5 w-5 text-olive" />
                     <span className="font-medium">{displayUser?.echanges_count || "0"}</span>
-                    <span className="text-sm text-neutral-600">Échanges réussis</span>
+                    <span className="text-sm text-neutral-600">{t('profile.successful_swaps')}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Package className="h-5 w-5 text-olive" />
                     <span className="font-medium">{myItems.length}</span>
-                    <span className="text-sm text-neutral-600">Objets publiés</span>
+                    <span className="text-sm text-neutral-600">{t('profile.published_items')}</span>
                   </div>
                 </div>
               </>
@@ -365,21 +368,21 @@ export function UserProfile() {
       {/* Tabs */}
       <Tabs defaultValue="items" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="items">Mes objets</TabsTrigger>
-          <TabsTrigger value="reviews">Avis reçus</TabsTrigger>
-          <TabsTrigger value="settings">Paramètres</TabsTrigger>
+          <TabsTrigger value="items">{t('profile.my_objects')}</TabsTrigger>
+          <TabsTrigger value="reviews">{t('profile.received_reviews')}</TabsTrigger>
+          <TabsTrigger value="settings">{t('profile.settings')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="items" className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold">Mes objets ({myItems.length})</h2>
+            <h2 className="text-xl font-bold">{t('profile.my_objects')} ({myItems.length})</h2>
             <Link to="/user/publish">
-              <Button>Publier un objet</Button>
+              <Button>{t('common.publish')}</Button>
             </Link>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {loadingItems ? (
-              <p className="col-span-full text-center py-8 text-neutral-500">Chargement de vos objets...</p>
+              <p className="col-span-full text-center py-8 text-neutral-500">{t('common.loading')}</p>
             ) : myItems.length > 0 ? (
               myItems.map((item) => (
                 <div key={item.id_objet} className="group overflow-hidden rounded-xl border bg-white transition-all hover:shadow-md">
@@ -402,15 +405,15 @@ export function UserProfile() {
                           'bg-green-500 hover:bg-green-600'
                         } text-white text-[10px] uppercase font-bold`}
                       >
-                        {item.disponibilite === 'echange' ? 'En échange' : 
-                         item.disponibilite === 'reserve' ? 'Réservé' : 
-                         item.disponibilite === 'disponible' ? 'Disponible' : item.disponibilite}
+                        {item.disponibilite === 'echange' ? t('common.exchanged') : 
+                         item.disponibilite === 'reserve' ? t('common.reserved') : 
+                         item.disponibilite === 'disponible' ? t('common.available') : item.disponibilite}
                       </Badge>
                     </div>
                     <p className="mb-3 text-sm text-neutral-600 line-clamp-2">{item.description}</p>
                     <div className="flex flex-wrap gap-1 mb-4">
                       <Badge variant="outline" className="text-[10px]">
-                        {item.categorie?.nom || 'Sans catégorie'}
+                        {item.categorie?.nom || '—'}
                       </Badge>
                       <Badge variant="secondary" className="text-[10px]">
                         {item.etat}
@@ -419,21 +422,21 @@ export function UserProfile() {
                     <div className="flex gap-2">
                       {isOwnProfile ? (
                         <>
-                          <Link 
-                            to={`/user/item/edit/${item.id_objet}`}
-                            className="flex-1"
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => navigate(`/user/item/edit/${item.id_objet}`)}
+                            className="flex-1 text-xs border-olive text-olive hover:bg-olive/5"
                           >
-                            <Button variant="outline" size="sm" className="w-full text-xs border-olive text-olive hover:bg-olive/5">
-                              Modifier
-                            </Button>
-                          </Link>
+                            {t('common.edit')}
+                          </Button>
                           <Button 
                             variant="outline" 
                             size="sm" 
                             onClick={() => handleDeleteItem(item.id_objet)}
                             className="flex-1 text-xs text-destructive hover:bg-destructive/5 hover:text-destructive border-destructive/20"
                           >
-                            Supprimer
+                            {t('common.delete')}
                           </Button>
                         </>
                       ) : (
@@ -442,7 +445,7 @@ export function UserProfile() {
                           className="flex-1"
                         >
                           <Button variant="outline" size="sm" className="w-full text-xs border-olive text-olive hover:bg-olive/5">
-                            Voir l'objet
+                            {t('common.view_all')}
                           </Button>
                         </Link>
                       )}
@@ -452,9 +455,9 @@ export function UserProfile() {
               ))
             ) : (
               <div className="col-span-full text-center py-12 bg-neutral-50 rounded-xl border-2 border-dashed">
-                <p className="text-neutral-500 mb-4">Vous n'avez pas encore publié d'objets.</p>
+                <p className="text-neutral-500 mb-4">{t('dashboard.no_recommended')}</p>
                 <Link to="/user/publish">
-                  <Button variant="outline" className="border-olive text-olive">Publier mon premier objet</Button>
+                  <Button variant="outline" className="border-olive text-olive">{t('common.publish')}</Button>
                 </Link>
               </div>
             )}
@@ -462,10 +465,10 @@ export function UserProfile() {
         </TabsContent>
 
         <TabsContent value="reviews" className="space-y-4">
-          <h2 className="text-xl font-bold">Avis reçus ({reviews.length})</h2>
+          <h2 className="text-xl font-bold">{t('profile.received_reviews')} ({reviews.length})</h2>
           <div className="space-y-4">
             {loadingReviews ? (
-              <p className="text-center py-8 text-neutral-500">Chargement des avis...</p>
+              <p className="text-center py-8 text-neutral-500">{t('common.loading')}</p>
             ) : reviews.length > 0 ? (
               reviews.map((review, idx) => (
                 <div key={review.id_avis || idx} className="rounded-lg border bg-white p-4">
@@ -488,28 +491,26 @@ export function UserProfile() {
                       </div>
                     </div>
                     <span className="text-xs text-neutral-500">
-                      {new Date(review.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      {new Date(review.created_at).toLocaleDateString()}
                     </span>
                   </div>
                   <p className="text-neutral-700">{review.commentaire}</p>
                   {review.objet && (
-                    <p className="mt-2 text-xs text-olive italic">Objet concerné : {review.objet.titre}</p>
+                    <p className="mt-2 text-xs text-olive italic">Objet: {review.objet.titre}</p>
                   )}
                 </div>
               ))
             ) : (
               <div className="text-center py-12 bg-neutral-50 rounded-xl border-2 border-dashed">
-                <p className="text-neutral-500">Aucun avis reçu pour le moment.</p>
+                <p className="text-neutral-500">{t('profile.received_reviews')} (0)</p>
               </div>
             )}
           </div>
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-6">
-
-
           <div className="rounded-lg border bg-white p-6">
-            <h2 className="mb-4 text-xl font-bold">Changer le mot de passe</h2>
+            <h2 className="mb-4 text-xl font-bold">{t('profile.change_password')}</h2>
             
             {passwordErrors.form && (
               <div className="mb-4 rounded-md bg-destructive/15 p-3 text-sm text-destructive">
@@ -519,7 +520,7 @@ export function UserProfile() {
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>Mot de passe actuel</Label>
+                <Label>{t('profile.current_password')}</Label>
                 <div className="relative">
                   <Input 
                     type={showCurrentPassword ? "text" : "password"} 
@@ -539,7 +540,7 @@ export function UserProfile() {
               </div>
 
               <div className="space-y-2">
-                <Label>Nouveau mot de passe</Label>
+                <Label>{t('profile.new_password')}</Label>
                 <div className="relative">
                   <Input 
                     type={showNewPassword ? "text" : "password"} 
@@ -559,7 +560,7 @@ export function UserProfile() {
               </div>
 
               <div className="space-y-2">
-                <Label>Confirmer le mot de passe</Label>
+                <Label>{t('profile.confirm_password')}</Label>
                 <div className="relative">
                   <Input 
                     type={showConfirmPassword ? "text" : "password"} 
@@ -579,7 +580,7 @@ export function UserProfile() {
               </div>
 
               <Button onClick={handlePasswordUpdate} disabled={isUpdatingPassword}>
-                {isUpdatingPassword ? "Mise à jour..." : "Mettre à jour le mot de passe"}
+                {isUpdatingPassword ? t('common.loading') : t('profile.update_password')}
               </Button>
             </div>
           </div>

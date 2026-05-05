@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "../../components/ui/input";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
@@ -12,56 +12,37 @@ import {
   TableRow,
 } from "../../components/ui/table";
 import { Search, FileText, Download } from "lucide-react";
-import { mockActivityLogs } from "../../lib/mockData";
 import { toast } from "sonner";
-
-const allLogs = [
-  ...mockActivityLogs,
-  {
-    id: "4",
-    admin: "Admin System",
-    action: "Modifié catégorie",
-    target: "Électronique",
-    timestamp: "2026-04-11 14:20",
-    details: "Mise à jour du nom et de l'icône",
-  },
-  {
-    id: "5",
-    admin: "Modérateur Jean",
-    action: "Approuvé annonce",
-    target: "Annonce #3456",
-    timestamp: "2026-04-11 12:05",
-    details: "Après vérification du contenu",
-  },
-  {
-    id: "6",
-    admin: "Admin System",
-    action: "Réactivé utilisateur",
-    target: "Marc Dupont",
-    timestamp: "2026-04-10 18:30",
-    details: "Suspension levée après appel",
-  },
-  {
-    id: "7",
-    admin: "Modérateur Sophie",
-    action: "Résolu signalement",
-    target: "Signalement #234",
-    timestamp: "2026-04-10 16:15",
-    details: "Contenu conforme aux règles",
-  },
-  {
-    id: "8",
-    admin: "Admin System",
-    action: "Modifié paramètres",
-    target: "Paramètres généraux",
-    timestamp: "2026-04-10 09:45",
-    details: "Mise à jour des règles de modération",
-  },
-];
+import { API_BASE_URL } from "../../config";
+import { useLanguage } from "../../LanguageContext";
 
 export function ActivityLogs() {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [actionFilter, setActionFilter] = useState("all");
+  const [allLogs, setAllLogs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLogs = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${API_BASE_URL}/admin/logs`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setAllLogs(data);
+        }
+      } catch (error) {
+        console.error("Erreur fetch logs:", error);
+        toast.error(t('logs.error_fetch'));
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLogs();
+  }, []);
 
   const filteredLogs = allLogs.filter((log) => {
     const matchesSearch =
@@ -86,33 +67,91 @@ export function ActivityLogs() {
   };
 
   const handleExport = () => {
-    toast.success("Export des logs en cours...");
+    if (filteredLogs.length === 0) {
+      toast.error(t('logs.error_no_data_export'));
+      return;
+    }
+
+    const headers = [t('admin_dashboard.table.user'), t('admin_dashboard.table.type'), t('admin_dashboard.table.target'), t('admin_dashboard.table.date'), t('reports.details')];
+    const csvContent = [
+      headers.join(","),
+      ...filteredLogs.map(log => [
+        `"${log.admin}"`,
+        `"${log.action}"`,
+        `"${log.target}"`,
+        `"${log.timestamp}"`,
+        `"${log.details || ''}"`
+      ].join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `logs-swapmarket-${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success(t('logs.success_export'));
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="mb-2 text-3xl font-bold">Logs d'activité</h1>
+          <h1 className="mb-2 text-3xl font-bold">{t('admin_nav.logs')}</h1>
           <p className="text-neutral-600">
-            Historique des actions administratives ({filteredLogs.length} entrées)
+            {t('logs.history_desc', { count: filteredLogs.length })}
           </p>
         </div>
         <Button onClick={handleExport} className="gap-2">
           <Download className="h-5 w-5" />
-          Exporter
+          {t('admin.export')}
         </Button>
       </div>
 
       {/* Stats */}
       <div className="grid gap-6 sm:grid-cols-4">
         {[
-          { label: "Total actions", value: allLogs.length, color: "bg-blue-50 text-blue-600" },
-          { label: "Aujourd'hui", value: "5", color: "bg-green-50 text-green-600" },
-          { label: "Cette semaine", value: "24", color: "bg-purple-50 text-purple-600" },
-          { label: "Ce mois", value: "142", color: "bg-orange-50 text-orange-600" },
+          { 
+            label: t('logs.stat_total'), 
+            value: allLogs.length, 
+            color: "bg-blue-50 text-blue-600" 
+          },
+          { 
+            label: t('logs.stat_today'), 
+            value: allLogs.filter(l => {
+              const d = new Date(l.timestamp);
+              const today = new Date();
+              return d.getDate() === today.getDate() && 
+                     d.getMonth() === today.getMonth() && 
+                     d.getFullYear() === today.getFullYear();
+            }).length, 
+            color: "bg-green-50 text-green-600" 
+          },
+          { 
+            label: t('logs.stat_week'), 
+            value: allLogs.filter(l => {
+              const d = new Date(l.timestamp);
+              const weekAgo = new Date();
+              weekAgo.setDate(weekAgo.getDate() - 7);
+              return d >= weekAgo;
+            }).length, 
+            color: "bg-purple-50 text-purple-600" 
+          },
+          { 
+            label: t('logs.stat_month'), 
+            value: allLogs.filter(l => {
+              const d = new Date(l.timestamp);
+              const monthAgo = new Date();
+              monthAgo.setMonth(monthAgo.getMonth() - 1);
+              return d >= monthAgo;
+            }).length, 
+            color: "bg-orange-50 text-orange-600" 
+          },
         ].map((stat, idx) => (
-          <div key={idx} className="rounded-xl border bg-white p-6">
+          <div key={idx} className="rounded-xl border bg-white p-6 shadow-sm">
             <p className="mb-1 text-sm text-neutral-600">{stat.label}</p>
             <p className={`text-3xl font-bold ${stat.color.split(" ")[1]}`}>{stat.value}</p>
           </div>
@@ -124,7 +163,7 @@ export function ActivityLogs() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
           <Input
-            placeholder="Rechercher dans les logs..."
+            placeholder={t('logs.search_placeholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -135,11 +174,11 @@ export function ActivityLogs() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Toutes les actions</SelectItem>
-            <SelectItem value="créé">Créations</SelectItem>
-            <SelectItem value="modifié">Modifications</SelectItem>
-            <SelectItem value="supprimé">Suppressions</SelectItem>
-            <SelectItem value="suspendu">Suspensions</SelectItem>
+            <SelectItem value="all">{t('logs.filter_all')}</SelectItem>
+            <SelectItem value="créé">{t('logs.filter_create')}</SelectItem>
+            <SelectItem value="modifié">{t('logs.filter_update')}</SelectItem>
+            <SelectItem value="supprimé">{t('logs.filter_delete')}</SelectItem>
+            <SelectItem value="suspendu">{t('logs.filter_suspend')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -149,37 +188,47 @@ export function ActivityLogs() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Administrateur</TableHead>
-              <TableHead>Action</TableHead>
-              <TableHead>Cible</TableHead>
-              <TableHead>Date & Heure</TableHead>
-              <TableHead>Détails</TableHead>
+              <TableHead>{t('admin.user')}</TableHead>
+              <TableHead>{t('admin_dashboard.table.type')}</TableHead>
+              <TableHead>{t('admin_dashboard.table.target')}</TableHead>
+              <TableHead>{t('admin_dashboard.table.date_time')}</TableHead>
+              <TableHead>{t('reports.details')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredLogs.map((log) => (
-              <TableRow key={log.id}>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <div className="h-8 w-8 rounded-full bg-neutral-100 flex items-center justify-center">
-                      <FileText className="h-4 w-4 text-neutral-600" />
-                    </div>
-                    <span className="font-medium">{log.admin}</span>
-                  </div>
-                </TableCell>
-                <TableCell>{getActionBadge(log.action)}</TableCell>
-                <TableCell className="font-medium">{log.target}</TableCell>
-                <TableCell className="text-neutral-600">{log.timestamp}</TableCell>
-                <TableCell className="text-sm text-neutral-600">{log.details}</TableCell>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={5} className="h-24 text-center">{t('common.loading')}</TableCell>
               </TableRow>
-            ))}
+            ) : filteredLogs.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="h-24 text-center">{t('logs.no_logs')}</TableCell>
+              </TableRow>
+            ) : (
+              filteredLogs.map((log) => (
+                <TableRow key={log.id}>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <div className="h-8 w-8 rounded-full bg-neutral-100 flex items-center justify-center">
+                        <FileText className="h-4 w-4 text-neutral-600" />
+                      </div>
+                      <span className="font-medium">{log.admin}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>{getActionBadge(log.action)}</TableCell>
+                  <TableCell className="font-medium">{log.target}</TableCell>
+                  <TableCell className="text-neutral-600">{log.timestamp}</TableCell>
+                  <TableCell className="text-sm text-neutral-600">{log.details}</TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
 
       {/* Timeline View */}
       <div className="rounded-xl border bg-white p-6">
-        <h2 className="mb-4 text-xl font-bold">Vue chronologique</h2>
+        <h2 className="mb-4 text-xl font-bold">{t('logs.timeline_view')}</h2>
         <div className="space-y-4">
           {filteredLogs.slice(0, 5).map((log, idx) => (
             <div key={log.id} className="flex gap-4">

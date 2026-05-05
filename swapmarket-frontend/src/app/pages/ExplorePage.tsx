@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import { Filter, SlidersHorizontal, X } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
-import { Footer } from '../components/Footer';
 import { SearchBar } from '../components/SearchBar';
 import { ItemCard } from '../components/ItemCard';
 import { Button } from '../components/Button';
 import { Badge } from '../components/Badge';
+import { useLanguage } from '../LanguageContext';
 
 interface ExplorePageProps {
   onNavigate: (page: string) => void;
 }
 
 export function ExplorePage({ onNavigate }: ExplorePageProps) {
+  const { t } = useLanguage();
   const [showFilters, setShowFilters] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
@@ -31,7 +32,7 @@ export function ExplorePage({ onNavigate }: ExplorePageProps) {
     },
     {
       id: '2',
-      title: 'Mid-Century Olive Green Lounge Chair',
+      title: 'Mid-Century Modern Lounge Chair',
       category: 'Furniture',
       condition: 'Good' as const,
       location: 'Austin, TX',
@@ -143,9 +144,9 @@ export function ExplorePage({ onNavigate }: ExplorePageProps) {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-semibold mb-2" style={{ fontFamily: 'var(--font-heading)' }}>
-            Explore Items
+            {t('explore.title')}
           </h1>
-          <p className="text-muted-foreground">Discover unique items from trusted community members</p>
+          <p className="text-muted-foreground">{t('explore.subtitle')}</p>
         </div>
 
         {/* Search and Filter Bar */}
@@ -157,7 +158,7 @@ export function ExplorePage({ onNavigate }: ExplorePageProps) {
             className="shrink-0"
           >
             <SlidersHorizontal className="w-4 h-4" />
-            <span className="hidden sm:inline">Filters</span>
+            <span className="hidden sm:inline">{t('search.filters')}</span>
             {(selectedCategories.length > 0 || selectedConditions.length > 0) && (
               <Badge variant="olive" size="sm">
                 {selectedCategories.length + selectedConditions.length}
@@ -182,7 +183,7 @@ export function ExplorePage({ onNavigate }: ExplorePageProps) {
               </Badge>
             ))}
             <button onClick={clearFilters} className="text-sm text-olive hover:underline">
-              Clear all
+              {t('explore.clear_all')}
             </button>
           </div>
         )}
@@ -194,16 +195,16 @@ export function ExplorePage({ onNavigate }: ExplorePageProps) {
               <div className="flex items-center justify-between mb-6">
                 <h2 className="font-semibold flex items-center gap-2">
                   <Filter className="w-4 h-4" />
-                  Filters
+                  {t('search.filters')}
                 </h2>
                 <button onClick={clearFilters} className="text-sm text-olive hover:underline">
-                  Clear
+                  {t('explore.clear')}
                 </button>
               </div>
 
               {/* Categories */}
               <div className="mb-6">
-                <h3 className="font-semibold mb-3 text-sm">Category</h3>
+                <h3 className="font-semibold mb-3 text-sm">{t('search.category')}</h3>
                 <div className="space-y-2">
                   {categories.map((category) => (
                     <label key={category} className="flex items-center gap-2 cursor-pointer group">
@@ -221,7 +222,7 @@ export function ExplorePage({ onNavigate }: ExplorePageProps) {
 
               {/* Condition */}
               <div className="mb-6">
-                <h3 className="font-semibold mb-3 text-sm">Condition</h3>
+                <h3 className="font-semibold mb-3 text-sm">{t('search.condition')}</h3>
                 <div className="space-y-2">
                   {conditions.map((condition) => (
                     <label key={condition} className="flex items-center gap-2 cursor-pointer group">
@@ -239,13 +240,13 @@ export function ExplorePage({ onNavigate }: ExplorePageProps) {
 
               {/* Location Range */}
               <div>
-                <h3 className="font-semibold mb-3 text-sm">Distance</h3>
+                <h3 className="font-semibold mb-3 text-sm">{t('explore.distance')}</h3>
                 <select className="w-full px-3 py-2 bg-input-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-sm">
-                  <option>Within 10 miles</option>
-                  <option>Within 25 miles</option>
-                  <option>Within 50 miles</option>
-                  <option>Within 100 miles</option>
-                  <option>Anywhere</option>
+                  <option>{t('explore.within_10')}</option>
+                  <option>{t('explore.within_25')}</option>
+                  <option>{t('explore.within_50')}</option>
+                  <option>{t('explore.within_100')}</option>
+                  <option>{t('explore.anywhere')}</option>
                 </select>
               </div>
             </div>
@@ -255,12 +256,12 @@ export function ExplorePage({ onNavigate }: ExplorePageProps) {
           <div>
             <div className="flex items-center justify-between mb-6">
               <p className="text-sm text-muted-foreground">
-                {items.length} items available
+                {t('explore.items_available', { count: items.length })}
               </p>
               <select className="px-3 py-2 bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-sm">
-                <option>Most Recent</option>
-                <option>Distance: Near to Far</option>
-                <option>Trust Score: High to Low</option>
+                <option>{t('explore.sort_recent')}</option>
+                <option>{t('explore.sort_distance')}</option>
+                <option>{t('explore.sort_trust')}</option>
               </select>
             </div>
 
@@ -275,20 +276,18 @@ export function ExplorePage({ onNavigate }: ExplorePageProps) {
             {/* Pagination */}
             <div className="flex items-center justify-center gap-2 mt-12">
               <Button variant="secondary" size="sm" disabled>
-                Previous
+                {t('explore.previous')}
               </Button>
               <Button variant="olive" size="sm">1</Button>
               <Button variant="ghost" size="sm">2</Button>
               <Button variant="ghost" size="sm">3</Button>
               <Button variant="secondary" size="sm">
-                Next
+                {t('explore.next')}
               </Button>
             </div>
           </div>
         </div>
-      </div>
-
-      <Footer />
+      </main>
     </div>
   );
 }

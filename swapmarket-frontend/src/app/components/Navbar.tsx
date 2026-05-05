@@ -4,6 +4,8 @@ import { Button } from './Button';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { getStorageUrl } from '../config';
+import { useLanguage } from '../LanguageContext';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 interface NavbarProps {
   variant?: 'public' | 'authenticated';
@@ -12,6 +14,7 @@ interface NavbarProps {
 
 export function Navbar({ variant = 'public', currentPage }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { t } = useLanguage();
   const userStr = localStorage.getItem('user');
   const currentUser = userStr ? JSON.parse(userStr) : null;
 
@@ -34,7 +37,7 @@ export function Navbar({ variant = 'public', currentPage }: NavbarProps) {
                     currentPage === 'explore' ? 'text-olive' : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  Explorer
+                  {t('nav.explore')}
                 </Link>
                 <Link
                   to="/user/history"
@@ -42,7 +45,7 @@ export function Navbar({ variant = 'public', currentPage }: NavbarProps) {
                     currentPage === 'swaps' ? 'text-olive' : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  Mes Trocs
+                  {t('nav.my_swaps')}
                 </Link>
                 <Link
                   to="/user"
@@ -50,14 +53,26 @@ export function Navbar({ variant = 'public', currentPage }: NavbarProps) {
                     currentPage === 'items' ? 'text-olive' : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  Mes Objets
+                  {t('nav.my_items')}
                 </Link>
+                {currentUser?.role === 'admin' && (
+                  <Link
+                    to="/admin"
+                    className="text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors border border-red-100"
+                  >
+                    {t('nav.admin_panel')}
+                  </Link>
+                )}
               </div>
             )}
           </div>
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-3">
+            <div className="hidden sm:block mr-2">
+              <LanguageSwitcher />
+            </div>
+
             {variant === 'authenticated' && currentUser && (
               <>
                 <button className="p-2 rounded-lg hover:bg-secondary transition-colors hidden sm:block">
@@ -79,7 +94,7 @@ export function Navbar({ variant = 'public', currentPage }: NavbarProps) {
                       currentUser?.nom_complet?.charAt(0).toUpperCase() || 'U'
                     )}
                   </div>
-                  <span className="hidden lg:block text-sm font-medium text-foreground">{currentUser?.nom_complet || 'Utilisateur'}</span>
+                  <span className="hidden lg:block text-sm font-medium text-foreground">{currentUser?.nom_complet || t('common.user')}</span>
                 </Link>
               </>
             )}
@@ -100,18 +115,26 @@ export function Navbar({ variant = 'public', currentPage }: NavbarProps) {
         {variant === 'authenticated' && mobileMenuOpen && currentUser && (
           <div className="md:hidden py-4 border-t border-border">
             <div className="flex flex-col gap-3">
+              <div className="px-3 mb-2">
+                <LanguageSwitcher />
+              </div>
               <Link to="/user/search" className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-secondary">
-                Explorer
+                {t('nav.explore')}
               </Link>
               <Link to="/user/history" className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-secondary">
-                Mes Trocs
+                {t('nav.my_swaps')}
               </Link>
               <Link to="/user" className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-secondary">
-                Mes Objets
+                {t('nav.my_items')}
               </Link>
               <Link to="/user/profile" className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-secondary text-olive">
-                Mon Profil
+                {t('nav.profile')}
               </Link>
+              {currentUser?.role === 'admin' && (
+                <Link to="/admin" className="px-3 py-2 text-sm font-bold rounded-lg bg-red-50 text-red-600 border border-red-100">
+                  {t('nav.admin_panel')}
+                </Link>
+              )}
             </div>
           </div>
         )}

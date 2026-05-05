@@ -7,8 +7,10 @@ import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { toast } from "sonner";
 import { API_BASE_URL } from "../../config";
+import { useLanguage } from "../../LanguageContext";
 
 export function LoginPage() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,17 +36,17 @@ export function LoginPage() {
         localStorage.setItem('user', JSON.stringify(data.user));
         
         if (data.user.role === 'admin') {
-          toast.success("Connexion réussie en tant qu'admin");
+          toast.success(t('auth.success_admin'));
           navigate("/admin");
         } else {
-          toast.success("Connexion réussie");
+          toast.success(t('auth.success_user'));
           navigate("/user");
         }
       } else {
-        toast.error(data.message || "Erreur de connexion");
+        toast.error(data.message || t('auth.error_login'));
       }
     } catch (error) {
-      toast.error("Erreur de connexion au serveur");
+      toast.error(t('auth.error_server'));
       console.error(error);
     }
   };
@@ -60,15 +62,15 @@ export function LoginPage() {
 
           <div className="text-white">
             <h1 className="mb-4 text-4xl font-bold">
-              Échangez vos objets<br />en toute confiance
+              {t('auth.hero_title')}
             </h1>
             <p className="text-lg text-blue-100">
-              Rejoignez une communauté de passionnés d'échange et donnez une seconde vie à vos objets.
+              {t('auth.hero_subtitle')}
             </p>
           </div>
 
           <div className="text-sm text-blue-100">
-            © 2026 SwapMarket. Tous droits réservés.
+            © 2026 SwapMarket. {t('common.all_rights_reserved')}
           </div>
         </div>
       </div>
@@ -80,19 +82,19 @@ export function LoginPage() {
             <img src={logoImage} alt="SwapMarket" className="h-12 w-auto" />
           </div>
           <div className="mb-8">
-            <h2 className="mb-2 text-3xl font-bold">Connexion</h2>
+            <h2 className="mb-2 text-3xl font-bold">{t('auth.login_title')}</h2>
             <p className="text-neutral-600">
-              Bienvenue ! Connectez-vous à votre compte
+              {t('auth.login_subtitle')}
             </p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('auth.email')}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="vous@exemple.com"
+                placeholder={t('auth.placeholder_email')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -101,16 +103,16 @@ export function LoginPage() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Mot de passe</Label>
-                <Link to="/forgot-password" title="Réinitialiser mon mot de passe" className="text-sm text-blue-600 hover:underline">
-                  Mot de passe oublié ?
+                <Label htmlFor="password">{t('auth.password')}</Label>
+                <Link to="/forgot-password" title={t('auth.forgot_password')} className="text-sm text-blue-600 hover:underline">
+                  {t('auth.forgot_password')}
                 </Link>
               </div>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
+                  placeholder={t('auth.placeholder_password')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -126,17 +128,15 @@ export function LoginPage() {
             </div>
 
             <Button type="submit" className="w-full" size="lg">
-              Se connecter
+              {t('auth.login_button')}
             </Button>
 
             <div className="text-center text-sm text-neutral-600">
-              Pas encore de compte ?{" "}
+              {t('auth.no_account')}{" "}
               <Link to="/signup" className="font-medium text-blue-600 hover:underline">
-                Créer un compte
+                {t('auth.create_account')}
               </Link>
             </div>
-
-
           </form>
         </div>
       </div>

@@ -8,8 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { API_BASE_URL, getStorageUrl } from "../../config";
+import { useLanguage } from "../../LanguageContext";
 
 export function EditItem() {
+  const { t } = useLanguage();
   const { id } = useParams();
   const navigate = useNavigate();
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -42,7 +44,7 @@ export function EditItem() {
         setFormData({
           title: data.titre,
           description: data.description,
-          category: data.id_categorie.toString(),
+          category: data.id_categorie?.toString() || "",
           condition: data.etat,
           location: data.user?.ville || "",
         });
@@ -62,10 +64,10 @@ export function EditItem() {
       })
       .catch(err => {
         console.error("Error fetching item:", err);
-        toast.error("Impossible de charger les données de l'objet.");
+        toast.error(t('items.not_found'));
         setLoading(false);
       });
-  }, [id]);
+  }, [id, t]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -128,7 +130,7 @@ export function EditItem() {
       const result = await response.json();
 
       if (response.ok) {
-        toast.success("Objet mis à jour avec succès !");
+        toast.success(t('publish_edit.success_edit'));
         navigate("/user/profile");
       } else if (response.status === 422) {
         // Validation errors from Backend (lang folder)
@@ -146,13 +148,13 @@ export function EditItem() {
           });
         }
         setErrors(backendErrors);
-        toast.error("Veuillez corriger les erreurs.");
+        toast.error(t('publish_edit.error_validation'));
       } else {
-        toast.error(result.message || "Erreur lors de la mise à jour.");
+        toast.error(result.message || t('auth.error_server'));
       }
     } catch (error) {
       console.error("Error updating item:", error);
-      toast.error("Erreur de connexion.");
+      toast.error(t('auth.error_server'));
     } finally {
       setIsSubmitting(false);
     }
@@ -177,24 +179,24 @@ export function EditItem() {
     );
   };
 
-  if (loading) return <div className="text-center py-20">Chargement...</div>;
+  if (loading) return <div className="text-center py-20">{t('common.loading')}</div>;
 
   return (
     <div className="mx-auto max-w-3xl">
       <div className="mb-8">
-        <h1 className="mb-2 text-3xl font-bold">Modifier l'objet</h1>
-        <p className="text-neutral-600">Modifiez les informations de votre annonce</p>
+        <h1 className="mb-2 text-3xl font-bold">{t('publish_edit.edit_title')}</h1>
+        <p className="text-neutral-600">{t('publish_edit.edit_desc')}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6 rounded-xl border bg-white p-6">
         <div className="space-y-2">
-          <Label>Photos de l'objet</Label>
+          <Label>{t('publish_edit.photos')}</Label>
           <div className="grid gap-4 sm:grid-cols-3">
             {existingImages.map((img, idx) => (
               <div key={`existing-${idx}`} className="relative aspect-square overflow-hidden rounded-lg border">
-                <img src={img.url} alt={`Photo ${idx + 1}`} className="h-full w-full object-cover" />
+                <img src={img.url} alt={`${t('publish_edit.photo_alt')} ${idx + 1}`} className="h-full w-full object-cover" />
                 <span className="absolute left-2 top-2 rounded bg-black/50 px-1.5 py-0.5 text-[10px] text-white">
-                  {img.isMain ? 'Principale' : 'Galerie'}
+                  {img.isMain ? t('publish_edit.main_photo') : t('publish_edit.gallery_photo')}
                 </span>
                 <button
                   type="button"
@@ -207,8 +209,8 @@ export function EditItem() {
             ))}
             {newPreviews.map((img, idx) => (
               <div key={`new-${idx}`} className="relative aspect-square overflow-hidden rounded-lg border border-green-300">
-                <img src={img} alt={`Nouvelle ${idx + 1}`} className="h-full w-full object-cover" />
-                <span className="absolute left-2 top-2 rounded bg-green-600/80 px-1.5 py-0.5 text-[10px] text-white">Nouvelle</span>
+                <img src={img} alt={`${t('publish_edit.new_photo_alt')} ${idx + 1}`} className="h-full w-full object-cover" />
+                <span className="absolute left-2 top-2 rounded bg-green-600/80 px-1.5 py-0.5 text-[10px] text-white">{t('publish_edit.new_photo')}</span>
                 <button
                   type="button"
                   onClick={() => removeNewImage(idx)}
@@ -221,7 +223,7 @@ export function EditItem() {
             {allPreviews.length < 5 && (
               <label className="flex aspect-square cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors hover:border-olive hover:bg-olive/5">
                 <Upload className="mb-2 h-8 w-8 text-neutral-400" />
-                <span className="text-sm text-neutral-600">Ajouter une photo</span>
+                <span className="text-sm text-neutral-600">{t('publish_edit.add_photo')}</span>
                 <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
               </label>
             )}
@@ -230,7 +232,7 @@ export function EditItem() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="title">Titre de l'annonce *</Label>
+          <Label htmlFor="title">{t('publish_edit.title_label')}</Label>
           <Input
             id="title"
             value={formData.title}
@@ -241,7 +243,7 @@ export function EditItem() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="description">Description *</Label>
+          <Label htmlFor="description">{t('publish_edit.desc_label')}</Label>
           <Textarea
             id="description"
             rows={5}
@@ -254,7 +256,7 @@ export function EditItem() {
 
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="category">Catégorie *</Label>
+            <Label htmlFor="category">{t('publish_edit.category_label')}</Label>
             <Select value={formData.category} onValueChange={(value) => handleChange("category", value)}>
               <SelectTrigger className={errors.category ? "border-amber-500 ring-amber-500/20" : ""}>
                 <SelectValue />
@@ -271,16 +273,16 @@ export function EditItem() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="condition">État *</Label>
+            <Label htmlFor="condition">{t('publish_edit.condition_label')}</Label>
             <Select value={formData.condition} onValueChange={(value) => handleChange("condition", value)}>
               <SelectTrigger className={errors.condition ? "border-amber-500 ring-amber-500/20" : ""}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="neuf">Neuf</SelectItem>
-                <SelectItem value="bon">Bon état</SelectItem>
-                <SelectItem value="moyen">État moyen</SelectItem>
-                <SelectItem value="mauvais">Mauvais état</SelectItem>
+                <SelectItem value="neuf">{t('common.new')}</SelectItem>
+                <SelectItem value="bon">{t('common.good')}</SelectItem>
+                <SelectItem value="moyen">{t('common.fair')}</SelectItem>
+                <SelectItem value="mauvais">{t('common.fair')}</SelectItem>
               </SelectContent>
             </Select>
             <ErrorMessage message={errors.condition} />
@@ -289,10 +291,10 @@ export function EditItem() {
 
         <div className="flex gap-4">
           <Button type="submit" className="flex-1" size="lg" disabled={isSubmitting}>
-            {isSubmitting ? "Mise à jour..." : "Enregistrer les modifications"}
+            {isSubmitting ? t('publish_edit.updating') : t('publish_edit.submit_edit')}
           </Button>
           <Button type="button" variant="outline" onClick={() => navigate("/user/profile")} size="lg">
-            Annuler
+            {t('common.cancel')}
           </Button>
         </div>
       </form>

@@ -12,6 +12,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Models\ActivityLog;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
@@ -84,6 +86,13 @@ class AdminController extends Controller
 
         $user->update(['statut_compte' => $request->statut]);
 
+        ActivityLog::create([
+            'admin_id' => Auth::id(),
+            'action' => ucfirst($request->statut) . ' utilisateur',
+            'target' => $user->nom_complet,
+            'details' => "L'utilisateur a été passé en statut {$request->statut}"
+        ]);
+
         return response()->json([
             'message' => 'Statut mis a jour',
             'user' => $user,
@@ -105,6 +114,13 @@ class AdminController extends Controller
         }
 
         $user->update(['role' => $request->role]);
+
+        ActivityLog::create([
+            'admin_id' => Auth::id(),
+            'action' => 'Modifié rôle',
+            'target' => $user->nom_complet,
+            'details' => "Rôle changé en {$request->role}"
+        ]);
 
         return response()->json([
             'message' => 'Role mis a jour',
@@ -144,6 +160,13 @@ class AdminController extends Controller
 
         $objet->delete();
 
+        ActivityLog::create([
+            'admin_id' => Auth::id(),
+            'action' => 'Supprimé annonce',
+            'target' => "Annonce #{$id}",
+            'details' => "L'annonce '{$objet->titre}' a été supprimée"
+        ]);
+
         return response()->json(['message' => 'Objet supprime']);
     }
 
@@ -178,6 +201,13 @@ class AdminController extends Controller
                 ->update(['disponibilite' => 'disponible']);
         }
 
+        ActivityLog::create([
+            'admin_id' => Auth::id(),
+            'action' => ucfirst($request->statut) . ' échange',
+            'target' => "Échange #{$id}",
+            'details' => "L'échange a été mis en statut {$request->statut}"
+        ]);
+
         return response()->json([
             'message' => 'Statut de l echange mis a jour',
             'echange' => $echange->load(['objet1', 'objet2', 'demandeur', 'destinataire']),
@@ -193,7 +223,15 @@ class AdminController extends Controller
 
     public function destroyAvis($id)
     {
-        Avis::findOrFail($id)->delete();
+        $avis = Avis::findOrFail($id);
+        $avis->delete();
+
+        ActivityLog::create([
+            'admin_id' => Auth::id(),
+            'action' => 'Supprimé avis',
+            'target' => "Avis #{$id}",
+            'details' => "Avis supprimé"
+        ]);
 
         return response()->json(['message' => 'Avis supprime']);
     }

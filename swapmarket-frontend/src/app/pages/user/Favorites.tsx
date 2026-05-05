@@ -7,8 +7,10 @@ import { useState, useEffect } from "react";
 import { API_BASE_URL, getStorageUrl } from "../../config";
 import { toast } from "sonner";
 import { ImageSlider } from "../../components/ImageSlider";
+import { useLanguage } from "../../LanguageContext";
 
 export function Favorites() {
+  const { t } = useLanguage();
   const [favoriteItems, setFavoriteItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -26,7 +28,7 @@ export function Favorites() {
       setFavoriteItems(data);
     } catch (error) {
       console.error("Error fetching favorites:", error);
-      toast.error("Erreur lors du chargement des favoris.");
+      toast.error(t('auth.error_server'));
     } finally {
       setLoading(false);
     }
@@ -49,11 +51,11 @@ export function Favorites() {
 
       if (response.ok) {
         setFavoriteItems(prev => prev.filter(f => f.id_objet !== objetId));
-        toast.success("Retiré des favoris.");
+        toast.success(t('favorites_page.success_remove'));
       }
     } catch (error) {
       console.error("Error toggling favorite:", error);
-      toast.error("Une erreur est survenue.");
+      toast.error(t('auth.error_server'));
     }
   };
 
@@ -61,7 +63,7 @@ export function Favorites() {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <Loader2 className="h-8 w-8 animate-spin text-olive" />
-        <p className="mt-4 text-neutral-500">Chargement de vos favoris...</p>
+        <p className="mt-4 text-neutral-500">{t('favorites_page.loading')}</p>
       </div>
     );
   }
@@ -69,21 +71,23 @@ export function Favorites() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="mb-2 text-3xl font-bold">Mes favoris</h1>
+        <h1 className="mb-2 text-3xl font-bold">{t('favorites_page.title')}</h1>
         <p className="text-neutral-600">
-          Vous avez {favoriteItems.length} objet{favoriteItems.length > 1 ? "s" : ""} en favoris
+          {favoriteItems.length === 1 
+            ? t('favorites_page.count', { count: favoriteItems.length })
+            : t('favorites_page.count_plural', { count: favoriteItems.length })}
         </p>
       </div>
 
       {favoriteItems.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border bg-white py-16">
           <Heart className="mb-4 h-16 w-16 text-neutral-300" />
-          <h2 className="mb-2 text-xl font-bold">Aucun favori</h2>
+          <h2 className="mb-2 text-xl font-bold">{t('favorites_page.empty_title')}</h2>
           <p className="mb-6 text-neutral-600">
-            Ajoutez des objets à vos favoris pour les retrouver facilement
+            {t('favorites_page.empty_desc')}
           </p>
           <Link to="/user/search">
-            <Button className="bg-olive text-black hover:bg-olive/90">Découvrir des objets</Button>
+            <Button className="bg-olive text-black hover:bg-olive/90">{t('favorites_page.cta')}</Button>
           </Link>
         </div>
       ) : (
@@ -128,7 +132,7 @@ export function Favorites() {
                       {item.categorie?.nom || "Autre"}
                     </Badge>
                     <Badge variant="outline" className="text-neutral-500 capitalize">
-                      {item.etat}
+                      {t(`common.${item.etat}`) || item.etat}
                     </Badge>
                   </div>
 

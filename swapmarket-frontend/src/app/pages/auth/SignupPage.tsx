@@ -7,8 +7,10 @@ import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { toast } from "sonner";
 import { API_BASE_URL } from "../../config";
+import { useLanguage } from "../../LanguageContext";
 
 export function SignupPage() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
@@ -32,12 +34,12 @@ export function SignupPage() {
       /[@$!%*#?&_\-\+\=\(\)\[\]\{\}\.\,\;]/.test(formData.password);
 
     if (!isValidPassword) {
-      toast.error("Le mot de passe doit contenir au moins 8 caractères, dont une lettre majuscule, un chiffre et un caractère spécial.");
+      toast.error(t('auth.error_password_invalid'));
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      toast.error("Les mots de passe ne correspondent pas");
+      toast.error(t('auth.error_password_match'));
       return;
     }
 
@@ -66,15 +68,14 @@ export function SignupPage() {
       if (response.ok) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
-        toast.success("Compte créé avec succès !");
+        toast.success(t('auth.success_signup'));
         navigate("/user");
       } else {
-        // Handle validation errors if any
-        const errorMessage = data.message || "Erreur lors de l'inscription";
+        const errorMessage = data.message || t('auth.error_server');
         toast.error(errorMessage);
       }
     } catch (error) {
-      toast.error("Erreur de connexion au serveur");
+      toast.error(t('auth.error_server'));
       console.error(error);
     }
   };
@@ -94,15 +95,15 @@ export function SignupPage() {
 
           <div className="text-white">
             <h1 className="mb-4 text-4xl font-bold">
-              Commencez à troquer<br />dès aujourd'hui
+              {t('auth.hero_signup_title')}
             </h1>
             <p className="text-lg text-white/80">
-              Créez votre compte gratuitement et découvrez des milliers d'objets à échanger près de chez vous.
+              {t('auth.hero_signup_subtitle')}
             </p>
           </div>
 
           <div className="text-sm text-white/80">
-            © 2026 SwapMarket. Tous droits réservés.
+            © 2026 SwapMarket. {t('common.all_rights_reserved')}
           </div>
         </div>
       </div>
@@ -114,20 +115,20 @@ export function SignupPage() {
             <img src={logoImage} alt="SwapMarket" className="h-12 w-auto" />
           </div>
           <div className="mb-8">
-            <h2 className="mb-2 text-3xl font-bold">Créer un compte</h2>
+            <h2 className="mb-2 text-3xl font-bold">{t('auth.signup_title')}</h2>
             <p className="text-neutral-600">
-              Rejoignez notre communauté d'échangeurs
+              {t('auth.signup_subtitle')}
             </p>
           </div>
 
           <form onSubmit={handleSignup} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="name">Nom complet</Label>
+              <Label htmlFor="name">{t('auth.full_name')}</Label>
               <Input
                 id="name"
                 name="name"
                 type="text"
-                placeholder="yassmine lakaiydi"
+                placeholder={t('auth.placeholder_name')}
                 value={formData.name}
                 onChange={handleChange}
                 required
@@ -135,12 +136,12 @@ export function SignupPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('auth.email')}</Label>
               <Input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="vous@exemple.com"
+                placeholder={t('auth.placeholder_email')}
                 value={formData.email}
                 onChange={handleChange}
                 required
@@ -148,12 +149,12 @@ export function SignupPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="city">Ville</Label>
+              <Label htmlFor="city">{t('auth.city')}</Label>
               <Input
                 id="city"
                 name="city"
                 type="text"
-                placeholder="casablanca"
+                placeholder={t('auth.placeholder_city')}
                 value={formData.city}
                 onChange={handleChange}
                 required
@@ -162,18 +163,18 @@ export function SignupPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="phone">Téléphone</Label>
+                <Label htmlFor="phone">{t('auth.phone')}</Label>
                 <Input
                   id="phone"
                   name="phone"
                   type="tel"
-                  placeholder="0612345678"
+                  placeholder={t('auth.placeholder_phone')}
                   value={formData.phone}
                   onChange={handleChange}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="birthDate">Date de naissance</Label>
+                <Label htmlFor="birthDate">{t('auth.birth_date')}</Label>
                 <Input
                   id="birthDate"
                   name="birthDate"
@@ -185,13 +186,13 @@ export function SignupPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Mot de passe</Label>
+              <Label htmlFor="password">{t('auth.password')}</Label>
               <div className="relative">
                 <Input
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
+                  placeholder={t('auth.placeholder_password')}
                   value={formData.password}
                   onChange={handleChange}
                   required
@@ -207,13 +208,13 @@ export function SignupPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+              <Label htmlFor="confirmPassword">{t('auth.confirm_password')}</Label>
               <div className="relative">
                 <Input
                   id="confirmPassword"
                   name="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
-                  placeholder="••••••••"
+                  placeholder={t('auth.placeholder_password')}
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   required
@@ -229,13 +230,13 @@ export function SignupPage() {
             </div>
 
             <Button type="submit" className="w-full" size="lg">
-              Créer mon compte
+              {t('auth.signup_button')}
             </Button>
 
             <div className="text-center text-sm text-neutral-600">
-              Vous avez déjà un compte ?{" "}
+              {t('auth.has_account')}{" "}
               <Link to="/login" className="font-medium text-primary hover:underline">
-                Se connecter
+                {t('auth.login_button')}
               </Link>
             </div>
           </form>

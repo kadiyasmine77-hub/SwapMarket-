@@ -8,8 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { API_BASE_URL } from "../../config";
+import { useLanguage } from "../../LanguageContext";
 
 export function PublishItem() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
@@ -34,7 +36,7 @@ export function PublishItem() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (selectedFiles.length + files.length > 5) {
-      toast.error("Maximum 5 photos autorisées");
+      toast.error(t('publish_edit.max_photos'));
       return;
     }
     
@@ -82,7 +84,7 @@ export function PublishItem() {
       const result = await response.json();
 
       if (response.ok) {
-        toast.success("Votre objet a été publié avec succès !");
+        toast.success(t('publish_edit.success_publish'));
         navigate("/user/profile");
       } else if (response.status === 422) {
         // Validation errors from Backend (lang folder)
@@ -100,13 +102,13 @@ export function PublishItem() {
           });
         }
         setErrors(backendErrors);
-        toast.error("Veuillez corriger les erreurs dans le formulaire.");
+        toast.error(t('publish_edit.error_validation'));
       } else {
-        toast.error(result.message || "Une erreur est survenue lors de la publication.");
+        toast.error(result.message || t('auth.error_server'));
       }
     } catch (error) {
       console.error("Error publishing item:", error);
-      toast.error("Erreur de connexion au serveur.");
+      toast.error(t('auth.error_server'));
     } finally {
       setIsSubmitting(false);
     }
@@ -136,20 +138,20 @@ export function PublishItem() {
   return (
     <div className="mx-auto max-w-3xl">
       <div className="mb-8">
-        <h1 className="mb-2 text-3xl font-bold">Publier un objet</h1>
+        <h1 className="mb-2 text-3xl font-bold">{t('publish_edit.publish_title')}</h1>
         <p className="text-neutral-600">
-          Remplissez les informations ci-dessous pour proposer votre objet à l'échange
+          {t('publish_edit.publish_desc')}
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6 rounded-xl border bg-white p-6">
         {/* Images */}
         <div className="space-y-2">
-          <Label>Photos de l'objet</Label>
+          <Label>{t('publish_edit.photos')}</Label>
           <div className="grid gap-4 sm:grid-cols-3">
             {previews.map((img, idx) => (
               <div key={idx} className="relative aspect-square overflow-hidden rounded-lg border">
-                <img src={img} alt={`Upload ${idx + 1}`} className="h-full w-full object-cover" />
+                <img src={img} alt={`${t('publish_edit.upload_alt')} ${idx + 1}`} className="h-full w-full object-cover" />
                 <button
                   type="button"
                   onClick={() => removeImage(idx)}
@@ -162,7 +164,7 @@ export function PublishItem() {
             {previews.length < 5 && (
               <label className="flex aspect-square cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors hover:border-olive hover:bg-olive/5">
                 <Upload className="mb-2 h-8 w-8 text-neutral-400" />
-                <span className="text-sm text-neutral-600">Ajouter une photo</span>
+                <span className="text-sm text-neutral-600">{t('publish_edit.add_photo')}</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -173,16 +175,16 @@ export function PublishItem() {
               </label>
             )}
           </div>
-          <p className="text-xs text-neutral-500">Maximum 5 photos. Première photo = photo principale</p>
+          <p className="text-xs text-neutral-500">{t('publish_edit.max_photos')}</p>
           <ErrorMessage message={errors.images} />
         </div>
 
         {/* Title */}
         <div className="space-y-2">
-          <Label htmlFor="title">Titre de l'annonce *</Label>
+          <Label htmlFor="title">{t('publish_edit.title_label')}</Label>
           <Input
             id="title"
-            placeholder="Ex: Appareil photo Canon EOS 2000D"
+            placeholder={t('publish_edit.title_placeholder')}
             value={formData.title}
             onChange={(e) => handleChange("title", e.target.value)}
             className={errors.title ? "border-amber-500 ring-amber-500/20" : ""}
@@ -192,10 +194,10 @@ export function PublishItem() {
 
         {/* Description */}
         <div className="space-y-2">
-          <Label htmlFor="description">Description *</Label>
+          <Label htmlFor="description">{t('publish_edit.desc_label')}</Label>
           <Textarea
             id="description"
-            placeholder="Décrivez votre objet en détail : état, accessoires inclus, raison de l'échange..."
+            placeholder={t('publish_edit.desc_placeholder')}
             rows={5}
             value={formData.description}
             onChange={(e) => handleChange("description", e.target.value)}
@@ -207,10 +209,10 @@ export function PublishItem() {
         {/* Category & Condition */}
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="category">Catégorie *</Label>
+            <Label htmlFor="category">{t('publish_edit.category_label')}</Label>
             <Select onValueChange={(value) => handleChange("category", value)}>
               <SelectTrigger className={errors.category ? "border-amber-500 ring-amber-500/20" : ""}>
-                <SelectValue placeholder="Choisir une catégorie" />
+                <SelectValue placeholder={t('publish_edit.category_placeholder')} />
               </SelectTrigger>
               <SelectContent>
                 {categories.map((cat) => (
@@ -224,16 +226,16 @@ export function PublishItem() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="condition">État *</Label>
+            <Label htmlFor="condition">{t('publish_edit.condition_label')}</Label>
             <Select onValueChange={(value) => handleChange("condition", value)}>
               <SelectTrigger className={errors.condition ? "border-amber-500 ring-amber-500/20" : ""}>
-                <SelectValue placeholder="Choisir un état" />
+                <SelectValue placeholder={t('publish_edit.condition_placeholder')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="neuf">Neuf</SelectItem>
-                <SelectItem value="bon">Bon état</SelectItem>
-                <SelectItem value="moyen">État moyen</SelectItem>
-                <SelectItem value="mauvais">Mauvais état</SelectItem>
+                <SelectItem value="neuf">{t('common.new')}</SelectItem>
+                <SelectItem value="bon">{t('common.good')}</SelectItem>
+                <SelectItem value="moyen">{t('common.fair')}</SelectItem>
+                <SelectItem value="mauvais">{t('common.fair')}</SelectItem>
               </SelectContent>
             </Select>
             <ErrorMessage message={errors.condition} />
@@ -242,10 +244,10 @@ export function PublishItem() {
 
         {/* Location */}
         <div className="space-y-2">
-          <Label htmlFor="location">Localisation *</Label>
+          <Label htmlFor="location">{t('publish_edit.location_label')}</Label>
           <Input
             id="location"
-            placeholder="Ville ou code postal"
+            placeholder={t('publish_edit.location_placeholder')}
             value={formData.location}
             onChange={(e) => handleChange("location", e.target.value)}
             className={errors.location ? "border-amber-500 ring-amber-500/20" : ""}
@@ -256,7 +258,7 @@ export function PublishItem() {
         {/* Actions */}
         <div className="flex gap-4">
           <Button type="submit" className="flex-1" size="lg" disabled={isSubmitting}>
-            {isSubmitting ? "Publication en cours..." : "Publier l'annonce"}
+            {isSubmitting ? t('publish_edit.publishing') : t('publish_edit.submit_publish')}
           </Button>
           <Button
             type="button"
@@ -264,7 +266,7 @@ export function PublishItem() {
             onClick={() => navigate("/user")}
             size="lg"
           >
-            Annuler
+            {t('common.cancel')}
           </Button>
         </div>
       </form>

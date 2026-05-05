@@ -1,16 +1,17 @@
 import { motion } from 'motion/react';
 import { ArrowRight, Shield, Users, Sparkles, Package, TrendingUp, Heart } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
-import { Footer } from '../components/Footer';
 import { Button } from '../components/Button';
 import { ItemCard } from '../components/ItemCard';
 import { Badge } from '../components/Badge';
+import { useLanguage } from '../LanguageContext';
 
 interface LandingPageProps {
   onNavigate: (page: string) => void;
 }
 
 export function LandingPage({ onNavigate }: LandingPageProps) {
+  const { t } = useLanguage();
   const featuredItems = [
     {
       id: '1',
@@ -104,7 +105,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
             >
               <Badge variant="olive" className="text-sm">
                 <Sparkles className="w-3 h-3" />
-                Trusted by 50,000+ community members
+                {t('hero.trusted', { count: 50000 })}
               </Badge>
             </motion.div>
 
@@ -116,7 +117,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
               className="text-5xl sm:text-6xl lg:text-7xl font-semibold text-white mb-6 leading-tight"
               style={{ fontFamily: 'var(--font-heading)' }}
             >
-              Exchange with trust, trade with purpose
+              {t('hero.title')}
             </motion.h1>
 
             {/* Supporting Copy */}
@@ -126,7 +127,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
               transition={{ delay: 0.4, duration: 0.8 }}
               className="text-xl text-white/90 mb-8 max-w-xl"
             >
-              The peer-to-peer marketplace where items find new life and communities grow stronger through direct exchange.
+              {t('hero.subtitle')}
             </motion.p>
 
             {/* CTA Buttons */}
@@ -142,7 +143,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                 onClick={() => onNavigate('register')}
                 className="group"
               >
-                Start Trading
+                {t('hero.start_trading')}
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
               <Button
@@ -151,7 +152,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                 onClick={() => onNavigate('explore')}
                 className="bg-white/10 backdrop-blur-sm text-white border-white/20 hover:bg-white/20"
               >
-                Explore Items
+                {t('hero.explore_items')}
               </Button>
             </motion.div>
           </motion.div>
@@ -165,7 +166,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
           className="absolute bottom-8 left-1/2 -translate-x-1/2"
         >
           <div className="flex flex-col items-center gap-2 text-white/60">
-            <span className="text-sm">Scroll to explore</span>
+            <span className="text-sm">{t('hero.scroll')}</span>
             <motion.div
               animate={{ y: [0, 8, 0] }}
               transition={{ repeat: Infinity, duration: 1.5 }}
@@ -188,10 +189,10 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
             className="text-center mb-16"
           >
             <h2 className="text-3xl sm:text-4xl font-semibold mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
-              How SwapMarket Works
+              {t('how.title')}
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Simple, transparent exchange built on community trust
+              {t('how.subtitle')}
             </p>
           </motion.div>
 
@@ -199,18 +200,18 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
             {[
               {
                 icon: Package,
-                title: 'List Your Items',
-                description: 'Share what you have to offer with photos, condition details, and your story.',
+                title: t('how.step1_title'),
+                description: t('how.step1_desc'),
               },
               {
                 icon: Users,
-                title: 'Connect & Propose',
-                description: 'Find items you want, propose fair swaps with optional cash adjustments.',
+                title: t('how.step2_title'),
+                description: t('how.step2_desc'),
               },
               {
                 icon: Shield,
-                title: 'Exchange Safely',
-                description: 'Meet locally, verify condition, and complete the exchange with confidence.',
+                title: t('how.step3_title'),
+                description: t('how.step3_desc'),
               },
             ].map((step, idx) => (
               <motion.div
@@ -238,12 +239,12 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
           <div className="flex items-center justify-between mb-12">
             <div>
               <h2 className="text-3xl sm:text-4xl font-semibold mb-2" style={{ fontFamily: 'var(--font-heading)' }}>
-                Featured Items
+                {t('featured.title')}
               </h2>
-              <p className="text-muted-foreground">Curated picks from trusted community members</p>
+              <p className="text-muted-foreground">{t('featured.subtitle')}</p>
             </div>
             <Button variant="ghost" onClick={() => onNavigate('explore')}>
-              View All
+              {t('featured.view_all')}
               <ArrowRight className="w-4 h-4" />
             </Button>
           </div>
@@ -276,9 +277,9 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
             className="text-center mb-12"
           >
             <h2 className="text-3xl sm:text-4xl font-semibold mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
-              Browse Categories
+              {t('categories.title')}
             </h2>
-            <p className="text-muted-foreground">Discover items across diverse categories</p>
+            <p className="text-muted-foreground">{t('categories.subtitle')}</p>
           </motion.div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -295,7 +296,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
               >
                 <category.icon className="w-8 h-8 text-olive mx-auto mb-3 group-hover:scale-110 transition-transform" />
                 <h3 className="font-semibold mb-1">{category.name}</h3>
-                <p className="text-sm text-muted-foreground">{category.count} items</p>
+                <p className="text-sm text-muted-foreground">{t('categories.items_count', { count: category.count })}</p>
               </motion.button>
             ))}
           </div>
@@ -312,28 +313,28 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
               viewport={{ once: true }}
             >
               <h2 className="text-3xl sm:text-4xl font-semibold mb-6" style={{ fontFamily: 'var(--font-heading)' }}>
-                Built on Trust, Powered by Community
+                {t('trust.title')}
               </h2>
               <p className="text-lg text-muted-foreground mb-8">
-                Every member earns their trust score through successful swaps, verified identity, and community feedback.
+                {t('trust.subtitle')}
               </p>
 
               <div className="space-y-6">
                 {[
                   {
                     icon: Shield,
-                    title: 'Verified Profiles',
-                    description: 'Identity verification and trust scores help you trade with confidence.',
+                    title: t('trust.feature1_title'),
+                    description: t('trust.feature1_desc'),
                   },
                   {
                     icon: TrendingUp,
-                    title: 'Community Reviews',
-                    description: 'Real feedback from real exchanges builds reputation over time.',
+                    title: t('trust.feature2_title'),
+                    description: t('trust.feature2_desc'),
                   },
                   {
                     icon: Heart,
-                    title: 'Fair Exchange',
-                    description: 'Transparent negotiation with optional cash adjustments for balanced trades.',
+                    title: t('trust.feature3_title'),
+                    description: t('trust.feature3_desc'),
                   },
                 ].map((feature, idx) => (
                   <motion.div
@@ -378,7 +379,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                     <Shield className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Trust Score</p>
+                    <p className="text-xs text-muted-foreground">{t('trust.score')}</p>
                     <p className="text-2xl font-semibold text-trust-gold">4.9</p>
                   </div>
                 </div>
@@ -397,10 +398,10 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
             viewport={{ once: true }}
           >
             <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
-              Ready to Start Trading?
+              {t('trust.ready')}
             </h2>
             <p className="text-xl text-white/90 mb-8">
-              Join thousands of community members exchanging with purpose
+              {t('trust.join')}
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Button
@@ -409,7 +410,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                 onClick={() => onNavigate('register')}
                 className="bg-white text-olive hover:bg-white/90"
               >
-                Create Free Account
+                {t('trust.create_account')}
                 <ArrowRight className="w-5 h-5" />
               </Button>
               <Button
@@ -418,14 +419,12 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                 onClick={() => onNavigate('login')}
                 className="text-white border-white/30 hover:bg-white/10"
               >
-                Sign In
+                {t('trust.sign_in')}
               </Button>
             </div>
           </motion.div>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 }

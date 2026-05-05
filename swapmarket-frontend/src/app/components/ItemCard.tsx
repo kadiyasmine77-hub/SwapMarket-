@@ -1,5 +1,6 @@
 import { Heart, MapPin, Calendar } from 'lucide-react';
 import { Badge } from './Badge';
+import { useLanguage } from '../LanguageContext';
 
 interface ItemCardProps {
   id: string;
@@ -31,6 +32,15 @@ export function ItemCard({
   onFavorite,
   disponibilite = 'disponible',
 }: ItemCardProps) {
+  const { t } = useLanguage();
+
+  const conditionMap: Record<string, string> = {
+    'Neuf': t('common.new'),
+    'Comme neuf': t('common.like_new'),
+    'Bon état': t('common.good'),
+    'État correct': t('common.fair'),
+  };
+
   const conditionColors: Record<string, 'success' | 'olive' | 'warning' | 'default'> = {
     'Neuf': 'success',
     'Comme neuf': 'olive',
@@ -39,9 +49,9 @@ export function ItemCard({
   };
 
   const availabilityLabels = {
-    disponible: { label: 'Disponible', variant: 'success' as const },
-    echange: { label: 'En échange', variant: 'warning' as const },
-    reserve: { label: 'Réservé', variant: 'default' as const },
+    disponible: { label: t('common.available'), variant: 'success' as const },
+    echange: { label: t('common.exchanged'), variant: 'warning' as const },
+    reserve: { label: t('common.reserved'), variant: 'default' as const },
   };
 
   return (
@@ -67,7 +77,7 @@ export function ItemCard({
           {/* Condition & Availability Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-1.5">
             <Badge variant={conditionColors[condition]} size="sm">
-              {condition}
+              {conditionMap[condition] || condition}
             </Badge>
             {disponibilite && (
               <Badge variant={availabilityLabels[disponibilite].variant} size="sm">

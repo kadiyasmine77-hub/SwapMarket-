@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Categorie;
 use Illuminate\Http\Request;
+use App\Models\ActivityLog;
+use Illuminate\Support\Facades\Auth;
 
 class CategorieController extends Controller
 {
@@ -25,7 +27,18 @@ class CategorieController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        return response()->json(Categorie::create($data), 201);
+        $categorie = Categorie::create($data);
+
+        if (Auth::check() && Auth::user()->role === 'admin') {
+            ActivityLog::create([
+                'admin_id' => Auth::id(),
+                'action' => 'Créé catégorie',
+                'target' => "Catégorie: {$categorie->nom}",
+                'details' => "Nouvelle catégorie ajoutée"
+            ]);
+        }
+
+        return response()->json($categorie, 201);
     }
 
     public function show($id)
@@ -42,6 +55,15 @@ class CategorieController extends Controller
             'description' => 'nullable|string',
         ]));
 
+        if (Auth::check() && Auth::user()->role === 'admin') {
+            ActivityLog::create([
+                'admin_id' => Auth::id(),
+                'action' => 'Modifié catégorie',
+                'target' => "Catégorie: {$categorie->nom}",
+                'details' => "Catégorie mise à jour"
+            ]);
+        }
+
         return response()->json($categorie);
     }
 
@@ -55,7 +77,17 @@ class CategorieController extends Controller
             ], 409);
         }
 
+        $nom = $categorie->nom;
         $categorie->delete();
+
+        if (Auth::check() && Auth::user()->role === 'admin') {
+            ActivityLog::create([
+                'admin_id' => Auth::id(),
+                'action' => 'Supprimé catégorie',
+                'target' => "Catégorie: {$nom}",
+                'details' => "Catégorie supprimée"
+            ]);
+        }
 
         return response()->json(['message' => 'Categorie supprimee']);
     }

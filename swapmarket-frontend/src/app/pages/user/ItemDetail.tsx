@@ -4,7 +4,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "../../components/ui/avatar"
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import { Separator } from "../../components/ui/separator";
-import { Heart, MapPin, Calendar, CheckCircle2, ShieldCheck, Share2, MessageSquare, AlertTriangle, Star, Flag } from "lucide-react";
+import { Heart, MapPin, Calendar, CheckCircle2, ShieldCheck, Share2, MessageSquare, AlertTriangle, Star, Flag, Package } from "lucide-react";
 import { toast } from "sonner";
 import { API_BASE_URL, getStorageUrl } from "../../config";
 import { ImageSlider } from "../../components/ImageSlider";
@@ -17,8 +17,10 @@ import {
   DialogTitle,
 } from "../../components/ui/dialog";
 import { ScrollArea } from "../../components/ui/scroll-area";
+import { useLanguage } from "../../LanguageContext";
 
 export function ItemDetail() {
+  const { t } = useLanguage();
   const { id } = useParams();
   const navigate = useNavigate();
   const [item, setItem] = useState<any>(null);
@@ -28,6 +30,12 @@ export function ItemDetail() {
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loadingMyItems, setLoadingMyItems] = useState(false);
+
+  // Signaler states
+  const [showReportDialog, setShowReportDialog] = useState(false);
+  const [reportMotif, setReportMotif] = useState("");
+  const [reportDesc, setReportDesc] = useState("");
+  const [isReporting, setIsReporting] = useState(false);
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/objets/${id}`)
@@ -47,12 +55,12 @@ export function ItemDetail() {
     const currentUser = userStr ? JSON.parse(userStr) : null;
 
     if (!currentUser) {
-      toast.error("Vous devez être connecté pour proposer un échange.");
+      toast.error(t('items.must_be_logged'));
       return;
     }
 
     if (item.id_user === currentUser.id_user) {
-      toast.error("Vous ne pouvez pas échanger un objet avec vous-même !");
+      toast.error(t('items.cannot_swap_self'));
       return;
     }
 
@@ -66,7 +74,7 @@ export function ItemDetail() {
       setMyItems(items);
     } catch (error) {
       console.error("Error fetching my items:", error);
-      toast.error("Impossible de charger vos objets.");
+      toast.error(t('items.no_items_available'));
     } finally {
       setLoadingMyItems(false);
     }
@@ -74,7 +82,7 @@ export function ItemDetail() {
 
   const handleConfirmProposal = async () => {
     if (!selectedItemId) {
-      toast.error("Veuillez sélectionner un objet à échanger.");
+      toast.error(t('items.select_motif'));
       return;
     }
 
@@ -95,23 +103,23 @@ export function ItemDetail() {
       });
 
       if (response.ok) {
-        toast.success("Proposition d'échange envoyée !");
+        toast.success(t('items.proposal_sent'));
         setShowProposalDialog(false);
         navigate("/user/history");
       } else {
         const errorData = await response.json();
-        toast.error(errorData.message || "Erreur lors de l'envoi de la proposition.");
+        toast.error(errorData.message || t('admin.update_error'));
       }
     } catch (error) {
       console.error("Error proposing exchange:", error);
-      toast.error("Erreur de connexion.");
+      toast.error("Error");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleMessage = () => {
-    toast.success(`Votre intérêt pour "${item.titre}" a été noté. Vous pourrez discuter une fois l'échange proposé !`);
+    toast.success(t('items.message_interest_toast', { title: item.titre }));
     // On pourrait aussi rediriger vers la page de profil du propriétaire
   };
 
@@ -135,16 +143,62 @@ export function ItemDetail() {
       }
     } catch (error) {
       console.error("Error toggling favorite:", error);
-      toast.error("Une erreur est survenue.");
+      toast.error("Error");
     }
   };
 
   const handleReport = () => {
-    toast.success("L'objet a été signalé à l'équipe de modération. Merci de votre vigilance.");
+    const userStr = localStorage.getItem('user');
+    if (!userStr) {
+      toast.error(t('items.must_be_logged'));
+      return;
+    }
+    setShowReportDialog(true);
   };
 
-  if (loading) return <div className="text-center py-20 font-medium">Chargement de l'objet...</div>;
-  if (!item) return <div className="text-center py-20 font-medium text-destructive">Objet non trouvé.</div>;
+  const submitReport = async () => {
+    if (!reportMotif) {
+      toast.error(t('items.select_motif'));
+      return;
+    }
+
+    setIsReporting(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/signalements`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify({
+          id_objet: item.id_objet,
+          motif: reportMotif,
+          description: reportDesc
+        })
+      });
+
+      const data = await response.json();
+      
+      if (response.ok || response.status === 201) {
+        toast.success(data.message || t('items.report_success'));
+        setShowReportDialog(false);
+        setReportMotif("");
+        setReportDesc("");
+      } else {
+        toast.error(data.message || t('admin.update_error'));
+      }
+    } catch (error) {
+      console.error("Error submitting report:", error);
+      toast.error("Error");
+    } finally {
+      setIsReporting(false);
+    }
+  };
+
+  if (loading) return <div className="text-center py-20 font-medium">{t('common.loading')}</div>;
+  if (!item) return <div className="text-center py-20 font-medium text-destructive">{t('items.not_found')}</div>;
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -175,16 +229,16 @@ export function ItemDetail() {
             </div>
             <div className="flex items-center gap-2 text-neutral-600">
               <MapPin className="h-4 w-4" />
-              <span>{item.user?.ville || "Localisation inconnue"}</span>
+              <span>{item.user?.ville || "—"}</span>
               <span>•</span>
               <Calendar className="h-4 w-4" />
-              <span>Publié le {new Date(item.created_at).toLocaleDateString()}</span>
+              <span>{t('items.posted_on')} {new Date(item.created_at).toLocaleDateString()}</span>
             </div>
           </div>
 
           <div className="flex flex-wrap gap-2">
             <Badge variant="secondary" className="text-sm">
-              {item.categorie?.nom || "Autre"}
+              {item.categorie?.nom || "—"}
             </Badge>
             <Badge variant="outline" className="text-sm">
               {item.etat}
@@ -196,16 +250,16 @@ export function ItemDetail() {
                 'bg-green-500 hover:bg-green-600'
               } text-white text-sm font-bold`}
             >
-              {item.disponibilite === 'echange' ? 'En échange' : 
-               item.disponibilite === 'reserve' ? 'Réservé' : 
-               item.disponibilite === 'disponible' ? 'Disponible' : item.disponibilite}
+              {item.disponibilite === 'echange' ? t('common.exchanged') : 
+               item.disponibilite === 'reserve' ? t('common.reserved') : 
+               item.disponibilite === 'disponible' ? t('common.available') : item.disponibilite}
             </Badge>
           </div>
 
           <Separator />
 
           <div>
-            <h2 className="mb-2 font-semibold">Description</h2>
+            <h2 className="mb-2 font-semibold">{t('items.description')}</h2>
             <p className="text-neutral-700">{item.description}</p>
           </div>
 
@@ -213,7 +267,7 @@ export function ItemDetail() {
 
           {/* Owner */}
           <div>
-            <h2 className="mb-3 font-semibold">Proposé par</h2>
+            <h2 className="mb-3 font-semibold">{t('items.proposed_by')}</h2>
             <div className="flex items-center gap-3 rounded-lg border p-4">
               <Avatar className="h-12 w-12">
                 <AvatarImage src={getStorageUrl(item.user?.photo_profil) || undefined} alt={item.user?.nom_complet} />
@@ -225,12 +279,12 @@ export function ItemDetail() {
                   <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                   <span>{item.user?.avg_rating || "0.0"}</span>
                   <span>•</span>
-                  <span>{item.user?.objets_count || 0} objets</span>
+                  <span>{t('items.objects_count', { count: item.user?.objets_count || 0 })}</span>
                 </div>
               </div>
               <Link to={`/user/profile/${item.user?.id_user}`}>
                 <Button variant="outline" size="sm">
-                  Voir profil
+                  {t('items.view_profile')}
                 </Button>
               </Link>
             </div>
@@ -242,26 +296,26 @@ export function ItemDetail() {
               <div className="rounded-lg bg-amber-50 border border-amber-200 p-4">
                 <p className="text-sm text-amber-800 font-medium text-center">
                   {item.disponibilite === 'echange' 
-                    ? "Cet objet n'est plus disponible car un troc a déjà été accepté." 
-                    : "Cet objet a déjà été échangé."}
+                    ? t('items.unavailable_accepted') 
+                    : t('items.unavailable_exchanged')}
                 </p>
                 <Button disabled size="lg" className="w-full mt-3 bg-neutral-300 text-neutral-500 cursor-not-allowed">
-                  Échange indisponible
+                  {t('items.swap_unavailable')}
                 </Button>
               </div>
             ) : (
               <Button onClick={handlePropose} size="lg" className="w-full bg-black text-white hover:bg-black/90">
-                Proposer un échange
+                {t('common.propose_swap')}
               </Button>
             )}
             <div className="grid grid-cols-2 gap-3">
               <Button variant="outline" className="gap-2" onClick={handleMessage}>
                 <MessageSquare className="h-5 w-5" />
-                Message
+                {t('items.message')}
               </Button>
               <Button variant="outline" className="gap-2" onClick={handleReport}>
                 <Flag className="h-5 w-5" />
-                Signaler
+                {t('items.report')}
               </Button>
             </div>
           </div>
@@ -271,15 +325,15 @@ export function ItemDetail() {
       <Dialog open={showProposalDialog} onOpenChange={setShowProposalDialog}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Proposer un échange</DialogTitle>
+            <DialogTitle>{t('items.propose_swap_title')}</DialogTitle>
             <DialogDescription>
-              Choisissez l'un de vos objets pour l'échanger contre <strong>{item.titre}</strong>.
+              {t('items.propose_swap_desc', { title: item.titre })}
             </DialogDescription>
           </DialogHeader>
 
           <div className="py-4">
             {loadingMyItems ? (
-              <div className="py-10 text-center text-sm text-neutral-500">Chargement de vos objets...</div>
+              <div className="py-10 text-center text-sm text-neutral-500">{t('common.loading')}</div>
             ) : myItems.length > 0 ? (
               <div className="grid gap-3 max-h-[300px] overflow-y-auto p-1">
                 {myItems.map((myObj) => (
@@ -307,7 +361,7 @@ export function ItemDetail() {
                     </div>
                     <div className="flex-1">
                       <p className="font-medium text-sm line-clamp-1">{myObj.titre}</p>
-                      <p className="text-xs text-neutral-500">{myObj.categorie?.nom || "Sans catégorie"}</p>
+                      <p className="text-xs text-neutral-500">{myObj.categorie?.nom || "—"}</p>
                     </div>
                     {selectedItemId === myObj.id_objet.toString() && (
                       <div className="h-5 w-5 rounded-full bg-olive flex items-center justify-center">
@@ -319,10 +373,10 @@ export function ItemDetail() {
               </div>
             ) : (
               <div className="rounded-lg border-2 border-dashed p-8 text-center">
-                <p className="mb-4 text-sm text-neutral-500">Vous n'avez aucun objet disponible pour l'échange.</p>
+                <p className="mb-4 text-sm text-neutral-500">{t('items.no_items_available')}</p>
                 <Link to="/user/publish">
                   <Button variant="outline" size="sm" className="border-olive text-olive">
-                    Publier un objet
+                    {t('common.publish')}
                   </Button>
                 </Link>
               </div>
@@ -331,14 +385,67 @@ export function ItemDetail() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowProposalDialog(false)}>
-              Annuler
+              {t('common.cancel')}
             </Button>
             <Button
               onClick={handleConfirmProposal}
               disabled={!selectedItemId || isSubmitting}
               className="bg-black text-white hover:bg-black/90"
             >
-              {isSubmitting ? "Envoi..." : "Confirmer la proposition"}
+              {isSubmitting ? t('common.loading') : t('items.confirm_proposal')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Signaler */}
+      <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>{t('items.report_title')}</DialogTitle>
+            <DialogDescription>
+              {t('items.report_desc', { title: item.titre })}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="py-4 space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">{t('items.report_motif')} <span className="text-red-500">*</span></label>
+              <select 
+                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-white px-3 py-2 text-sm"
+                value={reportMotif}
+                onChange={(e) => setReportMotif(e.target.value)}
+              >
+                <option value="" disabled>{t('items.select_motif')}</option>
+                <option value="spam">{t('items.motif_spam')}</option>
+                <option value="inapproprie">{t('items.motif_inappropriate')}</option>
+                <option value="contrefacon">{t('items.motif_counterfeit')}</option>
+                <option value="arnaque">{t('items.motif_scam')}</option>
+                <option value="autre">{t('items.motif_other')}</option>
+              </select>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">{t('items.report_details')}</label>
+              <textarea 
+                className="flex min-h-[100px] w-full rounded-md border border-input bg-white px-3 py-2 text-sm placeholder:text-neutral-400"
+                placeholder="..."
+                value={reportDesc}
+                onChange={(e) => setReportDesc(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowReportDialog(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              onClick={submitReport}
+              disabled={!reportMotif || isReporting}
+              className="bg-red-600 text-white hover:bg-red-700"
+            >
+              {isReporting ? t('common.loading') : t('items.report_send')}
             </Button>
           </DialogFooter>
         </DialogContent>

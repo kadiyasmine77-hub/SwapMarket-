@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -43,6 +44,14 @@ class AuthController extends Controller
 
         $user  = User::create($data);
         $token = $user->createToken('api-token')->plainTextToken;
+
+        // Enregistrer le log
+        ActivityLog::create([
+            'admin_id' => 1, // Action système
+            'action' => 'Inscription utilisateur',
+            'target' => $user->nom_complet,
+            'details' => "Nouvel utilisateur inscrit"
+        ]);
 
         return response()->json([
             'user'  => $user,

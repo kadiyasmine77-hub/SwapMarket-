@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Shield, MapPin, Calendar, Edit, Settings, Package, Star } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
-import { Footer } from '../components/Footer';
 import { Button } from '../components/Button';
 import { Badge } from '../components/Badge';
 import { ItemCard } from '../components/ItemCard';
@@ -389,9 +388,7 @@ export function ProfilePage({ onNavigate }: ProfilePageProps) {
             </div>
           )}
         </div>
-      </div>
-
-      <Footer />
+      </main>
     </div>
   );
 }

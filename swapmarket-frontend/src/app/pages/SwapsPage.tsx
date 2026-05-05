@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Navbar } from '../components/Navbar';
-import { Footer } from '../components/Footer';
 import { SwapOfferCard } from '../components/SwapOfferCard';
+import { useLanguage } from '../LanguageContext';
 
 interface SwapsPageProps {
   onNavigate: (page: string) => void;
@@ -10,6 +10,7 @@ interface SwapsPageProps {
 type Tab = 'received' | 'sent' | 'completed';
 
 export function SwapsPage({ onNavigate }: SwapsPageProps) {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<Tab>('received');
 
   const receivedOffers = [
@@ -181,9 +182,9 @@ export function SwapsPage({ onNavigate }: SwapsPageProps) {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-semibold mb-2" style={{ fontFamily: 'var(--font-heading)' }}>
-            My Swaps
+            {t('swaps.title')}
           </h1>
-          <p className="text-muted-foreground">Manage your incoming and outgoing swap offers</p>
+          <p className="text-muted-foreground">{t('swaps.subtitle')}</p>
         </div>
 
         {/* Tabs */}
@@ -197,7 +198,7 @@ export function SwapsPage({ onNavigate }: SwapsPageProps) {
                   : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
-              Received ({receivedOffers.length})
+              {t('swaps.received')} ({receivedOffers.length})
             </button>
             <button
               onClick={() => setActiveTab('sent')}
@@ -207,7 +208,7 @@ export function SwapsPage({ onNavigate }: SwapsPageProps) {
                   : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
-              Sent ({sentOffers.length})
+              {t('swaps.sent')} ({sentOffers.length})
             </button>
             <button
               onClick={() => setActiveTab('completed')}
@@ -217,7 +218,7 @@ export function SwapsPage({ onNavigate }: SwapsPageProps) {
                   : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
-              Completed ({completedSwaps.length})
+              {t('swaps.completed')} ({completedSwaps.length})
             </button>
           </div>
         </div>
@@ -236,17 +237,15 @@ export function SwapsPage({ onNavigate }: SwapsPageProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold mb-2">No swaps yet</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('swaps.no_swaps')}</h3>
             <p className="text-muted-foreground mb-6">
-              {activeTab === 'received' && "You haven't received any swap offers yet"}
-              {activeTab === 'sent' && "You haven't sent any swap offers yet"}
-              {activeTab === 'completed' && "You haven't completed any swaps yet"}
+              {activeTab === 'received' && t('swaps.no_received')}
+              {activeTab === 'sent' && t('swaps.no_sent')}
+              {activeTab === 'completed' && t('swaps.no_completed')}
             </p>
           </div>
         )}
-      </div>
-
-      <Footer />
+      </main>
     </div>
   );
 }

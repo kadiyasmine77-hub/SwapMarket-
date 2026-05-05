@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Heart, MapPin, Calendar, Shield, ChevronLeft, Share2, Flag } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
-import { Footer } from '../components/Footer';
 import { Button } from '../components/Button';
 import { Badge } from '../components/Badge';
 import { ItemCard } from '../components/ItemCard';
@@ -271,9 +270,7 @@ export function ItemDetailPage({ onNavigate }: ItemDetailPageProps) {
             ))}
           </div>
         </div>
-      </div>
-
-      <Footer />
+      </main>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { ArrowRight, Calendar, User } from 'lucide-react';
 import { Badge } from './Badge';
 import { Button } from './Button';
+import { useLanguage } from '../LanguageContext';
 
 interface OfferItem {
   title: string;
@@ -38,12 +39,22 @@ export function SwapOfferCard({
   onCounter,
   onView,
 }: SwapOfferCardProps) {
+  const { t } = useLanguage();
+
   const statusVariants: Record<string, 'success' | 'warning' | 'danger' | 'olive' | 'default'> = {
     pending: 'warning',
     accepted: 'success',
     rejected: 'danger',
     countered: 'olive',
     completed: 'success',
+  };
+
+  const statusLabels: Record<string, string> = {
+    pending: t('exchanges.status_pending'),
+    accepted: t('exchanges.status_accepted'),
+    rejected: t('exchanges.status_refused'),
+    countered: t('messages_page.status_ongoing'),
+    completed: t('messages_page.status_completed'),
   };
 
   return (
@@ -60,14 +71,14 @@ export function SwapOfferCard({
             <span>{date}</span>
           </div>
         </div>
-        <Badge variant={statusVariants[status]}>{status}</Badge>
+        <Badge variant={statusVariants[status]}>{statusLabels[status] || status}</Badge>
       </div>
 
       {/* Swap Items Visual */}
       <div className="grid grid-cols-[1fr,auto,1fr] gap-4 items-center mb-4">
         {/* Offering Items */}
         <div className="space-y-2">
-          <p className="text-xs text-muted-foreground mb-2">{type === 'sent' ? 'You offer' : 'They offer'}</p>
+          <p className="text-xs text-muted-foreground mb-2">{type === 'sent' ? t('messages_page.your_item') : t('messages_page.their_item')}</p>
           <div className="flex gap-2">
             {offeringItems.map((item, idx) => (
               <div key={idx} className="flex-1">
@@ -85,14 +96,14 @@ export function SwapOfferCard({
           <ArrowRight className="w-5 h-5 text-olive" />
           {cashAdjustment !== undefined && cashAdjustment !== 0 && (
             <span className="text-xs font-semibold text-olive">
-              {cashAdjustment > 0 ? `+$${cashAdjustment}` : `-$${Math.abs(cashAdjustment)}`}
+              {cashAdjustment > 0 ? `+${cashAdjustment}` : `-${Math.abs(cashAdjustment)}`}
             </span>
           )}
         </div>
 
         {/* Requested Items */}
         <div className="space-y-2">
-          <p className="text-xs text-muted-foreground mb-2">{type === 'sent' ? 'You request' : 'They request'}</p>
+          <p className="text-xs text-muted-foreground mb-2">{type === 'sent' ? t('messages_page.their_item') : t('messages_page.your_item')}</p>
           <div className="flex gap-2">
             {requestedItems.map((item, idx) => (
               <div key={idx} className="flex-1">
@@ -118,29 +129,29 @@ export function SwapOfferCard({
         {status === 'pending' && type === 'received' && (
           <>
             <Button variant="olive" size="sm" onClick={onAccept} className="flex-1">
-              Accept
+              {t('history_page.card.accept')}
             </Button>
             <Button variant="secondary" size="sm" onClick={onCounter} className="flex-1">
-              Counter
+              {t('history_page.card.contact')}
             </Button>
             <Button variant="ghost" size="sm" onClick={onReject}>
-              Reject
+              {t('history_page.card.reject')}
             </Button>
           </>
         )}
         {status === 'pending' && type === 'sent' && (
           <Button variant="ghost" size="sm" onClick={onView} className="flex-1">
-            View Details
+            {t('common.open')}
           </Button>
         )}
         {(status === 'accepted' || status === 'completed') && (
           <Button variant="olive" size="sm" onClick={onView} className="flex-1">
-            View Swap Details
+            {t('messages_page.details')}
           </Button>
         )}
         {status === 'countered' && (
           <Button variant="olive" size="sm" onClick={onView} className="flex-1">
-            View Counter Offer
+            {t('messages_page.status_ongoing')}
           </Button>
         )}
       </div>

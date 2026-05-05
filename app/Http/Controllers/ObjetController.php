@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Objet;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -88,6 +89,14 @@ class ObjetController extends Controller
 
         $data['id_user'] = $user->id_user;
         $objet = Objet::create($data);
+
+        // Enregistrer le log
+        ActivityLog::create([
+            'admin_id' => 1, // Marqué comme action système/automatique
+            'action' => 'Nouvelle annonce',
+            'target' => $objet->titre,
+            'details' => "Annonce publiée par {$user->nom_complet}"
+        ]);
 
         // Handle gallery images if present
         if ($request->hasFile('gallery')) {

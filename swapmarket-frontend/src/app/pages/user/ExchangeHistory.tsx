@@ -17,8 +17,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../components/ui/dialog";
+import { useLanguage } from "../../LanguageContext";
 
 export function ExchangeHistory() {
+  const { t } = useLanguage();
   const [exchanges, setExchanges] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const userStr = localStorage.getItem('user');
@@ -44,7 +46,7 @@ export function ExchangeHistory() {
       setExchanges(data);
     } catch (error) {
       console.error("Error fetching exchanges:", error);
-      toast.error("Impossible de charger l'historique.");
+      toast.error(t('auth.error_server'));
     } finally {
       setLoading(false);
     }
@@ -64,20 +66,20 @@ export function ExchangeHistory() {
       });
 
       if (response.ok) {
-        let msg = "Statut mis à jour.";
-        if (status === 'valide') msg = "Échange accepté !";
-        else if (status === 'refuse') msg = "Échange refusé.";
-        else if (status === 'termine') msg = "Échange terminé avec succès !";
-        else if (status === 'annule') msg = "Échange annulé.";
+        let msg = t('exchanges.status_updated');
+        if (status === 'valide') msg = t('exchanges.success_accept');
+        else if (status === 'refuse') msg = t('exchanges.success_refuse');
+        else if (status === 'termine') msg = t('exchanges.success_complete');
+        else if (status === 'annule') msg = t('exchanges.success_cancel');
         toast.success(msg);
         fetchExchanges();
       } else {
         const errorData = await response.json();
-        toast.error(errorData.message || "Erreur lors de la mise à jour.");
+        toast.error(errorData.message || t('auth.error_server'));
       }
     } catch (error) {
       console.error("Error updating exchange:", error);
-      toast.error("Erreur de connexion.");
+      toast.error(t('auth.error_server'));
     }
   };
 
@@ -100,17 +102,17 @@ export function ExchangeHistory() {
       });
 
       if (response.ok) {
-        toast.success("Avis soumis avec succès !");
+        toast.success(t('exchanges.review_success'));
         setReviewItem(null);
         setRating(5);
         setComment("");
       } else {
         const error = await response.json();
-        toast.error(error.message || "Erreur lors de la soumission de l'avis.");
+        toast.error(error.message || t('exchanges.review_error'));
       }
     } catch (error) {
       console.error("Error submitting review:", error);
-      toast.error("Erreur de connexion.");
+      toast.error(t('auth.error_server'));
     } finally {
       setIsSubmittingReview(false);
     }
@@ -138,39 +140,22 @@ export function ExchangeHistory() {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("PDF Download error:", error);
-      toast.error("Impossible de télécharger le PDF.");
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "en_attente":
-        return <Clock className="h-5 w-5 text-yellow-600" />;
-      case "valide":
-        return <CheckCircle2 className="h-5 w-5 text-green-600" />;
-      case "termine":
-        return <CheckCircle2 className="h-5 w-5 text-blue-600" />;
-      case "refuse":
-        return <XCircle className="h-5 w-5 text-red-600" />;
-      case "annule":
-        return <XCircle className="h-5 w-5 text-neutral-400" />;
-      default:
-        return <ArrowRightLeft className="h-5 w-5 text-neutral-600" />;
+      toast.error(t('exchanges.pdf_error'));
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "en_attente":
-        return <Badge variant="outline">En attente</Badge>;
+        return <Badge variant="outline">{t('exchanges.status_pending')}</Badge>;
       case "valide":
-        return <Badge className="bg-green-600">Accepté</Badge>;
+        return <Badge className="bg-green-600">{t('exchanges.status_ongoing')}</Badge>;
       case "termine":
-        return <Badge variant="secondary">Terminé</Badge>;
+        return <Badge variant="secondary">{t('exchanges.status_completed')}</Badge>;
       case "refuse":
-        return <Badge variant="destructive">Refusé</Badge>;
+        return <Badge variant="destructive">{t('exchanges.status_refused')}</Badge>;
       case "annule":
-        return <Badge variant="outline" className="text-neutral-500 border-neutral-200">Annulé</Badge>;
+        return <Badge variant="outline" className="text-neutral-500 border-neutral-200">{t('exchanges.status_cancelled')}</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -183,29 +168,29 @@ export function ExchangeHistory() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="mb-2 text-3xl font-bold">Historique des échanges</h1>
-        <p className="text-neutral-600">Gérez vos propositions et échanges réalisés</p>
+        <h1 className="mb-2 text-3xl font-bold">{t('exchanges.title')}</h1>
+        <p className="text-neutral-600">{t('exchanges.desc')}</p>
       </div>
 
       <Tabs defaultValue="all" className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="all">
-            Tous ({exchanges.length})
+            {t('exchanges.all')} ({exchanges.length})
           </TabsTrigger>
           <TabsTrigger value="pending">
-            En attente ({pendingExchanges.length})
+            {t('exchanges.status_pending')} ({pendingExchanges.length})
           </TabsTrigger>
           <TabsTrigger value="accepted">
-            Acceptés ({acceptedExchanges.length})
+            {t('exchanges.accepted')} ({acceptedExchanges.length})
           </TabsTrigger>
           <TabsTrigger value="completed">
-            Terminés ({completedExchanges.length})
+            {t('exchanges.status_completed')} ({completedExchanges.length})
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="space-y-4">
           {loading ? (
-            <p className="py-10 text-center text-neutral-500">Chargement de l'historique...</p>
+            <p className="py-10 text-center text-neutral-500">{t('common.loading')}</p>
           ) : exchanges.length > 0 ? (
             exchanges.map((exchange) => (
               <ExchangeCard 
@@ -216,10 +201,11 @@ export function ExchangeHistory() {
                 onConfirmCancel={(id: number, attempts: number) => setConfirmCancel({ id, attempts })}
                 onReview={(id: number, id_objet: number, titre: string) => setReviewItem({ id_echange: id, id_objet, titre })}
                 onDownloadPDF={handleDownloadPDF}
+                t={t}
               />
             ))
           ) : (
-            <EmptyState />
+            <EmptyState t={t} />
           )}
         </TabsContent>
 
@@ -234,10 +220,11 @@ export function ExchangeHistory() {
                 onConfirmCancel={(id: number, attempts: number) => setConfirmCancel({ id, attempts })}
                 onReview={(id: number, id_objet: number, titre: string) => setReviewItem({ id_echange: id, id_objet, titre })}
                 onDownloadPDF={handleDownloadPDF}
+                t={t}
               />
             ))
           ) : (
-            <EmptyState />
+            <EmptyState t={t} />
           )}
         </TabsContent>
 
@@ -251,10 +238,11 @@ export function ExchangeHistory() {
                 onUpdate={handleUpdateStatus} 
                 onConfirmCancel={(id: number, attempts: number) => setConfirmCancel({ id, attempts })}
                 onReview={(id: number, id_objet: number, titre: string) => setReviewItem({ id_echange: id, id_objet, titre })}
+                t={t}
               />
             ))
           ) : (
-            <EmptyState />
+            <EmptyState t={t} />
           )}
         </TabsContent>
 
@@ -268,10 +256,11 @@ export function ExchangeHistory() {
                 onUpdate={handleUpdateStatus}
                 onConfirmCancel={(id: number, attempts: number) => setConfirmCancel({ id, attempts })}
                 onReview={(id: number, id_objet: number, titre: string) => setReviewItem({ id_echange: id, id_objet, titre })}
+                t={t}
               />
             ))
           ) : (
-            <EmptyState />
+            <EmptyState t={t} />
           )}
         </TabsContent>
       </Tabs>
@@ -282,17 +271,17 @@ export function ExchangeHistory() {
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
               <AlertTriangle className="h-6 w-6 text-red-600" />
             </div>
-            <DialogTitle className="text-center">Confirmer l'annulation</DialogTitle>
+            <DialogTitle className="text-center">{t('exchanges.confirm_cancel')}</DialogTitle>
             <DialogDescription className="text-center pt-2">
-              Voulez-vous vraiment annuler votre demande ?
+              {t('exchanges.cancel_confirm_desc')}
               <div className="mt-3 rounded-lg bg-neutral-50 p-3 text-neutral-900 font-medium border border-neutral-100">
-                Il vous restera <span className="text-red-600 font-bold">{3 - (confirmCancel?.attempts || 1)}</span> tentative(s) pour proposer un échange avec cet objet.
+                {t('exchanges.attempts_left', { count: 3 - (confirmCancel?.attempts || 1) })}
               </div>
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex-col gap-2 sm:flex-row sm:justify-center sm:gap-4 mt-2">
             <Button variant="outline" onClick={() => setConfirmCancel(null)} className="sm:w-32">
-              Retour
+              {t('common.back')}
             </Button>
             <Button 
               variant="destructive" 
@@ -302,7 +291,7 @@ export function ExchangeHistory() {
               }}
               className="sm:w-40"
             >
-              Confirmer l'annulation
+              {t('exchanges.confirm_cancel_btn')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -311,14 +300,14 @@ export function ExchangeHistory() {
       <Dialog open={!!reviewItem} onOpenChange={() => setReviewItem(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Laisser un avis</DialogTitle>
+            <DialogTitle>{t('exchanges.leave_review')}</DialogTitle>
             <DialogDescription>
-              Comment s'est passé votre échange pour <strong>{reviewItem?.titre}</strong> ?
+              {t('exchanges.review_desc', { title: reviewItem?.titre })}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-6 py-4">
             <div className="flex flex-col items-center gap-3">
-              <p className="text-sm font-medium text-neutral-600">Note</p>
+              <p className="text-sm font-medium text-neutral-600">{t('exchanges.rating')}</p>
               <div className="flex gap-2">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -334,10 +323,10 @@ export function ExchangeHistory() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="comment">Votre commentaire</Label>
+              <Label htmlFor="comment">{t('exchanges.your_comment')}</Label>
               <Textarea
                 id="comment"
-                placeholder="Partagez votre expérience..."
+                placeholder={t('exchanges.comment_placeholder')}
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 className="min-h-[100px] resize-none"
@@ -345,13 +334,13 @@ export function ExchangeHistory() {
             </div>
           </div>
           <DialogFooter className="flex gap-2 sm:justify-end">
-            <Button variant="outline" onClick={() => setReviewItem(null)}>Annuler</Button>
+            <Button variant="outline" onClick={() => setReviewItem(null)}>{t('common.cancel')}</Button>
             <Button 
               onClick={handleSubmittingReview} 
               disabled={isSubmittingReview || !comment.trim()}
               className="bg-black text-white hover:bg-black/90"
             >
-              {isSubmittingReview ? "Envoi..." : "Publier l'avis"}
+              {isSubmittingReview ? t('common.sending') : t('exchanges.publish_review')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -360,7 +349,7 @@ export function ExchangeHistory() {
   );
 }
 
-function ExchangeCard({ exchange, currentUser, onUpdate, onConfirmCancel, onReview, onDownloadPDF }: { exchange: any, currentUser: any, onUpdate: any, onConfirmCancel: any, onReview: any, onDownloadPDF: any }) {
+function ExchangeCard({ exchange, currentUser, onUpdate, onConfirmCancel, onReview, onDownloadPDF, t }: { exchange: any, currentUser: any, onUpdate: any, onConfirmCancel: any, onReview: any, onDownloadPDF?: any, t: any }) {
   const isDemandeur = exchange.id_demandeur === currentUser?.id_user;
   const otherUser = isDemandeur ? exchange.destinataire : exchange.demandeur;
   const myItem = isDemandeur ? exchange.objet1 : exchange.objet2;
@@ -379,11 +368,11 @@ function ExchangeCard({ exchange, currentUser, onUpdate, onConfirmCancel, onRevi
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "en_attente": return <Badge variant="outline">En attente</Badge>;
-      case "valide": return <Badge className="bg-green-600">Accepté</Badge>;
-      case "termine": return <Badge variant="secondary">Terminé</Badge>;
-      case "refuse": return <Badge variant="destructive">Refusé</Badge>;
-      case "annule": return <Badge variant="outline" className="text-neutral-500 border-neutral-200">Annulé</Badge>;
+      case "en_attente": return <Badge variant="outline">{t('exchanges.status_pending')}</Badge>;
+      case "valide": return <Badge className="bg-green-600">{t('exchanges.status_ongoing')}</Badge>;
+      case "termine": return <Badge variant="secondary">{t('exchanges.status_completed')}</Badge>;
+      case "refuse": return <Badge variant="destructive">{t('exchanges.status_refused')}</Badge>;
+      case "annule": return <Badge variant="outline" className="text-neutral-500 border-neutral-200">{t('exchanges.status_cancelled')}</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
     }
   };
@@ -399,7 +388,7 @@ function ExchangeCard({ exchange, currentUser, onUpdate, onConfirmCancel, onRevi
           <div className="mb-2 flex items-start justify-between">
             <div>
               <h3 className="mb-1 font-semibold">
-                Échange avec {otherUser?.nom_complet || "Utilisateur"}
+                {t('exchanges.exchange_with', { name: otherUser?.nom_complet || t('common.user') })}
               </h3>
               <div className="flex items-center gap-2 text-sm text-neutral-600">
                 <span className="font-medium text-olive">{myItem?.titre}</span>
@@ -424,29 +413,29 @@ function ExchangeCard({ exchange, currentUser, onUpdate, onConfirmCancel, onRevi
             {exchange.statut === "en_attente" && !isDemandeur && (
               <>
                 <Button size="sm" className="bg-black text-white hover:bg-black/90" onClick={() => onUpdate(exchange.id_echange, 'valide')}>
-                  Accepter
+                  {t('exchanges.accept')}
                 </Button>
                 <Button variant="outline" size="sm" className="text-destructive border-destructive/20" onClick={() => onUpdate(exchange.id_echange, 'refuse')}>
-                  Refuser
+                  {t('exchanges.refuse')}
                 </Button>
               </>
             )}
             {exchange.statut === "en_attente" && isDemandeur && (
               <div className="flex flex-col gap-1">
-                <p className="text-sm italic text-neutral-500 mb-1">En attente de réponse du destinataire...</p>
+                <p className="text-sm italic text-neutral-500 mb-1">{t('exchanges.waiting_response')}</p>
                 <Button 
                   variant="ghost" 
                   size="sm" 
                   className="text-destructive hover:bg-red-50 hover:text-red-600 w-fit h-7 px-2 text-xs" 
                   onClick={() => onConfirmCancel(exchange.id_echange, exchange.attempts_count)}
                 >
-                  Annuler ma demande
+                  {t('exchanges.cancel_request')}
                 </Button>
               </div>
             )}
             {(exchange.statut === "valide" || exchange.statut === "termine") && (
               <Button variant="outline" size="sm" onClick={() => window.location.href = `/user/messages?echange_id=${exchange.id_echange}`}>
-                Contacter
+                {t('exchanges.chat')}
               </Button>
             )}
             {exchange.statut === "termine" && (
@@ -457,13 +446,13 @@ function ExchangeCard({ exchange, currentUser, onUpdate, onConfirmCancel, onRevi
                 onClick={() => onReview(exchange.id_echange, isDemandeur ? exchange.id_objet2 : exchange.id_objet1, isDemandeur ? exchange.objet2?.titre : exchange.objet1?.titre)}
               >
                 <Star className="mr-2 h-4 w-4" />
-                Laisser un avis
+                {t('exchanges.leave_review')}
               </Button>
             )}
             {exchange.statut === "valide" && (
               <>
                 <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700" onClick={() => onUpdate(exchange.id_echange, 'termine')}>
-                  Marquer comme terminé
+                  {t('exchanges.mark_completed')}
                 </Button>
                 <Button 
                   variant="outline" 
@@ -471,11 +460,11 @@ function ExchangeCard({ exchange, currentUser, onUpdate, onConfirmCancel, onRevi
                   className="text-destructive border-destructive/20" 
                   onClick={() => onConfirmCancel(exchange.id_echange, exchange.attempts_count)}
                 >
-                  Annuler l'échange
+                  {t('exchanges.cancel_exchange')}
                 </Button>
               </>
             )}
-            {(exchange.statut === "valide" || exchange.statut === "termine") && (
+            {(exchange.statut === "valide" || exchange.statut === "termine") && onDownloadPDF && (
               <Button 
                 variant="outline" 
                 size="sm" 
@@ -493,10 +482,10 @@ function ExchangeCard({ exchange, currentUser, onUpdate, onConfirmCancel, onRevi
   );
 }
 
-function EmptyState() {
+function EmptyState({ t }: { t: any }) {
   return (
     <div className="py-20 text-center border-2 border-dashed rounded-xl">
-      <p className="text-neutral-500">Aucun échange trouvé dans cette catégorie.</p>
+      <p className="text-neutral-500">{t('exchanges.no_exchanges')}</p>
     </div>
   );
 }

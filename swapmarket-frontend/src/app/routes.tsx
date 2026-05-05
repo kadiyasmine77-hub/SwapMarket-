@@ -18,8 +18,7 @@ import { AdminDashboard } from "./pages/admin/AdminDashboard";
 import { ManageUsers } from "./pages/admin/ManageUsers";
 import { ManageItems } from "./pages/admin/ManageItems";
 import { ManageCategories } from "./pages/admin/ManageCategories";
-import { Moderation } from "./pages/admin/Moderation";
-import { RolesPermissions } from "./pages/admin/RolesPermissions";
+import { AdminReports } from "./pages/admin/AdminReports";
 import { ActivityLogs } from "./pages/admin/ActivityLogs";
 import { PlatformSettings } from "./pages/admin/PlatformSettings";
 import { NotFound } from "./pages/NotFound";
@@ -70,8 +69,7 @@ export const router = createBrowserRouter([
       { path: "users", element: <ManageUsers /> },
       { path: "items", element: <ManageItems /> },
       { path: "categories", element: <ManageCategories /> },
-      { path: "moderation", element: <Moderation /> },
-      { path: "roles", element: <RolesPermissions /> },
+      { path: "reports", element: <AdminReports /> },
       { path: "logs", element: <ActivityLogs /> },
       { path: "settings", element: <PlatformSettings /> },
     ],

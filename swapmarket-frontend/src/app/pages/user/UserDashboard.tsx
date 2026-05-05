@@ -7,8 +7,10 @@ import { Avatar, AvatarImage, AvatarFallback } from "../../components/ui/avatar"
 import { Badge } from "../../components/ui/badge";
 import { API_BASE_URL, getStorageUrl } from "../../config";
 import { ImageSlider } from "../../components/ImageSlider";
+import { useLanguage } from "../../LanguageContext";
 
 export function UserDashboard() {
+  const { t } = useLanguage();
   const userStr = localStorage.getItem('user');
   const currentUser = userStr ? JSON.parse(userStr) : null;
   const [recommendedItems, setRecommendedItems] = useState<any[]>([]);
@@ -18,8 +20,6 @@ export function UserDashboard() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    
-
 
     // Fetch Recent Exchanges
     fetch(`${API_BASE_URL}/echanges`, {
@@ -54,37 +54,35 @@ export function UserDashboard() {
       });
   }, []);
 
-
-
   return (
     <div className="space-y-8">
       {/* Welcome */}
       <div>
-        <h1 className="mb-2 text-3xl font-bold">Bienvenue, {currentUser?.nom_complet || 'Utilisateur'} 👋</h1>
+        <h1 className="mb-2 text-3xl font-bold">
+          {t('dashboard.welcome')}, {currentUser?.nom_complet || t('common.user')} 👋
+        </h1>
         <p className="text-neutral-600">
-          Voici un aperçu de votre activité sur SwapMarket
+          {t('dashboard.overview')}
         </p>
       </div>
 
-
-
       {/* Quick Actions */}
       <div className="rounded-xl border bg-white p-6">
-        <h2 className="mb-4 text-xl font-bold">Actions rapides</h2>
+        <h2 className="mb-4 text-xl font-bold">{t('dashboard.quick_actions')}</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           <Link to="/user/publish">
             <Button className="w-full" size="lg">
-              Publier un objet
+              {t('common.publish')}
             </Button>
           </Link>
           <Link to="/user/search">
             <Button variant="outline" className="w-full" size="lg">
-              Rechercher
+              {t('common.search')}
             </Button>
           </Link>
           <Link to="/user/messages">
             <Button variant="outline" className="w-full" size="lg">
-              Messagerie
+              {t('dashboard.messaging')}
             </Button>
           </Link>
         </div>
@@ -94,21 +92,25 @@ export function UserDashboard() {
         {/* Recent Messages */}
         <div className="rounded-xl border bg-white p-6">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-xl font-bold">Messages</h2>
+            <h2 className="text-xl font-bold">{t('user_nav.messages')}</h2>
             <Link to="/user/messages">
-              <Button variant="ghost" size="sm">Ouvrir</Button>
+              <Button variant="ghost" size="sm">{t('common.open')}</Button>
             </Link>
           </div>
           <div className="space-y-4 h-[120px] flex flex-col justify-center items-center bg-neutral-50/50 rounded-lg border border-dashed">
             <MessageSquare className={`h-8 w-8 mb-2 ${unreadMessagesCount > 0 ? 'text-olive' : 'text-neutral-300'}`} />
             {unreadMessagesCount > 0 ? (
               <div className="text-center">
-                <p className="font-semibold text-olive">Vous avez {unreadMessagesCount} message{unreadMessagesCount > 1 ? 's' : ''} non lu{unreadMessagesCount > 1 ? 's' : ''}</p>
-                <p className="text-xs text-neutral-500 mt-1">Consultez votre messagerie pour y répondre.</p>
+                <p className="font-semibold text-olive">
+                  {unreadMessagesCount > 1 
+                    ? t('dashboard.unread_messages_plural', { count: unreadMessagesCount }) 
+                    : t('dashboard.unread_messages', { count: unreadMessagesCount })}
+                </p>
+                <p className="text-xs text-neutral-500 mt-1">{t('dashboard.check_messages')}</p>
               </div>
             ) : (
               <p className="text-center text-neutral-500 text-sm">
-                Aucun nouveau message pour le moment.
+                {t('dashboard.no_messages')}
               </p>
             )}
           </div>
@@ -117,9 +119,9 @@ export function UserDashboard() {
         {/* Recent Exchanges */}
         <div className="rounded-xl border bg-white p-6">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-xl font-bold">Échanges en cours</h2>
+            <h2 className="text-xl font-bold">{t('dashboard.current_exchanges')}</h2>
             <Link to="/user/history">
-              <Button variant="ghost" size="sm">Voir tout</Button>
+              <Button variant="ghost" size="sm">{t('common.view_all')}</Button>
             </Link>
           </div>
           <div className="space-y-4">
@@ -148,9 +150,9 @@ export function UserDashboard() {
                               : "outline"
                           }
                         >
-                          {exchange.statut === "en_attente" && "En attente"}
-                          {exchange.statut === "valide" && "Accepté"}
-                          {exchange.statut === "refuse" && "Refusé"}
+                          {exchange.statut === "en_attente" && t('exchanges.status_pending')}
+                          {exchange.statut === "valide" && t('exchanges.status_accepted')}
+                          {exchange.statut === "refuse" && t('exchanges.status_refused')}
                         </Badge>
                         <span className="text-xs text-neutral-500">
                           {new Date(exchange.date_demande).toLocaleDateString()}
@@ -161,7 +163,7 @@ export function UserDashboard() {
                 );
               })
             ) : (
-              <p className="text-center py-4 text-neutral-500 text-sm">Aucun échange en cours.</p>
+              <p className="text-center py-4 text-neutral-500 text-sm">{t('dashboard.no_exchanges')}</p>
             )}
           </div>
         </div>
@@ -169,10 +171,10 @@ export function UserDashboard() {
 
       {/* Recommended Items */}
       <div className="rounded-xl border bg-white p-6">
-        <h2 className="mb-4 text-xl font-bold">Objets recommandés pour vous</h2>
+        <h2 className="mb-4 text-xl font-bold">{t('dashboard.recommended')}</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {loading ? (
-            <p className="col-span-full text-center py-8 text-neutral-500">Chargement...</p>
+            <p className="col-span-full text-center py-8 text-neutral-500">{t('common.loading')}</p>
           ) : recommendedItems.length > 0 ? (
             recommendedItems.slice(0, 4).map((item) => (
               <Link key={item.id_objet} to={`/user/item/${item.id_objet}`}>
@@ -194,9 +196,9 @@ export function UserDashboard() {
                           'bg-green-500 hover:bg-green-600'
                         } text-white text-[9px] px-1.5 py-0 uppercase font-bold`}
                       >
-                        {item.disponibilite === 'echange' ? 'Échange' : 
-                         item.disponibilite === 'reserve' ? 'Réservé' : 
-                         item.disponibilite === 'disponible' ? 'Dispo' : item.disponibilite}
+                        {item.disponibilite === 'echange' ? t('common.exchanged') : 
+                         item.disponibilite === 'reserve' ? t('common.reserved') : 
+                         item.disponibilite === 'disponible' ? t('common.available') : item.disponibilite}
                       </Badge>
                     </div>
                   </div>
@@ -208,14 +210,14 @@ export function UserDashboard() {
                         <AvatarImage src={getStorageUrl(item.user?.photo_profil) || undefined} alt={item.user?.nom_complet} />
                         <AvatarFallback>{item.user?.nom_complet?.[0] || "?"}</AvatarFallback>
                       </Avatar>
-                      <span className="text-xs text-neutral-500 line-clamp-1">{item.user?.nom_complet || "Utilisateur"}</span>
+                      <span className="text-xs text-neutral-500 line-clamp-1">{item.user?.nom_complet || t('common.user')}</span>
                     </div>
                   </div>
                 </div>
               </Link>
             ))
           ) : (
-            <p className="col-span-full text-center py-8 text-neutral-500">Aucun objet recommandé pour le moment.</p>
+            <p className="col-span-full text-center py-8 text-neutral-500">{t('dashboard.no_recommended')}</p>
           )}
         </div>
       </div>

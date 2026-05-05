@@ -4,11 +4,13 @@ import { Home, Search, Plus, MessageSquare, Heart, History, User, LogOut } from 
 import { Avatar, AvatarImage, AvatarFallback } from "../components/ui/avatar";
 import { Button } from "../components/ui/button";
 import { getStorageUrl } from "../config";
-
-
+import { useLanguage } from "../LanguageContext";
+import { LanguageSwitcher } from "../components/LanguageSwitcher";
+import { Footer } from "../components/Footer";
 
 export function UserLayout() {
   const location = useLocation();
+  const { t } = useLanguage();
   const userStr = localStorage.getItem('user');
   const currentUser = userStr ? JSON.parse(userStr) : { nom_complet: 'Utilisateur', photo_profil: null };
 
@@ -20,12 +22,12 @@ export function UserLayout() {
   };
 
   const navItems = [
-    { path: "/user", icon: Home, label: "Accueil" },
-    { path: "/user/search", icon: Search, label: "Rechercher" },
-    { path: "/user/publish", icon: Plus, label: "Publier" },
-    { path: "/user/messages", icon: MessageSquare, label: "Messages" },
-    { path: "/user/favorites", icon: Heart, label: "Favoris" },
-    { path: "/user/history", icon: History, label: "Historique" },
+    { path: "/user", icon: Home, label: t('user_nav.home') },
+    { path: "/user/search", icon: Search, label: t('user_nav.search') },
+    { path: "/user/publish", icon: Plus, label: t('user_nav.publish') },
+    { path: "/user/messages", icon: MessageSquare, label: t('user_nav.messages') },
+    { path: "/user/favorites", icon: Heart, label: t('user_nav.favorites') },
+    { path: "/user/history", icon: History, label: t('user_nav.history') },
   ];
 
     const handleLogout = () => {
@@ -41,8 +43,15 @@ export function UserLayout() {
             <Link to="/user" className="flex items-center">
               <img src={logoImage} alt="SwapMarket" className="h-9 w-auto" />
             </Link>
-  
             <div className="flex items-center gap-4">
+              <LanguageSwitcher />
+              {currentUser.role === 'admin' && (
+                <Link to="/admin">
+                  <Button variant="outline" className="gap-2 border-red-200 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 font-semibold hidden sm:flex">
+                    {t('nav.admin_panel')}
+                  </Button>
+                </Link>
+              )}
               <Link to="/user/profile">
                 <Button variant="ghost" className="gap-2">
                   <Avatar className="h-8 w-8">
@@ -54,7 +63,7 @@ export function UserLayout() {
               </Link>
               <Link to="/" onClick={handleLogout}>
                 <Button variant="ghost" size="icon">
-                  <LogOut className="h-5 w-5" />
+                  <LogOut className="h-5 w-5" title={t('nav.logout')} />
                 </Button>
               </Link>
             </div>
@@ -87,10 +96,10 @@ export function UserLayout() {
         </div>
       </nav>
 
-      {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 py-8">
         <Outlet />
       </main>
+      <Footer />
     </div>
   );
 }

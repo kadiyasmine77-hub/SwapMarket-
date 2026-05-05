@@ -81,6 +81,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/favoris', [FavoriController::class, 'index']);
     Route::post('/favoris/toggle', [FavoriController::class, 'toggle']);
     Route::get('/favoris/{id}/check', [FavoriController::class, 'check']);
+
+    // Signalements (Utilisateurs)
+    Route::post('/signalements', [App\Http\Controllers\SignalementController::class, 'store']);
 });
 
 Route::middleware(['auth:sanctum', 'checkrole:admin'])->prefix('admin')->group(function () {
@@ -96,6 +99,10 @@ Route::middleware(['auth:sanctum', 'checkrole:admin'])->prefix('admin')->group(f
     Route::put('/categories/{id}', [CategorieController::class, 'update']);
     Route::delete('/categories/{id}', [CategorieController::class, 'destroy']);
 
+    // Signalements (Admins)
+    Route::get('/signalements', [App\Http\Controllers\SignalementController::class, 'indexAdmin']);
+    Route::put('/signalements/{id}/statut', [App\Http\Controllers\SignalementController::class, 'updateStatut']);
+
     Route::get('/objets', [AdminController::class, 'objets']);
     Route::delete('/objets/{id}', [AdminController::class, 'destroyObjet']);
 
@@ -104,6 +111,8 @@ Route::middleware(['auth:sanctum', 'checkrole:admin'])->prefix('admin')->group(f
 
     Route::get('/avis', [AdminController::class, 'avis']);
     Route::delete('/avis/{id}', [AdminController::class, 'destroyAvis']);
+
+    Route::get('/logs', [App\Http\Controllers\LogController::class, 'index']);
 
     Route::get('/export/pdf', [AdminController::class, 'exportPdf']);
     Route::get('/export/xml', [AdminController::class, 'exportXml']);

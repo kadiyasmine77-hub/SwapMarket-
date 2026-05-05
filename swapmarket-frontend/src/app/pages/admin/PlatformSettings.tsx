@@ -1,303 +1,111 @@
-import { useState } from "react";
 import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
-import { Textarea } from "../../components/ui/textarea";
 import { Switch } from "../../components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
-import { Settings, Mail, Shield, Database, Globe, Bell } from "lucide-react";
+import { Download, FileText, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
+import { API_BASE_URL } from "../../config";
+import { useState } from "react";
+import { useLanguage } from "../../LanguageContext";
 
 export function PlatformSettings() {
-  const [settings, setSettings] = useState({
-    siteName: "TrocPlateforme",
-    siteDescription: "Plateforme d'échange d'objets entre particuliers",
-    contactEmail: "contact@trocplateforme.com",
-    maxPhotosPerItem: "5",
-    autoApproveItems: false,
-    emailNotifications: true,
-    maintenanceMode: false,
-    registrationOpen: true,
-  });
+  const { t } = useLanguage();
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
 
-  const handleSave = (section: string) => {
-    toast.success(`Paramètres ${section} sauvegardés`);
+  const handleExportPDF = async () => {
+    const token = localStorage.getItem("token");
+    toast.info(t('settings.export_pdf_loading'));
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/export/pdf`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error();
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `rapport-swapmarket-${new Date().toISOString().split("T")[0]}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success(t('settings.export_pdf_success'));
+    } catch {
+      toast.error(t('settings.export_pdf_error'));
+    }
+  };
+
+  const handleExportXML = async () => {
+    const token = localStorage.getItem("token");
+    toast.info(t('settings.export_xml_loading'));
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/export/xml`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error();
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `users-swapmarket-${new Date().toISOString().split("T")[0]}.xml`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success(t('settings.export_xml_success'));
+    } catch {
+      toast.error(t('settings.export_xml_error'));
+    }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-4xl space-y-8">
       <div>
-        <h1 className="mb-2 text-3xl font-bold">Paramètres de la plateforme</h1>
-        <p className="text-neutral-600">Configurez les paramètres généraux</p>
+        <h1 className="mb-2 text-3xl font-bold text-neutral-900">{t('admin_nav.settings')}</h1>
+        <p className="text-neutral-600">{t('settings.platform_desc')}</p>
       </div>
 
-      <Tabs defaultValue="general" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="general" className="gap-2">
-            <Settings className="h-4 w-4" />
-            Général
-          </TabsTrigger>
-          <TabsTrigger value="email" className="gap-2">
-            <Mail className="h-4 w-4" />
-            Email
-          </TabsTrigger>
-          <TabsTrigger value="security" className="gap-2">
-            <Shield className="h-4 w-4" />
-            Sécurité
-          </TabsTrigger>
-          <TabsTrigger value="notifications" className="gap-2">
-            <Bell className="h-4 w-4" />
-            Notifications
-          </TabsTrigger>
-        </TabsList>
+      <div className="grid gap-6">
+        {/* Export Section - Kept as requested */}
+        <div className="rounded-2xl border bg-white p-8 shadow-sm">
+          <h2 className="mb-2 text-xl font-bold text-neutral-900">{t('settings.export_data')}</h2>
+          <p className="mb-6 text-neutral-500">{t('settings.export_desc')}</p>
+          <div className="flex flex-wrap gap-4">
+            <Button onClick={handleExportPDF} className="h-11 gap-2 bg-neutral-900 px-6 text-white hover:bg-neutral-800 transition-all">
+              <FileText className="h-5 w-5" />
+              {t('settings.export_pdf_btn')}
+            </Button>
+            <Button variant="outline" onClick={handleExportXML} className="h-11 gap-2 px-6 border-neutral-200 hover:bg-neutral-50 transition-all">
+              <Download className="h-5 w-5" />
+              {t('settings.export_xml_btn')}
+            </Button>
+          </div>
+        </div>
 
-        <TabsContent value="general" className="space-y-6">
-          <div className="rounded-xl border bg-white p-6">
-            <h2 className="mb-4 text-xl font-bold">Informations générales</h2>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="site-name">Nom de la plateforme</Label>
-                <Input
-                  id="site-name"
-                  value={settings.siteName}
-                  onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
-                />
+        {/* Global Controls - Simplified */}
+        <div className="rounded-2xl border bg-white p-8 shadow-sm">
+          <h2 className="mb-6 text-xl font-bold text-neutral-900">{t('settings.system_controls')}</h2>
+          
+          <div className="space-y-6">
+            <div className="flex items-center justify-between rounded-xl bg-neutral-50 p-6">
+              <div className="flex gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600">
+                  <ShieldAlert className="h-6 w-6" />
+                </div>
+                <div>
+                  <p className="font-bold text-neutral-900">{t('settings.maintenance_mode')}</p>
+                  <p className="text-sm text-neutral-500">{t('settings.maintenance_desc')}</p>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="site-desc">Description</Label>
-                <Textarea
-                  id="site-desc"
-                  value={settings.siteDescription}
-                  onChange={(e) => setSettings({ ...settings, siteDescription: e.target.value })}
-                  rows={3}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="contact-email">Email de contact</Label>
-                <Input
-                  id="contact-email"
-                  type="email"
-                  value={settings.contactEmail}
-                  onChange={(e) => setSettings({ ...settings, contactEmail: e.target.value })}
-                />
-              </div>
-              <Button onClick={() => handleSave("généraux")}>Enregistrer</Button>
+              <Switch 
+                checked={maintenanceMode} 
+                onCheckedChange={(checked) => {
+                  setMaintenanceMode(checked);
+                  toast.info(checked ? t('settings.maintenance_on') : t('settings.maintenance_off'));
+                }} 
+              />
             </div>
           </div>
-
-          <div className="rounded-xl border bg-white p-6">
-            <h2 className="mb-4 text-xl font-bold">Paramètres des annonces</h2>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="max-photos">Nombre maximum de photos par annonce</Label>
-                <Input
-                  id="max-photos"
-                  type="number"
-                  value={settings.maxPhotosPerItem}
-                  onChange={(e) => setSettings({ ...settings, maxPhotosPerItem: e.target.value })}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Approbation automatique</p>
-                  <p className="text-sm text-neutral-600">
-                    Les nouvelles annonces sont publiées sans modération
-                  </p>
-                </div>
-                <Switch
-                  checked={settings.autoApproveItems}
-                  onCheckedChange={(checked) =>
-                    setSettings({ ...settings, autoApproveItems: checked })
-                  }
-                />
-              </div>
-              <Button onClick={() => handleSave("des annonces")}>Enregistrer</Button>
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="email" className="space-y-6">
-          <div className="rounded-xl border bg-white p-6">
-            <h2 className="mb-4 text-xl font-bold">Configuration SMTP</h2>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="smtp-host">Hôte SMTP</Label>
-                <Input id="smtp-host" placeholder="smtp.example.com" />
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="smtp-port">Port</Label>
-                  <Input id="smtp-port" placeholder="587" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="smtp-user">Utilisateur</Label>
-                  <Input id="smtp-user" placeholder="noreply@trocplateforme.com" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="smtp-password">Mot de passe</Label>
-                <Input id="smtp-password" type="password" />
-              </div>
-              <div className="flex gap-2">
-                <Button onClick={() => handleSave("SMTP")}>Enregistrer</Button>
-                <Button variant="outline">Tester la connexion</Button>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-xl border bg-white p-6">
-            <h2 className="mb-4 text-xl font-bold">Modèles d'email</h2>
-            <div className="space-y-3">
-              {[
-                "Email de bienvenue",
-                "Confirmation d'échange",
-                "Notification de message",
-                "Rappel d'évaluation",
-              ].map((template, idx) => (
-                <div key={idx} className="flex items-center justify-between rounded-lg border p-4">
-                  <span className="font-medium">{template}</span>
-                  <Button variant="outline" size="sm">
-                    Modifier
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="security" className="space-y-6">
-          <div className="rounded-xl border bg-white p-6">
-            <h2 className="mb-4 text-xl font-bold">Paramètres de sécurité</h2>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between border-b pb-4">
-                <div>
-                  <p className="font-medium">Mode maintenance</p>
-                  <p className="text-sm text-neutral-600">
-                    Rendre la plateforme inaccessible temporairement
-                  </p>
-                </div>
-                <Switch
-                  checked={settings.maintenanceMode}
-                  onCheckedChange={(checked) =>
-                    setSettings({ ...settings, maintenanceMode: checked })
-                  }
-                />
-              </div>
-              <div className="flex items-center justify-between border-b pb-4">
-                <div>
-                  <p className="font-medium">Inscriptions ouvertes</p>
-                  <p className="text-sm text-neutral-600">
-                    Autoriser les nouvelles inscriptions
-                  </p>
-                </div>
-                <Switch
-                  checked={settings.registrationOpen}
-                  onCheckedChange={(checked) =>
-                    setSettings({ ...settings, registrationOpen: checked })
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="session-timeout">Durée de session (minutes)</Label>
-                <Input id="session-timeout" type="number" defaultValue="30" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="max-login">Tentatives de connexion max</Label>
-                <Input id="max-login" type="number" defaultValue="5" />
-              </div>
-              <Button onClick={() => handleSave("de sécurité")}>Enregistrer</Button>
-            </div>
-          </div>
-
-          <div className="rounded-xl border bg-white p-6">
-            <h2 className="mb-4 text-xl font-bold">Journalisation</h2>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Logs d'activité admin</p>
-                  <p className="text-sm text-neutral-600">
-                    Enregistrer toutes les actions administratives
-                  </p>
-                </div>
-                <Switch defaultChecked />
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Logs de connexion</p>
-                  <p className="text-sm text-neutral-600">
-                    Enregistrer toutes les tentatives de connexion
-                  </p>
-                </div>
-                <Switch defaultChecked />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="log-retention">Durée de rétention des logs (jours)</Label>
-                <Input id="log-retention" type="number" defaultValue="90" />
-              </div>
-              <Button onClick={() => handleSave("de journalisation")}>Enregistrer</Button>
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="notifications" className="space-y-6">
-          <div className="rounded-xl border bg-white p-6">
-            <h2 className="mb-4 text-xl font-bold">Notifications système</h2>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between border-b pb-4">
-                <div>
-                  <p className="font-medium">Notifications par email</p>
-                  <p className="text-sm text-neutral-600">
-                    Activer les notifications par email
-                  </p>
-                </div>
-                <Switch
-                  checked={settings.emailNotifications}
-                  onCheckedChange={(checked) =>
-                    setSettings({ ...settings, emailNotifications: checked })
-                  }
-                />
-              </div>
-              <div className="flex items-center justify-between border-b pb-4">
-                <div>
-                  <p className="font-medium">Alertes admin</p>
-                  <p className="text-sm text-neutral-600">
-                    Recevoir les alertes importantes
-                  </p>
-                </div>
-                <Switch defaultChecked />
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Rapports hebdomadaires</p>
-                  <p className="text-sm text-neutral-600">
-                    Rapport d'activité chaque lundi
-                  </p>
-                </div>
-                <Switch defaultChecked />
-              </div>
-              <Button onClick={() => handleSave("de notification")}>Enregistrer</Button>
-            </div>
-          </div>
-
-          <div className="rounded-xl border bg-white p-6">
-            <h2 className="mb-4 text-xl font-bold">Types de notifications utilisateur</h2>
-            <div className="space-y-3">
-              {[
-                { label: "Nouveau message", enabled: true },
-                { label: "Proposition d'échange", enabled: true },
-                { label: "Échange accepté", enabled: true },
-                { label: "Rappel d'évaluation", enabled: true },
-                { label: "Annonce favori disponible", enabled: false },
-              ].map((notif, idx) => (
-                <div key={idx} className="flex items-center justify-between">
-                  <span className="text-sm">{notif.label}</span>
-                  <Switch defaultChecked={notif.enabled} />
-                </div>
-              ))}
-            </div>
-          </div>
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
     </div>
   );
 }

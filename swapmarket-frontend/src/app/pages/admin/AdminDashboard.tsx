@@ -1,197 +1,190 @@
+import { useState, useEffect } from "react";
 import { Card } from "../../components/ui/card";
-import { Users, Package, TrendingUp, Flag, ArrowUp, ArrowDown } from "lucide-react";
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { mockAdminStats } from "../../lib/mockData";
-
-const activityData = [
-  { date: "Lun", exchanges: 12, items: 24, users: 8 },
-  { date: "Mar", exchanges: 19, items: 32, users: 15 },
-  { date: "Mer", exchanges: 15, items: 28, users: 12 },
-  { date: "Jeu", exchanges: 22, items: 35, users: 18 },
-  { date: "Ven", exchanges: 28, items: 42, users: 22 },
-  { date: "Sam", exchanges: 32, items: 48, users: 25 },
-  { date: "Dim", exchanges: 25, items: 38, users: 16 },
-];
+import { Users, Package, TrendingUp, MessageSquare, ArrowUp } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
+import { API_BASE_URL } from "../../config";
+import { useLanguage } from "../../LanguageContext";
 
 export function AdminDashboard() {
-  const stats = [
-    {
-      label: "Utilisateurs actifs",
-      value: mockAdminStats.activeUsers,
-      total: mockAdminStats.totalUsers,
-      icon: Users,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-      trend: "+12%",
-      isUp: true,
-    },
-    {
-      label: "Annonces actives",
-      value: mockAdminStats.activeItems,
-      total: mockAdminStats.totalItems,
-      icon: Package,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-      trend: "+8%",
-      isUp: true,
-    },
-    {
-      label: "Échanges réalisés",
-      value: mockAdminStats.completedExchanges,
-      total: mockAdminStats.totalExchanges,
-      icon: TrendingUp,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-      trend: "+15%",
-      isUp: true,
-    },
-    {
-      label: "Signalements en attente",
-      value: mockAdminStats.pendingReports,
-      total: mockAdminStats.resolvedReports + mockAdminStats.pendingReports,
-      icon: Flag,
-      color: "text-red-600",
-      bgColor: "bg-red-50",
-      trend: "-3%",
-      isUp: false,
-    },
-  ];
+  const { t } = useLanguage();
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    fetch(`${API_BASE_URL}/admin/stats`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        setStats(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const statCards = stats
+    ? [
+        {
+          label: t('admin_dashboard.stats.stat_users'),
+          value: stats.users_actifs,
+          total: stats.users,
+          icon: Users,
+          color: "text-blue-600",
+          bgColor: "bg-blue-50",
+          trend: "+12%",
+        },
+        {
+          label: t('admin_dashboard.stats.stat_items'),
+          value: stats.objets_dispo,
+          total: stats.objets,
+          icon: Package,
+          color: "text-green-600",
+          bgColor: "bg-green-50",
+          trend: "+8%",
+        },
+        {
+          label: t('admin_dashboard.stats.stat_swaps'),
+          value: stats.echanges_valides,
+          total: stats.echanges,
+          icon: TrendingUp,
+          color: "text-purple-600",
+          bgColor: "bg-purple-50",
+          trend: "+15%",
+        },
+        {
+          label: t('admin_dashboard.stats.stat_reviews'),
+          value: stats.avis,
+          total: stats.messages,
+          icon: MessageSquare,
+          color: "text-orange-600",
+          bgColor: "bg-orange-50",
+          trend: "+5%",
+        },
+      ]
+    : [];
+
+  // Build chart data from API
+  const monthNames = ["Jan", "Fév", "Mar", "Avr", "Mai", "Jui", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc"];
+  const exchangesByMonth: any[] = stats?.echanges_par_mois?.map((item: any) => ({
+    date: monthNames[item.mois - 1],
+    exchanges: item.total,
+  })) ?? [];
+
+  const categoriesData: any[] = stats?.objets_par_categorie?.map((item: any) => ({
+    category: item.nom,
+    count: item.total,
+  })) ?? [];
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="mb-2 text-3xl font-bold">Dashboard Administrateur</h1>
-        <p className="text-neutral-600">Vue d'ensemble de la plateforme TrocPlateforme</p>
+        <h1 className="mb-2 text-3xl font-bold">{t('admin_dashboard.sidebar.dashboard')}</h1>
+        <p className="text-neutral-600">{t('admin_dashboard.desc')}</p>
       </div>
 
       {/* Stats Grid */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <div key={stat.label} className="rounded-xl border bg-white p-6">
-              <div className="mb-4 flex items-center justify-between">
-                <div className={`rounded-full ${stat.bgColor} p-3`}>
-                  <Icon className={`h-6 w-6 ${stat.color}`} />
-                </div>
-                <div className={`flex items-center gap-1 text-sm ${stat.isUp ? "text-green-600" : "text-red-600"}`}>
-                  {stat.isUp ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
-                  <span>{stat.trend}</span>
-                </div>
+        {loading
+          ? Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="rounded-xl border bg-white p-6 animate-pulse">
+                <div className="h-12 w-12 rounded-full bg-neutral-200 mb-4" />
+                <div className="h-4 w-24 bg-neutral-200 rounded mb-2" />
+                <div className="h-8 w-16 bg-neutral-200 rounded" />
               </div>
-              <p className="mb-1 text-sm text-neutral-600">{stat.label}</p>
-              <p className="text-3xl font-bold">{stat.value}</p>
-              <p className="mt-1 text-xs text-neutral-500">sur {stat.total} au total</p>
-            </div>
-          );
-        })}
+            ))
+          : statCards.map((stat) => {
+              const Icon = stat.icon;
+              return (
+                <div key={stat.label} className="rounded-xl border bg-white p-6">
+                  <div className="mb-4 flex items-center justify-between">
+                    <div className={`rounded-full ${stat.bgColor} p-3`}>
+                      <Icon className={`h-6 w-6 ${stat.color}`} />
+                    </div>
+                    <div className="flex items-center gap-1 text-sm text-green-600">
+                      <ArrowUp className="h-4 w-4" />
+                      <span>{stat.trend}</span>
+                    </div>
+                  </div>
+                  <p className="mb-1 text-sm text-neutral-600">{stat.label}</p>
+                  <p className="text-3xl font-bold">{stat.value ?? 0}</p>
+                  <p className="mt-1 text-xs text-neutral-500">
+                    {t('admin_dashboard.stats.stat_total_of', { total: stat.total ?? 0 })}
+                  </p>
+                </div>
+              );
+            })}
       </div>
 
       {/* Charts */}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Activity Chart */}
         <div className="rounded-xl border bg-white p-6">
-          <h2 className="mb-4 text-xl font-bold">Activité de la semaine</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={activityData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
-              <XAxis dataKey="date" stroke="#737373" fontSize={12} />
-              <YAxis stroke="#737373" fontSize={12} />
-              <Tooltip />
-              <Line type="monotone" dataKey="exchanges" stroke="#2563eb" strokeWidth={2} />
-              <Line type="monotone" dataKey="items" stroke="#16a34a" strokeWidth={2} />
-              <Line type="monotone" dataKey="users" stroke="#9333ea" strokeWidth={2} />
-            </LineChart>
-          </ResponsiveContainer>
-          <div className="mt-4 flex justify-center gap-6 text-sm">
-            <div className="flex items-center gap-2">
-              <div className="h-3 w-3 rounded-full bg-blue-600"></div>
-              <span className="text-neutral-600">Échanges</span>
+          <h2 className="mb-4 text-xl font-bold">{t('admin_dashboard.charts.swaps')}</h2>
+          {exchangesByMonth.length > 0 ? (
+            <ResponsiveContainer width="100%" height={280}>
+              <LineChart data={exchangesByMonth}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
+                <XAxis dataKey="date" stroke="#737373" fontSize={12} />
+                <YAxis stroke="#737373" fontSize={12} />
+                <Tooltip />
+                <Line type="monotone" dataKey="exchanges" stroke="#2d80d3" strokeWidth={2} dot={{ r: 4 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex h-64 items-center justify-center text-neutral-400">{t('admin_dashboard.charts.no_data')}</div>
+          )}
+        </div>
+
+        <div className="rounded-xl border bg-white p-6">
+          <h2 className="mb-4 text-xl font-bold">{t('admin_dashboard.charts.categories')}</h2>
+          {categoriesData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={280}>
+              <BarChart data={categoriesData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
+                <XAxis dataKey="category" stroke="#737373" fontSize={11} angle={-30} textAnchor="end" height={60} />
+                <YAxis stroke="#737373" fontSize={12} />
+                <Tooltip />
+                <Bar dataKey="count" fill="#14213d" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex h-64 items-center justify-center text-neutral-400">{t('admin_dashboard.charts.no_data')}</div>
+          )}
+        </div>
+      </div>
+
+      {/* Summary */}
+      {stats && (
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div className="rounded-xl border bg-white p-5 flex items-center gap-4">
+            <div className="rounded-full bg-yellow-50 p-3">
+              <TrendingUp className="h-5 w-5 text-yellow-600" />
             </div>
-            <div className="flex items-center gap-2">
-              <div className="h-3 w-3 rounded-full bg-green-600"></div>
-              <span className="text-neutral-600">Annonces</span>
+            <div>
+              <p className="text-sm text-neutral-500">{t('admin_dashboard.stats.pending_swaps')}</p>
+              <p className="text-2xl font-bold">{stats.echanges_en_attente}</p>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="h-3 w-3 rounded-full bg-purple-600"></div>
-              <span className="text-neutral-600">Utilisateurs</span>
+          </div>
+          <div className="rounded-xl border bg-white p-5 flex items-center gap-4">
+            <div className="rounded-full bg-red-50 p-3">
+              <Users className="h-5 w-5 text-red-600" />
+            </div>
+            <div>
+              <p className="text-sm text-neutral-500">{t('admin_dashboard.stats.suspended_users')}</p>
+              <p className="text-2xl font-bold">{stats.users_suspendus}</p>
+            </div>
+          </div>
+          <div className="rounded-xl border bg-white p-5 flex items-center gap-4">
+            <div className="rounded-full bg-blue-50 p-3">
+              <Package className="h-5 w-5 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-sm text-neutral-500">{t('admin_dashboard.stats.total_reviews')}</p>
+              <p className="text-2xl font-bold">{stats.avis}</p>
             </div>
           </div>
         </div>
-
-        {/* Categories Chart */}
-        <div className="rounded-xl border bg-white p-6">
-          <h2 className="mb-4 text-xl font-bold">Catégories populaires</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart
-              data={[
-                { category: "Électronique", count: 145 },
-                { category: "Vêtements", count: 312 },
-                { category: "Livres", count: 198 },
-                { category: "Maison", count: 267 },
-                { category: "Sports", count: 89 },
-              ]}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
-              <XAxis dataKey="category" stroke="#737373" fontSize={12} angle={-45} textAnchor="end" height={80} />
-              <YAxis stroke="#737373" fontSize={12} />
-              <Tooltip />
-              <Bar dataKey="count" fill="#2563eb" radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* Recent Activity */}
-      <div className="rounded-xl border bg-white p-6">
-        <h2 className="mb-4 text-xl font-bold">Activité récente</h2>
-        <div className="space-y-3">
-          {[
-            {
-              user: "Sophie Martin",
-              action: "a publié un nouvel objet",
-              item: "Appareil photo Canon",
-              time: "Il y a 5 min",
-            },
-            {
-              user: "Marc Dupont",
-              action: "a complété un échange avec",
-              item: "Julie Bernard",
-              time: "Il y a 12 min",
-            },
-            {
-              user: "Pierre Leroy",
-              action: "s'est inscrit sur la plateforme",
-              item: "",
-              time: "Il y a 25 min",
-            },
-            {
-              user: "Emma Rousseau",
-              action: "a signalé une annonce",
-              item: "Contenu inapproprié",
-              time: "Il y a 1 h",
-            },
-            {
-              user: "Thomas Petit",
-              action: "a laissé un avis 5★",
-              item: "pour Claire Moreau",
-              time: "Il y a 2 h",
-            },
-          ].map((activity, idx) => (
-            <div key={idx} className="flex items-center gap-3 border-b pb-3 last:border-0">
-              <div className="h-10 w-10 rounded-full bg-neutral-100"></div>
-              <div className="flex-1">
-                <p className="text-sm">
-                  <span className="font-medium">{activity.user}</span>{" "}
-                  <span className="text-neutral-600">{activity.action}</span>{" "}
-                  {activity.item && <span className="font-medium">{activity.item}</span>}
-                </p>
-                <span className="text-xs text-neutral-500">{activity.time}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      )}
     </div>
   );
 }
