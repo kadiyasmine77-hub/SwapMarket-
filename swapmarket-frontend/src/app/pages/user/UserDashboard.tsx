@@ -8,6 +8,8 @@ import { Badge } from "../../components/ui/badge";
 import { API_BASE_URL, getStorageUrl } from "../../config";
 import { ImageSlider } from "../../components/ImageSlider";
 import { useLanguage } from "../../LanguageContext";
+import { Footer } from "../../components/Footer";
+import { toast } from "sonner";
 
 export function UserDashboard() {
   const { t } = useLanguage();
@@ -70,7 +72,12 @@ export function UserDashboard() {
       <div className="rounded-xl border bg-white p-6">
         <h2 className="mb-4 text-xl font-bold">{t('dashboard.quick_actions')}</h2>
         <div className="grid gap-4 sm:grid-cols-3">
-          <Link to="/user/publish">
+          <Link to="/user/publish" onClick={(e) => {
+            if (currentUser?.role === 'admin') {
+              e.preventDefault();
+              toast.info("Vous êtes connecté en tant qu'administrateur. Cette action est réservée aux comptes utilisateurs.");
+            }
+          }}>
             <Button className="w-full" size="lg">
               {t('common.publish')}
             </Button>
@@ -80,7 +87,12 @@ export function UserDashboard() {
               {t('common.search')}
             </Button>
           </Link>
-          <Link to="/user/messages">
+          <Link to="/user/messages" onClick={(e) => {
+            if (currentUser?.role === 'admin') {
+              e.preventDefault();
+              toast.info("Vous êtes connecté en tant qu'administrateur. Cette action est réservée aux comptes utilisateurs.");
+            }
+          }}>
             <Button variant="outline" className="w-full" size="lg">
               {t('dashboard.messaging')}
             </Button>
@@ -93,7 +105,12 @@ export function UserDashboard() {
         <div className="rounded-xl border bg-white p-6">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-xl font-bold">{t('user_nav.messages')}</h2>
-            <Link to="/user/messages">
+            <Link to="/user/messages" onClick={(e) => {
+              if (currentUser?.role === 'admin') {
+                e.preventDefault();
+                toast.info("Vous êtes connecté en tant qu'administrateur. Cette action est réservée aux comptes utilisateurs.");
+              }
+            }}>
               <Button variant="ghost" size="sm">{t('common.open')}</Button>
             </Link>
           </div>
@@ -120,7 +137,12 @@ export function UserDashboard() {
         <div className="rounded-xl border bg-white p-6">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-xl font-bold">{t('dashboard.current_exchanges')}</h2>
-            <Link to="/user/history">
+            <Link to="/user/history" onClick={(e) => {
+              if (currentUser?.role === 'admin') {
+                e.preventDefault();
+                toast.info("Vous êtes connecté en tant qu'administrateur. Cette action est réservée aux comptes utilisateurs.");
+              }
+            }}>
               <Button variant="ghost" size="sm">{t('common.view_all')}</Button>
             </Link>
           </div>
@@ -221,6 +243,7 @@ export function UserDashboard() {
           )}
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

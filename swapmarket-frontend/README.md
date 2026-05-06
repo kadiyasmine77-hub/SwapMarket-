@@ -1,7 +1,7 @@
 
-  # Sans titre
+  # SwapMarket
 
-  This is a code bundle for Sans titre. The original project is available at https://www.figma.com/design/rupemRZvtjhDoDSDZXoaQs/Sans-titre.
+  This is a code bundle for SwapMarket. The original project is available at https://www.figma.com/design/rupemRZvtjhDoDSDZXoaQs/Sans-titre.
 
   ## Running the code
 

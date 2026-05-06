@@ -58,6 +58,15 @@ export function SearchItems() {
   const handleToggleFavorite = async (e: React.MouseEvent, objetId: number) => {
     e.preventDefault();
     e.stopPropagation();
+
+    const userStr = localStorage.getItem('user');
+    const currentUser = userStr ? JSON.parse(userStr) : null;
+
+    if (currentUser?.role === 'admin') {
+      toast.info("Vous êtes connecté en tant qu'administrateur. Cette action est réservée aux comptes utilisateurs.");
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/favoris/toggle`, {

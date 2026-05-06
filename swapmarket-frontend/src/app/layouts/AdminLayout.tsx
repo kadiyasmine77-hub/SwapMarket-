@@ -16,7 +16,6 @@ import { mockCurrentUser } from "../lib/mockData";
 import logoImage from "../components/logo.png";
 import { useLanguage } from "../LanguageContext";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
-import { Footer } from "../components/Footer";
 
 export function AdminLayout() {
   const location = useLocation();
@@ -78,10 +77,6 @@ export function AdminLayout() {
             </div>
           </nav>
 
-          {/* Language Switcher */}
-          <div className="px-6 py-3 border-t">
-            <LanguageSwitcher />
-          </div>
 
           {/* User Profile */}
           <div className="border-t p-4">
@@ -106,10 +101,14 @@ export function AdminLayout() {
 
       {/* Main Content */}
       <main className="ml-64 flex-1">
+        {/* Top Header */}
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-end border-b bg-white/80 px-8 backdrop-blur-md">
+          <LanguageSwitcher />
+        </header>
+
         <div className="mx-auto max-w-7xl p-8">
           <Outlet />
         </div>
-        <Footer />
       </main>
     </div>
   );

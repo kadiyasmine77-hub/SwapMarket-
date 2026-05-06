@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Filter, SlidersHorizontal, X } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
+import { API_BASE_URL } from '../config';
 import { SearchBar } from '../components/SearchBar';
 import { ItemCard } from '../components/ItemCard';
 import { Button } from '../components/Button';
@@ -116,8 +117,26 @@ export function ExplorePage({ onNavigate }: ExplorePageProps) {
     },
   ];
 
-  const categories = ['Photography', 'Furniture', 'Books', 'Music', 'Home & Garden', 'Sports', 'Art', 'Electronics'];
+  const [categories, setCategories] = useState<any[]>([]);
   const conditions = ['New', 'Like New', 'Good', 'Fair'];
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/categories`)
+      .then(res => res.json())
+      .then(data => {
+        const sorted = Array.isArray(data) ? [...data].sort((a, b) => {
+          const nameA = a.nom.toLowerCase();
+          const nameB = b.nom.toLowerCase();
+          const isOtherA = ['autre', 'autres', 'other', 'others'].includes(nameA);
+          const isOtherB = ['autre', 'autres', 'other', 'others'].includes(nameB);
+          if (isOtherA) return 1;
+          if (isOtherB) return -1;
+          return nameA.localeCompare(nameB);
+        }) : [];
+        setCategories(sorted);
+      })
+      .catch(err => console.error("Error fetching categories:", err));
+  }, []);
 
   const toggleCategory = (category: string) => {
     setSelectedCategories((prev) =>
@@ -207,14 +226,14 @@ export function ExplorePage({ onNavigate }: ExplorePageProps) {
                 <h3 className="font-semibold mb-3 text-sm">{t('search.category')}</h3>
                 <div className="space-y-2">
                   {categories.map((category) => (
-                    <label key={category} className="flex items-center gap-2 cursor-pointer group">
+                    <label key={category.id_categorie} className="flex items-center gap-2 cursor-pointer group">
                       <input
                         type="checkbox"
-                        checked={selectedCategories.includes(category)}
-                        onChange={() => toggleCategory(category)}
+                        checked={selectedCategories.includes(category.nom)}
+                        onChange={() => toggleCategory(category.nom)}
                         className="w-4 h-4 rounded border-border text-olive focus:ring-olive"
                       />
-                      <span className="text-sm group-hover:text-olive transition-colors">{category}</span>
+                      <span className="text-sm group-hover:text-olive transition-colors">{category.nom}</span>
                     </label>
                   ))}
                 </div>

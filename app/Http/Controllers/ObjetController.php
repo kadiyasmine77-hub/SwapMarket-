@@ -148,6 +148,7 @@ class ObjetController extends Controller
             'gallery.*' => 'image|mimes:jpg,jpeg,png,webp|max:5120',
             'deleted_images' => 'nullable|array',
             'deleted_images.*' => 'integer',
+            'delete_cover' => 'nullable|boolean',
         ]);
 
         $data = $request->only(['titre', 'description', 'etat', 'disponibilite', 'id_categorie']);
@@ -164,6 +165,11 @@ class ObjetController extends Controller
             $extension = $file->getClientOriginalExtension();
             $filename = $safeUser . '_' . $safeTitle . '_cover_' . time() . '.' . $extension;
             $data['image'] = $file->storeAs('objets/covers', $filename, 'public');
+        } elseif ($request->delete_cover) {
+            if ($obj->image) {
+                Storage::disk('public')->delete($obj->image);
+            }
+            $data['image'] = null;
         }
 
         $obj->update($data);

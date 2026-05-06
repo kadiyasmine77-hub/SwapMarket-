@@ -120,6 +120,11 @@ export function UserProfile() {
   }, [profileId, isOwnProfile]);
 
   const handleSave = async () => {
+    if (currentUser?.role === 'admin') {
+      toast.info("Vous êtes connecté en tant qu'administrateur. Cette action est réservée aux comptes utilisateurs.");
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       const data = new FormData();
@@ -160,6 +165,11 @@ export function UserProfile() {
   };
 
   const handleDeleteItem = async (itemId: number) => {
+    if (currentUser?.role === 'admin') {
+      toast.info("Vous êtes connecté en tant qu'administrateur. Cette action est réservée aux comptes utilisateurs.");
+      return;
+    }
+
     if (!confirm(t('publish_edit.confirm_delete'))) return;
 
     try {
@@ -187,6 +197,11 @@ export function UserProfile() {
 
 
   const handlePasswordUpdate = async () => {
+    if (currentUser?.role === 'admin') {
+      toast.info("Vous êtes connecté en tant qu'administrateur. Cette action est réservée aux comptes utilisateurs.");
+      return;
+    }
+
     setPasswordErrors({});
     if (!currentPassword) {
       setPasswordErrors({ current_password: t('profile.error_current_password_required') });
@@ -425,7 +440,13 @@ export function UserProfile() {
                           <Button 
                             variant="outline" 
                             size="sm" 
-                            onClick={() => navigate(`/user/item/edit/${item.id_objet}`)}
+                            onClick={() => {
+                              if (item.disponibilite === 'reserve') {
+                                toast.error("Vous n'avez pas le droit de faire une modification si l'objet est réservé");
+                                return;
+                              }
+                              navigate(`/user/item/edit/${item.id_objet}`);
+                            }}
                             className="flex-1 text-xs border-olive text-olive hover:bg-olive/5"
                           >
                             {t('common.edit')}

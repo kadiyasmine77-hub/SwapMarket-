@@ -44,6 +44,8 @@ class AdminController extends Controller
                 ->join('categories', 'objets.id_categorie', '=', 'categories.id_categorie')
                 ->selectRaw('categories.nom, COUNT(*) as total')
                 ->groupBy('categories.nom')
+                ->orderByRaw("CASE WHEN LOWER(categories.nom) IN ('autre', 'autres', 'other', 'others') THEN 1 ELSE 0 END ASC")
+                ->orderBy('categories.nom', 'ASC')
                 ->get(),
         ]);
     }
@@ -131,7 +133,10 @@ class AdminController extends Controller
     public function categories()
     {
         return response()->json(
-            Categorie::withCount('objets')->orderBy('nom')->get()
+            Categorie::withCount('objets')
+                ->orderByRaw("CASE WHEN LOWER(nom) IN ('autre', 'autres', 'other', 'others') THEN 1 ELSE 0 END ASC")
+                ->orderBy('nom', 'ASC')
+                ->get()
         );
     }
 

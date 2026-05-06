@@ -53,7 +53,16 @@ export function ManageCategories() {
     })
       .then((r) => r.json())
       .then((data) => {
-        setCategories(Array.isArray(data) ? data : []);
+        const sorted = Array.isArray(data) ? [...data].sort((a, b) => {
+          const nameA = a.nom.toLowerCase();
+          const nameB = b.nom.toLowerCase();
+          const isOtherA = ['autre', 'autres', 'other', 'others'].includes(nameA);
+          const isOtherB = ['autre', 'autres', 'other', 'others'].includes(nameB);
+          if (isOtherA) return 1;
+          if (isOtherB) return -1;
+          return nameA.localeCompare(nameB);
+        }) : [];
+        setCategories(sorted);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -198,7 +207,6 @@ export function ManageCategories() {
               </TableRow>
             ) : (
               categories
-                .sort((a, b) => (b.objets_count || 0) - (a.objets_count || 0))
                 .map((cat) => (
                   <TableRow key={cat.id_categorie}>
                     <TableCell>

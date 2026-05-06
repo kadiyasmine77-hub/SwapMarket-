@@ -71,10 +71,18 @@ export function AdminDashboard() {
     exchanges: item.total,
   })) ?? [];
 
-  const categoriesData: any[] = stats?.objets_par_categorie?.map((item: any) => ({
-    category: item.nom,
-    count: item.total,
-  })) ?? [];
+  const categoriesData: any[] = (stats?.objets_par_categorie ?? [])
+    .sort((a: any, b: any) => {
+      const nameA = a.nom.toLowerCase();
+      const nameB = b.nom.toLowerCase();
+      if (nameA === 'autre' || nameA === 'other') return 1;
+      if (nameB === 'autre' || nameB === 'other') return -1;
+      return nameA.localeCompare(nameB);
+    })
+    .map((item: any) => ({
+      category: item.nom,
+      count: item.total,
+    }));
 
   return (
     <div className="space-y-6">

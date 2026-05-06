@@ -17,6 +17,7 @@ export function EditItem() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<{id: number | string, url: string, isMain: boolean}[]>([]); 
   const [deletedImageIds, setDeletedImageIds] = useState<number[]>([]);
+  const [deleteMainImage, setDeleteMainImage] = useState(false);
   const [newPreviews, setNewPreviews] = useState<string[]>([]); 
   const [categories, setCategories] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,7 +35,18 @@ export function EditItem() {
     // Fetch categories
     fetch(`${API_BASE_URL}/categories`)
       .then(res => res.json())
-      .then(data => setCategories(data))
+      .then(data => {
+        const sorted = Array.isArray(data) ? [...data].sort((a, b) => {
+          const nameA = a.nom.toLowerCase();
+          const nameB = b.nom.toLowerCase();
+          const isOtherA = ['autre', 'autres', 'other', 'others'].includes(nameA);
+          const isOtherB = ['autre', 'autres', 'other', 'others'].includes(nameB);
+          if (isOtherA) return 1;
+          if (isOtherB) return -1;
+          return nameA.localeCompare(nameB);
+        }) : [];
+        setCategories(sorted);
+      })
       .catch(err => console.error("Error fetching categories:", err));
 
     // Fetch item data
@@ -78,7 +90,9 @@ export function EditItem() {
 
   const removeExistingImage = (index: number) => {
     const imgToRemove = existingImages[index];
-    if (imgToRemove.id !== 'main') {
+    if (imgToRemove.id === 'main') {
+      setDeleteMainImage(true);
+    } else {
       setDeletedImageIds(prev => [...prev, imgToRemove.id as number]);
     }
     setExistingImages(prev => prev.filter((_, i) => i !== index));
@@ -94,6 +108,14 @@ export function EditItem() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const userStr = localStorage.getItem('user');
+    const currentUser = userStr ? JSON.parse(userStr) : null;
+    
+    if (currentUser?.role === 'admin') {
+      toast.info("Vous êtes connecté en tant qu'administrateur. Cette action est réservée aux comptes utilisateurs.");
+      return;
+    }
+
     setErrors({});
     setIsSubmitting(true);
 
@@ -106,10 +128,21 @@ export function EditItem() {
       data.append('id_categorie', formData.category);
       data.append('etat', formData.condition);
       
-      // Send ALL new images as gallery
-      if (selectedFiles.length > 0) {
-        for (let i = 0; i < selectedFiles.length; i++) {
+      // Handle image logic: if main is deleted and we have new files, first one becomes new main
+      if (deleteMainImage && selectedFiles.length > 0) {
+        data.append('image', selectedFiles[0]);
+        // Rest go to gallery
+        for (let i = 1; i < selectedFiles.length; i++) {
           data.append('gallery[]', selectedFiles[i]);
+        }
+      } else {
+        // Normal behavior: all new files to gallery, and send delete_cover flag
+        if (deleteMainImage) data.append('delete_cover', '1');
+        
+        if (selectedFiles.length > 0) {
+          for (let i = 0; i < selectedFiles.length; i++) {
+            data.append('gallery[]', selectedFiles[i]);
+          }
         }
       }
 

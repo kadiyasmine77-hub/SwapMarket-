@@ -6,7 +6,7 @@ import { Button } from "../components/ui/button";
 import { getStorageUrl } from "../config";
 import { useLanguage } from "../LanguageContext";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
-import { Footer } from "../components/Footer";
+import { toast } from "sonner";
 
 export function UserLayout() {
   const location = useLocation();
@@ -77,8 +77,17 @@ export function UserLayout() {
             {navItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.path);
+              const isBlockedForAdmin = currentUser?.role === 'admin' && ['/user/publish', '/user/messages', '/user/favorites', '/user/history'].includes(item.path);
+
+              const handleClick = (e: React.MouseEvent) => {
+                if (isBlockedForAdmin) {
+                  e.preventDefault();
+                  toast.info("Vous êtes connecté en tant qu'administrateur. Cette action est réservée aux comptes utilisateurs.");
+                }
+              };
+
               return (
-                <Link key={item.path} to={item.path}>
+                <Link key={item.path} to={item.path} onClick={handleClick}>
                   <button
                     className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm transition-colors ${
                       active
@@ -99,7 +108,6 @@ export function UserLayout() {
       <main className="mx-auto max-w-7xl px-4 py-8">
         <Outlet />
       </main>
-      <Footer />
     </div>
   );
 }

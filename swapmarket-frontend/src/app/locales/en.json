@@ -225,7 +225,8 @@
     "success_delete": "Listing \"{{title}}\" deleted",
     "view_annonce": "View listing",
     "confirm_delete_title": "Delete this listing?",
-    "confirm_delete_desc": "You are about to delete \"{{title}}\". This action is irreversible."
+    "confirm_delete_desc": "You are about to delete \"{{title}}\". This action is irreversible.",
+    "message_interest_toast": "Your interest in {{title}} has been sent to the owner!"
   },
   "search": {
     "title": "Search for items",
@@ -378,9 +379,9 @@
     "privacy": "Privacy Policy",
     "rules": "Community Rules",
     "contact": "Contact",
-    "address": "Casablanca, Morocco",
-    "phone": "+212 5XX XX XX XX",
-    "email": "contact@swapmarket.ma",
+    "address": "Oulfa, Casablanca, Morocco",
+    "phone": "+212 771557768",
+    "email": "swapmarket.contact@gmail.com",
     "copyright": "SwapMarket. Built on trust."
   },
   "admin_dashboard": {

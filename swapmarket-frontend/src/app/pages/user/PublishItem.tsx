@@ -29,7 +29,18 @@ export function PublishItem() {
   useEffect(() => {
     fetch(`${API_BASE_URL}/categories`)
       .then(res => res.json())
-      .then(data => setCategories(data))
+      .then(data => {
+        const sorted = Array.isArray(data) ? [...data].sort((a, b) => {
+          const nameA = a.nom.toLowerCase();
+          const nameB = b.nom.toLowerCase();
+          const isOtherA = ['autre', 'autres', 'other', 'others'].includes(nameA);
+          const isOtherB = ['autre', 'autres', 'other', 'others'].includes(nameB);
+          if (isOtherA) return 1;
+          if (isOtherB) return -1;
+          return nameA.localeCompare(nameB);
+        }) : [];
+        setCategories(sorted);
+      })
       .catch(err => console.error("Error fetching categories:", err));
   }, []);
 
@@ -54,6 +65,14 @@ export function PublishItem() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const userStr = localStorage.getItem('user');
+    const currentUser = userStr ? JSON.parse(userStr) : null;
+    
+    if (currentUser?.role === 'admin') {
+      toast.info("Vous êtes connecté en tant qu'administrateur. Cette action est réservée aux comptes utilisateurs.");
+      return;
+    }
+
     setErrors({}); // Clear previous errors
     setIsSubmitting(true);
 

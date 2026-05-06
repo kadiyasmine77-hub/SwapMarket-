@@ -1,6 +1,8 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight, Shield, Users, Sparkles, Package, TrendingUp, Heart } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
+import { API_BASE_URL } from '../config';
 import { Button } from '../components/Button';
 import { ItemCard } from '../components/ItemCard';
 import { Badge } from '../components/Badge';
@@ -63,14 +65,25 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
     },
   ];
 
-  const categories = [
-    { name: 'Electronics', count: 234, icon: Package },
-    { name: 'Furniture', count: 189, icon: Package },
-    { name: 'Books', count: 456, icon: Package },
-    { name: 'Music', count: 167, icon: Package },
-    { name: 'Sports', count: 312, icon: Package },
-    { name: 'Art', count: 98, icon: Package },
-  ];
+  const [categories, setCategories] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/categories`)
+      .then(res => res.json())
+      .then(data => {
+        const sorted = Array.isArray(data) ? [...data].sort((a, b) => {
+          const nameA = a.nom.toLowerCase();
+          const nameB = b.nom.toLowerCase();
+          const isOtherA = ['autre', 'autres', 'other', 'others'].includes(nameA);
+          const isOtherB = ['autre', 'autres', 'other', 'others'].includes(nameB);
+          if (isOtherA) return 1;
+          if (isOtherB) return -1;
+          return nameA.localeCompare(nameB);
+        }) : [];
+        setCategories(sorted);
+      })
+      .catch(err => console.error("Error fetching categories:", err));
+  }, []);
 
   return (
     <div className="min-h-screen">
@@ -285,7 +298,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {categories.map((category, idx) => (
               <motion.button
-                key={idx}
+                key={category.id_categorie || idx}
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
@@ -294,9 +307,9 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                 onClick={() => onNavigate('explore')}
                 className="p-6 bg-card border border-border rounded-xl hover:border-olive/30 hover:shadow-md transition-all text-center group"
               >
-                <category.icon className="w-8 h-8 text-olive mx-auto mb-3 group-hover:scale-110 transition-transform" />
-                <h3 className="font-semibold mb-1">{category.name}</h3>
-                <p className="text-sm text-muted-foreground">{t('categories.items_count', { count: category.count })}</p>
+                <Package className="w-8 h-8 text-olive mx-auto mb-3 group-hover:scale-110 transition-transform" />
+                <h3 className="font-semibold mb-1">{category.nom}</h3>
+                <p className="text-sm text-muted-foreground">{t('categories.items_count', { count: category.objets_count || 0 })}</p>
               </motion.button>
             ))}
           </div>

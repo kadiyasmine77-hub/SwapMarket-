@@ -225,7 +225,8 @@
     "success_delete": "Annonce \"{{title}}\" supprimée",
     "view_annonce": "Voir l'annonce",
     "confirm_delete_title": "Supprimer cette annonce ?",
-    "confirm_delete_desc": "Vous êtes sur le point de supprimer \"{{title}}\". Cette action est irréversible."
+    "confirm_delete_desc": "Vous êtes sur le point de supprimer \"{{title}}\". Cette action est irréversible.",
+    "message_interest_toast": "Votre intérêt pour {{title}} a été envoyé au propriétaire !"
   },
   "search": {
     "title": "Rechercher des objets",
@@ -378,9 +379,9 @@
     "privacy": "Politique de confidentialité",
     "rules": "Règles de la communauté",
     "contact": "Contact",
-    "address": "Casablanca, Maroc",
-    "phone": "+212 5XX XX XX XX",
-    "email": "contact@swapmarket.ma",
+    "address": "Oulfa, Casablanca, Maroc",
+    "phone": "+212 771557768",
+    "email": "swapmarket.contact@gmail.com",
     "copyright": "SwapMarket. Bâti sur la confiance."
   },
   "admin_dashboard": {

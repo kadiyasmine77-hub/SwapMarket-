@@ -59,6 +59,11 @@ export function ItemDetail() {
       return;
     }
 
+    if (currentUser.role === 'admin') {
+      toast.info("Vous êtes connecté en tant qu'administrateur. Cette action est réservée aux comptes utilisateurs.");
+      return;
+    }
+
     if (item.id_user === currentUser.id_user) {
       toast.error(t('items.cannot_swap_self'));
       return;
@@ -119,6 +124,14 @@ export function ItemDetail() {
   };
 
   const handleMessage = () => {
+    const userStr = localStorage.getItem('user');
+    const currentUser = userStr ? JSON.parse(userStr) : null;
+
+    if (currentUser?.role === 'admin') {
+      toast.info("Vous êtes connecté en tant qu'administrateur. Cette action est réservée aux comptes utilisateurs.");
+      return;
+    }
+
     toast.success(t('items.message_interest_toast', { title: item.titre }));
     // On pourrait aussi rediriger vers la page de profil du propriétaire
   };
@@ -126,6 +139,14 @@ export function ItemDetail() {
   const handleToggleFavorite = async () => {
     try {
       const token = localStorage.getItem('token');
+      const userStr = localStorage.getItem('user');
+      const currentUser = userStr ? JSON.parse(userStr) : null;
+
+      if (currentUser?.role === 'admin') {
+        toast.info("Vous êtes connecté en tant qu'administrateur. Cette action est réservée aux comptes utilisateurs.");
+        return;
+      }
+
       const response = await fetch(`${API_BASE_URL}/favoris/toggle`, {
         method: "POST",
         headers: {
@@ -151,6 +172,12 @@ export function ItemDetail() {
     const userStr = localStorage.getItem('user');
     if (!userStr) {
       toast.error(t('items.must_be_logged'));
+      return;
+    }
+
+    const currentUser = JSON.parse(userStr);
+    if (currentUser.role === 'admin') {
+      toast.info("Vous êtes connecté en tant qu'administrateur. Cette action est réservée aux comptes utilisateurs.");
       return;
     }
     setShowReportDialog(true);

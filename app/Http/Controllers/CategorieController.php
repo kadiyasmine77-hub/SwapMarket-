@@ -17,7 +17,11 @@ class CategorieController extends Controller
 
     public function index()
     {
-        return response()->json(Categorie::all());
+        return response()->json(
+            Categorie::orderByRaw("CASE WHEN LOWER(nom) IN ('autre', 'autres', 'other', 'others') THEN 1 ELSE 0 END ASC")
+                ->orderBy('nom', 'ASC')
+                ->get()
+        );
     }
 
     public function store(Request $request)
