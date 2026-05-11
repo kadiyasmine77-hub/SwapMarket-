@@ -115,7 +115,7 @@ export function ManageItems() {
       </div>
 
       {/* Table */}
-      <div className="rounded-xl border bg-white">
+      <div className="overflow-x-auto rounded-xl border bg-white">
         <Table>
           <TableHeader>
             <TableRow>
@@ -150,12 +150,12 @@ export function ManageItems() {
               filtered.map((item) => (
                 <TableRow key={item.id_objet}>
                   <TableCell>
-                    <div className="flex items-center gap-3 max-w-[240px]">
+                    <div className="flex items-center gap-3 min-w-[200px]">
                       {item.image ? (
                         <img
                           src={getStorageUrl(item.image) || ""}
                           alt={item.titre}
-                          className="h-10 w-10 flex-shrink-0 rounded-lg object-cover"
+                          className="media-thumbnail"
                         />
                       ) : (
                         <div className="h-10 w-10 flex-shrink-0 rounded-lg bg-neutral-100 flex items-center justify-center text-neutral-400 text-xs">N/A</div>

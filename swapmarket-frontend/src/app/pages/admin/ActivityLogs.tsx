@@ -92,7 +92,7 @@ export function ActivityLogs() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     toast.success(t('logs.success_export'));
   };
 
@@ -112,43 +112,43 @@ export function ActivityLogs() {
       </div>
 
       {/* Stats */}
-      <div className="grid gap-6 sm:grid-cols-4">
+      <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-4">
         {[
-          { 
-            label: t('logs.stat_total'), 
-            value: allLogs.length, 
-            color: "bg-blue-50 text-blue-600" 
+          {
+            label: t('logs.stat_total'),
+            value: allLogs.length,
+            color: "bg-blue-50 text-blue-600"
           },
-          { 
-            label: t('logs.stat_today'), 
+          {
+            label: t('logs.stat_today'),
             value: allLogs.filter(l => {
               const d = new Date(l.timestamp);
               const today = new Date();
-              return d.getDate() === today.getDate() && 
-                     d.getMonth() === today.getMonth() && 
-                     d.getFullYear() === today.getFullYear();
-            }).length, 
-            color: "bg-green-50 text-green-600" 
+              return d.getDate() === today.getDate() &&
+                d.getMonth() === today.getMonth() &&
+                d.getFullYear() === today.getFullYear();
+            }).length,
+            color: "bg-green-50 text-green-600"
           },
-          { 
-            label: t('logs.stat_week'), 
+          {
+            label: t('logs.stat_week'),
             value: allLogs.filter(l => {
               const d = new Date(l.timestamp);
               const weekAgo = new Date();
               weekAgo.setDate(weekAgo.getDate() - 7);
               return d >= weekAgo;
-            }).length, 
-            color: "bg-purple-50 text-purple-600" 
+            }).length,
+            color: "bg-purple-50 text-purple-600"
           },
-          { 
-            label: t('logs.stat_month'), 
+          {
+            label: t('logs.stat_month'),
             value: allLogs.filter(l => {
               const d = new Date(l.timestamp);
               const monthAgo = new Date();
               monthAgo.setMonth(monthAgo.getMonth() - 1);
               return d >= monthAgo;
-            }).length, 
-            color: "bg-orange-50 text-orange-600" 
+            }).length,
+            color: "bg-orange-50 text-orange-600"
           },
         ].map((stat, idx) => (
           <div key={idx} className="rounded-xl border bg-white p-6 shadow-sm">
@@ -184,7 +184,7 @@ export function ActivityLogs() {
       </div>
 
       {/* Logs Table */}
-      <div className="rounded-xl border bg-white">
+      <div className="overflow-x-auto rounded-xl border bg-white">
         <Table>
           <TableHeader>
             <TableRow>

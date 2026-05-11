@@ -9,7 +9,10 @@ import {
   Settings,
   LogOut,
   ArrowLeft,
+  Menu,
+  X,
 } from "lucide-react";
+import { useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "../components/ui/avatar";
 import { Button } from "../components/ui/button";
 import { mockCurrentUser } from "../lib/mockData";
@@ -20,6 +23,7 @@ import { LanguageSwitcher } from "../components/LanguageSwitcher";
 export function AdminLayout() {
   const location = useLocation();
   const { t } = useLanguage();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const isActive = (path: string) => {
     if (path === "/admin") {
@@ -39,18 +43,40 @@ export function AdminLayout() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-neutral-50 lg:flex">
+      {/* Mobile Toggle Overlay */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-neutral-900/50 backdrop-blur-sm lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r bg-white">
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 w-64 border-r bg-white transition-transform duration-300 ease-in-out lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
         <div className="flex h-full flex-col">
-          {/* Logo & Return Arrow */}
-          <div className="flex h-16 items-center gap-3 border-b px-6">
-            <Link to="/user" title={t('admin_nav.back')}>
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-neutral-500 hover:text-neutral-900">
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-            </Link>
-            <img src={logoImage} alt="SwapMarket" className="h-9 w-auto" />
+          {/* Logo & Return Arrow & Close button for mobile */}
+          <div className="flex h-16 items-center justify-between border-b px-6">
+            <div className="flex items-center gap-3">
+              <Link to="/user" title={t('admin_nav.back')}>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-neutral-500 hover:text-neutral-900">
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+              </Link>
+              <img src={logoImage} alt="SwapMarket" className="h-9 w-auto" />
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden"
+              onClick={() => setIsSidebarOpen(false)}
+            >
+              <X className="h-5 w-5" />
+            </Button>
           </div>
 
           {/* Navigation */}
@@ -60,7 +86,11 @@ export function AdminLayout() {
                 const Icon = item.icon;
                 const active = isActive(item.path);
                 return (
-                  <Link key={item.path} to={item.path}>
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setIsSidebarOpen(false)}
+                  >
                     <button
                       className={`flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm transition-colors ${
                         active
@@ -76,7 +106,6 @@ export function AdminLayout() {
               })}
             </div>
           </nav>
-
 
           {/* User Profile */}
           <div className="border-t p-4">
@@ -100,14 +129,26 @@ export function AdminLayout() {
       </aside>
 
       {/* Main Content */}
-      <main className="ml-64 flex-1">
+      <main className="flex-1 overflow-hidden">
         {/* Top Header */}
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-end border-b bg-white/80 px-8 backdrop-blur-md">
+        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b bg-white/80 px-4 backdrop-blur-md lg:px-8">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden"
+              onClick={() => setIsSidebarOpen(true)}
+            >
+              <Menu className="h-6 w-6 text-neutral-600" />
+            </Button>
+          </div>
           <LanguageSwitcher />
         </header>
 
-        <div className="mx-auto max-w-7xl p-8">
-          <Outlet />
+        <div className="p-4 md:p-8">
+          <div className="mx-auto max-w-7xl">
+            <Outlet />
+          </div>
         </div>
       </main>
     </div>

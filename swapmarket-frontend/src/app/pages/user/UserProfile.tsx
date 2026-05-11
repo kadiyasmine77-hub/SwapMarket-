@@ -391,7 +391,15 @@ export function UserProfile() {
         <TabsContent value="items" className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">{t('profile.my_objects')} ({myItems.length})</h2>
-            <Link to="/user/publish">
+            <Link 
+              to="/user/publish"
+              onClick={(e) => {
+                if (currentUser?.role === 'admin') {
+                  e.preventDefault();
+                  toast.info("Vous êtes connecté en tant qu'administrateur. Cette action est réservée aux comptes utilisateurs.");
+                }
+              }}
+            >
               <Button>{t('common.publish')}</Button>
             </Link>
           </div>
@@ -477,7 +485,15 @@ export function UserProfile() {
             ) : (
               <div className="col-span-full text-center py-12 bg-neutral-50 rounded-xl border-2 border-dashed">
                 <p className="text-neutral-500 mb-4">{t('dashboard.no_recommended')}</p>
-                <Link to="/user/publish">
+                <Link 
+                  to="/user/publish"
+                  onClick={(e) => {
+                    if (currentUser?.role === 'admin') {
+                      e.preventDefault();
+                      toast.info("Vous êtes connecté en tant qu'administrateur. Cette action est réservée aux comptes utilisateurs.");
+                    }
+                  }}
+                >
                   <Button variant="outline" className="border-olive text-olive">{t('common.publish')}</Button>
                 </Link>
               </div>

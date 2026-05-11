@@ -54,7 +54,7 @@ export function AdminReports() {
         },
         body: JSON.stringify({ statut }),
       });
-      
+
       if (res.ok) {
         toast.success(t('reports.success_update', { status: t(`reports.status_${statut}`) }));
         fetchReports();
@@ -104,7 +104,7 @@ export function AdminReports() {
         </Button>
       </div>
 
-      <div className="rounded-xl border bg-white overflow-hidden">
+      <div className="overflow-x-auto rounded-xl border bg-white">
         <Table>
           <TableHeader>
             <TableRow>

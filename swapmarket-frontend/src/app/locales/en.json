@@ -412,6 +412,9 @@
     "charts": {
       "swaps": "Swaps per month",
       "categories": "Listings per category",
+      "users_distribution": "Users distribution",
+      "status_active": "Active",
+      "status_suspended": "Suspended",
       "no_data": "No data available"
     },
     "desc": "Overview of the SwapMarket platform",

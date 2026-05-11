@@ -119,8 +119,8 @@ export function UserDashboard() {
             {unreadMessagesCount > 0 ? (
               <div className="text-center">
                 <p className="font-semibold text-olive">
-                  {unreadMessagesCount > 1 
-                    ? t('dashboard.unread_messages_plural', { count: unreadMessagesCount }) 
+                  {unreadMessagesCount > 1
+                    ? t('dashboard.unread_messages_plural', { count: unreadMessagesCount })
                     : t('dashboard.unread_messages', { count: unreadMessagesCount })}
                 </p>
                 <p className="text-xs text-neutral-500 mt-1">{t('dashboard.check_messages')}</p>
@@ -168,8 +168,8 @@ export function UserDashboard() {
                             exchange.statut === "valide"
                               ? "default"
                               : exchange.statut === "refuse"
-                              ? "destructive"
-                              : "outline"
+                                ? "destructive"
+                                : "outline"
                           }
                         >
                           {exchange.statut === "en_attente" && t('exchanges.status_pending')}
@@ -202,25 +202,24 @@ export function UserDashboard() {
               <Link key={item.id_objet} to={`/user/item/${item.id_objet}`}>
                 <div className="group overflow-hidden rounded-lg border transition-shadow hover:shadow-lg">
                   <div className="relative aspect-square overflow-hidden">
-                    <ImageSlider 
+                    <ImageSlider
                       images={[
                         ...(item.image ? [getStorageUrl(item.image)!] : []),
                         ...(item.images?.map((img: any) => getStorageUrl(img.image_url)!) || [])
-                      ]} 
-                      alt={item.titre} 
+                      ]}
+                      alt={item.titre}
                     />
                     {/* Availability Badge */}
                     <div className="absolute left-2 top-2 z-10">
-                      <Badge 
-                        className={`${
-                          item.disponibilite === 'echange' ? 'bg-yellow-500 hover:bg-yellow-600' : 
-                          item.disponibilite === 'reserve' ? 'bg-neutral-500 hover:bg-neutral-600' : 
-                          'bg-green-500 hover:bg-green-600'
-                        } text-white text-[9px] px-1.5 py-0 uppercase font-bold`}
+                      <Badge
+                        className={`${item.disponibilite === 'echange' ? 'bg-yellow-500 hover:bg-yellow-600' :
+                          item.disponibilite === 'reserve' ? 'bg-neutral-500 hover:bg-neutral-600' :
+                            'bg-green-500 hover:bg-green-600'
+                          } text-white text-[9px] px-1.5 py-0 uppercase font-bold`}
                       >
-                        {item.disponibilite === 'echange' ? t('common.exchanged') : 
-                         item.disponibilite === 'reserve' ? t('common.reserved') : 
-                         item.disponibilite === 'disponible' ? t('common.available') : item.disponibilite}
+                        {item.disponibilite === 'echange' ? t('common.exchanged') :
+                          item.disponibilite === 'reserve' ? t('common.reserved') :
+                            item.disponibilite === 'disponible' ? t('common.available') : item.disponibilite}
                       </Badge>
                     </div>
                   </div>

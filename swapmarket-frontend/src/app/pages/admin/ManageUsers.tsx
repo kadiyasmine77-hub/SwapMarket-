@@ -134,7 +134,7 @@ export function ManageUsers() {
     } catch (error) {
       toast.error(t('admin.import_error'));
     }
-    
+
     // Reset input
     event.target.value = "";
   };
@@ -208,7 +208,7 @@ export function ManageUsers() {
       </div>
 
       {/* Table */}
-      <div className="rounded-xl border bg-white">
+      <div className="overflow-x-auto rounded-xl border bg-white">
         <Table>
           <TableHeader>
             <TableRow>
@@ -243,12 +243,12 @@ export function ManageUsers() {
               users.map((user) => (
                 <TableRow key={user.id_user}>
                   <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Avatar>
+                    <div className="flex items-center gap-3 min-w-[180px]">
+                      <Avatar className="h-9 w-9 border border-neutral-200">
                         <AvatarImage src={getStorageUrl(user.photo_profil) || undefined} alt={user.nom_complet} />
                         <AvatarFallback>{user.nom_complet?.[0] || "?"}</AvatarFallback>
                       </Avatar>
-                      <span className="font-medium">{user.nom_complet}</span>
+                      <span className="font-medium text-sm">{user.nom_complet}</span>
                     </div>
                   </TableCell>
                   <TableCell className="text-neutral-600">{user.email}</TableCell>

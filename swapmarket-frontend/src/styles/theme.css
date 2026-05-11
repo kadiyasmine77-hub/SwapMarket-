@@ -183,3 +183,32 @@
     line-height: 1.5;
   }
 }
+
+@layer utilities {
+  /* Media & Image Utilities */
+  .media-aspect-square {
+    aspect-ratio: 1 / 1;
+    @apply object-cover rounded-lg overflow-hidden;
+  }
+
+  .media-thumbnail {
+    @apply h-10 w-10 flex-shrink-0 rounded-lg object-cover border border-neutral-200 transition-transform hover:scale-110;
+  }
+
+  .responsive-grid {
+    @apply grid gap-4 sm:gap-6;
+  }
+
+  /* Responsive Container for Charts/Media */
+  .media-container {
+    @apply relative w-full overflow-hidden rounded-xl border bg-white shadow-sm;
+  }
+
+  /* Mobile optimizations */
+  @media (max-width: 640px) {
+    .mobile-px { @apply px-4; }
+    .mobile-py { @apply py-6; }
+    .mobile-card-gap { @apply gap-3; }
+    .mobile-text-sm { @apply text-sm; }
+  }
+}

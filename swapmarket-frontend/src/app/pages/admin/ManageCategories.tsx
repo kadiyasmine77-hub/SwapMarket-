@@ -182,7 +182,7 @@ export function ManageCategories() {
       </div>
 
       {/* Table */}
-      <div className="rounded-xl border bg-white">
+      <div className="overflow-x-auto rounded-xl border bg-white">
         <Table>
           <TableHeader>
             <TableRow>
