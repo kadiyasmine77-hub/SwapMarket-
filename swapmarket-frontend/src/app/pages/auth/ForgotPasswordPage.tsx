@@ -1,5 +1,5 @@
 import { useState } from "react";
-import logoImage from "../../components/logo.png";
+import logoImage from "../../../assets/logo.png";
 import { Link } from "react-router";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";

@@ -118,7 +118,7 @@ export function ExplorePage({ onNavigate }: ExplorePageProps) {
   ];
 
   const [categories, setCategories] = useState<any[]>([]);
-  const conditions = ['New', 'Like New', 'Good', 'Fair'];
+  const conditions = ['neuf', 'bon', 'moyen', 'mauvais'];
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/categories`)
@@ -197,7 +197,7 @@ export function ExplorePage({ onNavigate }: ExplorePageProps) {
             ))}
             {selectedConditions.map((condition) => (
               <Badge key={condition} variant="olive" className="cursor-pointer" onClick={() => toggleCondition(condition)}>
-                {condition}
+                {t(`common.${condition}`)}
                 <X className="w-3 h-3" />
               </Badge>
             ))}
@@ -251,7 +251,7 @@ export function ExplorePage({ onNavigate }: ExplorePageProps) {
                         onChange={() => toggleCondition(condition)}
                         className="w-4 h-4 rounded border-border text-olive focus:ring-olive"
                       />
-                      <span className="text-sm group-hover:text-olive transition-colors">{condition}</span>
+                      <span className="text-sm group-hover:text-olive transition-colors">{t(`common.${condition}`)}</span>
                     </label>
                   ))}
                 </div>

@@ -32,7 +32,10 @@ class AdminController extends Controller
             'objets_dispo' => Objet::where('disponibilite', 'disponible')->count(),
             'echanges' => Echange::count(),
             'echanges_en_attente' => Echange::where('statut', 'en_attente')->count(),
-            'echanges_valides' => Echange::where('statut', 'valide')->count(),
+            'echanges_valides' => Echange::where('statut', '!=', 'en_attente')
+                                ->where('statut', '!=', 'refuse')
+                                ->where('statut', '!=', 'annule')
+                                ->count(),
             'avis' => Avis::count(),
             'messages' => Message::count(),
             'echanges_par_mois' => Echange::selectRaw('MONTH(created_at) as mois, COUNT(*) as total')
@@ -101,6 +104,27 @@ class AdminController extends Controller
         ]);
     }
 
+    public function echanges(Request $request)
+    {
+        $query = Echange::with(['demandeur', 'destinataire', 'objet1', 'objet2']);
+
+        if ($request->statut) {
+            $query->where('statut', $request->statut);
+        }
+
+        if ($request->search) {
+            $query->where(function($q) use ($request) {
+                $q->whereHas('demandeur', function($uq) use ($request) {
+                    $uq->where('nom_complet', 'like', '%' . $request->search . '%');
+                })->orWhereHas('destinataire', function($uq) use ($request) {
+                    $uq->where('nom_complet', 'like', '%' . $request->search . '%');
+                });
+            });
+        }
+
+        return response()->json($query->latest('id_echange')->paginate(15));
+    }
+
     public function updateRoleUser(Request $request, $id)
     {
         $request->validate([
@@ -128,6 +152,50 @@ class AdminController extends Controller
             'message' => 'Role mis a jour',
             'user' => $user,
         ]);
+    }
+
+    public function destroyUser($id)
+    {
+        $user = User::with('objets.images')->findOrFail($id);
+
+        if ($user->id_user === Auth::id()) {
+            return response()->json([
+                'message' => 'Vous ne pouvez pas supprimer votre propre compte',
+            ], 403);
+        }
+
+        // 1. Supprimer les objets de l'utilisateur et leurs fichiers physiques
+        foreach ($user->objets as $objet) {
+            // Supprimer la photo de couverture de l'objet
+            if ($objet->image) {
+                Storage::disk('public')->delete($objet->image);
+            }
+
+            // Supprimer toutes les images de la galerie de l'objet
+            foreach ($objet->images as $img) {
+                Storage::disk('public')->delete($img->image_url);
+            }
+
+            // Supprimer l'objet de la base de données
+            $objet->delete();
+        }
+
+        // 2. Supprimer la photo de profil de l'utilisateur
+        if ($user->photo_profil) {
+            Storage::disk('public')->delete($user->photo_profil);
+        }
+
+        // 3. Supprimer l'utilisateur de la base de données
+        $user->delete();
+
+        ActivityLog::create([
+            'admin_id' => Auth::id(),
+            'action' => 'Supprimé utilisateur',
+            'target' => $user->nom_complet,
+            'details' => "L'utilisateur et toutes ses annonces ont été supprimés définitivement"
+        ]);
+
+        return response()->json(['message' => 'Utilisateur et ses annonces supprimés avec succès']);
     }
 
     public function categories()
@@ -173,15 +241,6 @@ class AdminController extends Controller
         ]);
 
         return response()->json(['message' => 'Objet supprime']);
-    }
-
-    public function echanges()
-    {
-        return response()->json(
-            Echange::with(['objet1', 'objet2', 'demandeur', 'destinataire'])
-                ->latest('id_echange')
-                ->get()
-        );
     }
 
     public function updateStatutEchange(Request $request, $id)

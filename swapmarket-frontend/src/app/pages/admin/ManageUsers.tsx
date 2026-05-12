@@ -13,13 +13,23 @@ import {
   TableRow,
 } from "../../components/ui/table";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../../components/ui/alert-dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu";
-import { Search, MoreVertical, UserCheck, UserX, Shield, ShieldOff, ChevronLeft, ChevronRight, Download, Upload } from "lucide-react";
+import { Search, MoreVertical, UserCheck, UserX, Shield, ShieldOff, ChevronLeft, ChevronRight, Download, Upload, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { API_BASE_URL, getStorageUrl } from "../../config";
 import { useLanguage } from "../../LanguageContext";
@@ -33,6 +43,7 @@ export function ManageUsers() {
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [deleteTarget, setDeleteTarget] = useState<any>(null);
 
   const getToken = () => localStorage.getItem("token");
 
@@ -103,6 +114,28 @@ export function ManageUsers() {
       const data = await res.json();
       toast.error(data.message || t('admin.update_error'));
     }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    const { id_user, nom_complet } = deleteTarget;
+
+    const token = getToken();
+    const res = await fetch(`${API_BASE_URL}/admin/users/${id_user}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (res.ok) {
+      toast.success(t('admin.user_deleted', { name: nom_complet }));
+      fetchUsers(currentPage);
+    } else {
+      const data = await res.json();
+      toast.error(data.message || t('admin.update_error'));
+    }
+    setDeleteTarget(null);
   };
 
   const handleImportXML = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -297,6 +330,14 @@ export function ManageUsers() {
                             {t('admin.promote')}
                           </DropdownMenuItem>
                         )}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem 
+                          className="text-destructive font-medium"
+                          onClick={() => setDeleteTarget(user)}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          {t('common.delete')}
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -331,6 +372,24 @@ export function ManageUsers() {
           </div>
         </div>
       )}
+
+      {/* Confirm Delete Dialog */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('common.delete')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('admin.confirm_delete_user', { name: deleteTarget?.nom_complet })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+              {t('common.delete')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

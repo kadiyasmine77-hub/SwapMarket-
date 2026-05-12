@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from "react-router";
-import logoImage from "../components/logo.png";
+import logoImage from "../../assets/logo.png";
 import { Home, Search, Plus, MessageSquare, Heart, History, User, LogOut } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "../components/ui/avatar";
 import { Button } from "../components/ui/button";

@@ -83,7 +83,8 @@ class ObjetController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $extension = $file->getClientOriginalExtension();
-            $filename = $safeUser . '_' . $safeTitle . '_cover.' . $extension;
+            // Dossier 'covers' pour l'image principale
+            $filename = $safeUser . '_' . $safeTitle . '_cover_' . time() . '.' . $extension;
             $data['image'] = $file->storeAs('objets/covers', $filename, 'public');
         }
 
@@ -102,6 +103,7 @@ class ObjetController extends Controller
         if ($request->hasFile('gallery')) {
             foreach ($request->file('gallery') as $index => $img) {
                 $extension = $img->getClientOriginalExtension();
+                // Dossier 'galerie' pour les images secondaires
                 $filename = $safeUser . '_' . $safeTitle . '_galerie_' . time() . '_' . $index . '.' . $extension;
                 $path = $img->storeAs('objets/galerie', $filename, 'public');
                 
@@ -153,17 +155,23 @@ class ObjetController extends Controller
 
         $data = $request->only(['titre', 'description', 'etat', 'disponibilite', 'id_categorie']);
         $user = Auth::user();
+        
+        // Nettoyage des noms pour le fichier
         $safeUser = str_replace(' ', '_', preg_replace('/[^A-Za-z0-9\- ]/', '', $user->nom_complet));
-        $safeTitle = str_replace(' ', '_', preg_replace('/[^A-Za-z0-9\- ]/', '', $request->titre ?: $obj->titre));
+        $currentTitle = $request->titre ?: $obj->titre;
+        $safeTitle = str_replace(' ', '_', preg_replace('/[^A-Za-z0-9\- ]/', '', $currentTitle));
 
         if ($request->hasFile('image')) {
-            // Delete old main image
+            // Suppression de l'ancienne image physique
             if ($obj->image) {
                 Storage::disk('public')->delete($obj->image);
             }
+            
             $file = $request->file('image');
             $extension = $file->getClientOriginalExtension();
+            // Nom significatif : nomuser_titre_cover_timestamp.ext
             $filename = $safeUser . '_' . $safeTitle . '_cover_' . time() . '.' . $extension;
+            
             $data['image'] = $file->storeAs('objets/covers', $filename, 'public');
         } elseif ($request->delete_cover) {
             if ($obj->image) {
@@ -189,7 +197,7 @@ class ObjetController extends Controller
         if ($request->hasFile('gallery')) {
             foreach ($request->file('gallery') as $index => $img) {
                 $extension = $img->getClientOriginalExtension();
-                $filename = $safeUser . '_' . $safeTitle . '_galerie_' . time() . '_' . $index . '.' . $extension;
+                $filename = $safeUser . '_galerie_' . time() . '_' . $index . '.' . $extension;
                 $path = $img->storeAs('objets/galerie', $filename, 'public');
                 
                 \App\Models\ObjetImage::create([

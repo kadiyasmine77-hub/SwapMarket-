@@ -11,12 +11,13 @@ import {
   ArrowLeft,
   Menu,
   X,
+  ArrowRightLeft,
 } from "lucide-react";
 import { useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "../components/ui/avatar";
 import { Button } from "../components/ui/button";
 import { mockCurrentUser } from "../lib/mockData";
-import logoImage from "../components/logo.png";
+import logoImage from "../../assets/logo.png";
 import { useLanguage } from "../LanguageContext";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
 
@@ -37,6 +38,7 @@ export function AdminLayout() {
     { path: "/admin/users", icon: Users, label: t('admin_nav.users') },
     { path: "/admin/items", icon: Package, label: t('admin_nav.items') },
     { path: "/admin/categories", icon: Tag, label: t('admin_nav.categories') },
+    { path: "/admin/echanges", icon: ArrowRightLeft, label: t('admin_nav.echanges') },
     { path: "/admin/reports", icon: Flag, label: t('admin_nav.reports') },
     { path: "/admin/logs", icon: FileText, label: t('admin_nav.logs') },
     { path: "/admin/settings", icon: Settings, label: t('admin_nav.settings') },

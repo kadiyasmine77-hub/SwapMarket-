@@ -29,8 +29,10 @@
     "reserved": "Réservé",
     "new": "Neuf",
     "like_new": "Comme neuf",
+    "very_good": "Très bon état",
     "good": "Bon état",
-    "fair": "État correct",
+    "fair": "État moyen",
+    "bad": "Mauvais état",
     "propose_swap": "Proposer un échange",
     "edit": "Modifier",
     "delete": "Supprimer",
@@ -44,6 +46,13 @@
     "actions": "Actions",
     "user": "Utilisateur",
     "back": "Retour",
+    "details": "Détails",
+    "pending": "En attente",
+    "validated": "Validé",
+    "finished": "Terminé",
+    "refused": "Refusé",
+    "cancelled": "Annulé",
+    "error_loading": "Erreur lors du chargement",
     "sending": "Envoi...",
     "city": "Ville",
     "all_rights_reserved": "Tous droits réservés."
@@ -64,7 +73,23 @@
     "reports": "Signalements",
     "logs": "Logs",
     "settings": "Paramètres",
+    "echanges": "Gestion Échanges",
     "back": "Retour au site"
+  },
+  "admin_exchanges": {
+    "title": "Gestion des Échanges",
+    "subtitle": "Suivi complet des transactions SwapMarket",
+    "search_placeholder": "Rechercher un échange...",
+    "table_id": "ID",
+    "table_participants": "Participants",
+    "table_items": "Objets",
+    "table_status": "Statut",
+    "table_date": "Date",
+    "table_actions": "Actions",
+    "modal_title": "Détails de l'échange",
+    "no_results": "Aucun échange trouvé.",
+    "sender": "Demandeur",
+    "receiver": "Destinataire"
   },
   "dashboard": {
     "welcome": "Bienvenue",
@@ -189,7 +214,9 @@
     "deactivate": "Désactiver",
     "demote": "Rétrograder en Utilisateur",
     "promote": "Promouvoir Admin",
-    "role_admin": "Administrateur"
+    "role_admin": "Administrateur",
+    "confirm_delete_user": "Êtes-vous sûr de vouloir supprimer définitivement l'utilisateur {{name}} ? Cette action est irréversible.",
+    "user_deleted": "Utilisateur {{name}} supprimé avec succès."
   },
   "items": {
     "posted_on": "Publié le",
@@ -226,7 +253,9 @@
     "view_annonce": "Voir l'annonce",
     "confirm_delete_title": "Supprimer cette annonce ?",
     "confirm_delete_desc": "Vous êtes sur le point de supprimer \"{{title}}\". Cette action est irréversible.",
-    "message_interest_toast": "Votre intérêt pour {{title}} a été envoyé au propriétaire !"
+    "message_interest_toast": "Votre intérêt pour {{title}} a été envoyé au propriétaire !",
+    "must_be_logged_fav": "Veuillez vous connecter pour ajouter cet objet à vos favoris.",
+    "admin_restricted": "Les administrateurs ne peuvent pas gérer de liste de favoris."
   },
   "search": {
     "title": "Rechercher des objets",

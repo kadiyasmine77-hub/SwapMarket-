@@ -315,7 +315,7 @@ export function EditItem() {
                 <SelectItem value="neuf">{t('common.new')}</SelectItem>
                 <SelectItem value="bon">{t('common.good')}</SelectItem>
                 <SelectItem value="moyen">{t('common.fair')}</SelectItem>
-                <SelectItem value="mauvais">{t('common.fair')}</SelectItem>
+                <SelectItem value="mauvais">{t('common.bad')}</SelectItem>
               </SelectContent>
             </Select>
             <ErrorMessage message={errors.condition} />

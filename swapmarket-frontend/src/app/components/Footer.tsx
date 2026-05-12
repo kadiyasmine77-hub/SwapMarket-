@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 import { Github, Twitter, Instagram, Mail, ShieldCheck, MapPin, Phone, Scale, Lock, ShieldAlert, FileText, Search, Plus, Tag, User, MessageSquare, Heart, History } from 'lucide-react';
-import logoImage from './logo.png';
+import logoImage from '../../assets/logo.png';
 import { useLanguage } from '../LanguageContext';
 
 export function Footer() {

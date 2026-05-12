@@ -72,7 +72,12 @@ class MessageController extends Controller
             : $echange->id_demandeur;
 
         if ($request->hasFile('piece_jointe')) {
-            $data['piece_jointe'] = $request->file('piece_jointe')->store('messages/attachments', 'public');
+            $user = Auth::user();
+            $safeName = str_replace(' ', '_', preg_replace('/[^A-Za-z0-9\- ]/', '', $user->nom_complet));
+            $extension = $request->file('piece_jointe')->getClientOriginalExtension();
+            $filename = $safeName . '_msg_' . time() . '.' . $extension;
+            
+            $data['piece_jointe'] = $request->file('piece_jointe')->storeAs('messages/attachments', $filename, 'public');
             $data['nom_piece_jointe'] = $request->file('piece_jointe')->getClientOriginalName();
         }
 

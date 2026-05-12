@@ -129,7 +129,7 @@ export function ManageCategories() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="mb-2 text-3xl font-bold">{t('admin.manage_categories')}</h1>
-          <p className="text-neutral-600">{categories.length} {t('admin_dashboard.management.categories_count', { count: categories.length })}</p>
+          <p className="text-neutral-600">{t('admin_dashboard.management.categories_count', { count: categories.length })}</p>
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
@@ -213,7 +213,7 @@ export function ManageCategories() {
                       <span className="font-medium">{cat.nom}</span>
                     </TableCell>
                     <TableCell>
-                      <span className="text-neutral-600">{cat.objets_count || 0} {t('items.objects_count', { count: cat.objets_count || 0 })}</span>
+                      <span className="text-neutral-600">{t('items.objects_count', { count: cat.objets_count || 0 })}</span>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">

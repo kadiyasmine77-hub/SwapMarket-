@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router";
 import { Eye, EyeOff } from "lucide-react";
-import logoImage from "../../components/logo.png";
+import logoImage from "../../../assets/logo.png";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";

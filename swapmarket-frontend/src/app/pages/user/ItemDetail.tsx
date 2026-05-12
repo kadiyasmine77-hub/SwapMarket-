@@ -38,7 +38,15 @@ export function ItemDetail() {
   const [isReporting, setIsReporting] = useState(false);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/objets/${id}`)
+    const token = localStorage.getItem('token');
+    const headers: Record<string, string> = {
+      "Accept": "application/json",
+    };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    fetch(`${API_BASE_URL}/objets/${id}`, { headers })
       .then(res => res.json())
       .then(data => {
         setItem(data);
@@ -142,8 +150,13 @@ export function ItemDetail() {
       const userStr = localStorage.getItem('user');
       const currentUser = userStr ? JSON.parse(userStr) : null;
 
-      if (currentUser?.role === 'admin') {
-        toast.info("Vous êtes connecté en tant qu'administrateur. Cette action est réservée aux comptes utilisateurs.");
+      if (!currentUser || !token) {
+        toast.info(t('items.must_be_logged_fav'));
+        return;
+      }
+
+      if (currentUser.role === 'admin') {
+        toast.info(t('items.admin_restricted'));
         return;
       }
 
@@ -157,14 +170,16 @@ export function ItemDetail() {
         body: JSON.stringify({ id_objet: item.id_objet })
       });
 
+      const data = await response.json();
       if (response.ok) {
-        const data = await response.json();
         setItem((prev: any) => ({ ...prev, is_favorited: data.status === 'added' }));
         toast.success(data.message);
+      } else {
+        toast.error(data.message || t('admin.update_error'));
       }
     } catch (error) {
       console.error("Error toggling favorite:", error);
-      toast.error("Error");
+      toast.error(t('admin.update_error'));
     }
   };
 

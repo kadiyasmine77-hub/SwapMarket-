@@ -30,6 +30,8 @@ export function Messages() {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const userStr = localStorage.getItem('user');
@@ -94,25 +96,30 @@ export function Messages() {
   };
 
   const handleSend = async () => {
-    if (!messageText.trim() || !selectedChat || isSending) return;
+    if ((!messageText.trim() && !selectedFile) || !selectedChat || isSending) return;
 
     setIsSending(true);
     try {
       const token = localStorage.getItem('token');
+      const formData = new FormData();
+      if (messageText.trim()) formData.append('contenu', messageText);
+      if (selectedFile) formData.append('piece_jointe', selectedFile);
+
       const response = await fetch(`${API_BASE_URL}/echanges/${selectedChat.id_echange}/messages`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
           "Accept": "application/json",
         },
-        body: JSON.stringify({ contenu: messageText })
+        body: formData
       });
 
       if (response.ok) {
         const newMessage = await response.json();
         setMessages([...messages, newMessage]);
         setMessageText("");
+        setSelectedFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
       } else {
         const errorData = await response.json();
         if (selectedChat.statut === 'refuse') {
@@ -126,6 +133,17 @@ export function Messages() {
       toast.error(t('auth.error_server'));
     } finally {
       setIsSending(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Le fichier est trop volumineux (max 5Mo)");
+        return;
+      }
+      setSelectedFile(file);
     }
   };
 
@@ -150,7 +168,9 @@ export function Messages() {
             {loading ? (
               <p className="p-8 text-center text-sm text-neutral-500 italic">{t('common.loading')}</p>
             ) : conversations.length > 0 ? (
-              conversations.map((conv) => {
+              conversations
+                .filter(c => c.statut !== 'annule')
+                .map((conv) => {
                 const other = getOtherUser(conv);
                 const isActive = selectedChat?.id_echange === conv.id_echange;
                 return (
@@ -309,6 +329,28 @@ export function Messages() {
                             : "bg-white text-neutral-900 border rounded-bl-none"
                         }`}
                       >
+                        {msg.piece_jointe && (
+                          <div className="mb-2 overflow-hidden rounded-lg">
+                            {msg.piece_jointe.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
+                              <img 
+                                src={getStorageUrl(msg.piece_jointe)!} 
+                                alt="pj" 
+                                className="max-h-60 w-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                                onClick={() => window.open(getStorageUrl(msg.piece_jointe)!, '_blank')}
+                              />
+                            ) : (
+                              <a 
+                                href={getStorageUrl(msg.piece_jointe)!} 
+                                target="_blank" 
+                                rel="noreferrer"
+                                className={`flex items-center gap-2 p-2 text-xs underline ${isMe ? 'text-white' : 'text-blue-600'}`}
+                              >
+                                <Paperclip className="h-3 w-3" />
+                                {msg.nom_piece_jointe || "Voir le fichier"}
+                              </a>
+                            )}
+                          </div>
+                        )}
                         <p className="text-sm leading-relaxed">{msg.contenu}</p>
                         <span
                           className={`mt-1 block text-[10px] ${
@@ -334,23 +376,43 @@ export function Messages() {
 
             {/* Input */}
             <div className="border-t p-4 bg-white">
+              {selectedFile && (
+                <div className="mb-2 flex items-center gap-2 bg-neutral-100 p-2 rounded-lg text-xs">
+                  <Paperclip className="h-3 w-3 text-neutral-500" />
+                  <span className="flex-1 truncate">{selectedFile.name}</span>
+                  <button onClick={() => setSelectedFile(null)} className="text-red-500 font-bold px-1">✕</button>
+                </div>
+              )}
               <div className="flex gap-2 items-center">
-                <Button variant="ghost" size="icon" className="text-neutral-400 hover:text-neutral-600">
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  onChange={handleFileChange} 
+                  className="hidden" 
+                  accept="image/*,.pdf,.doc,.docx"
+                />
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-neutral-400 hover:text-neutral-600"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isSending || ['refuse', 'termine', 'annule'].includes(selectedChat.statut)}
+                >
                     <Paperclip className="h-5 w-5" />
                 </Button>
                 <Input
-                  placeholder={selectedChat.statut === 'refuse' ? t('messages_page.input_disabled') : t('messages_page.input_placeholder')}
+                  placeholder={['refuse', 'annule'].includes(selectedChat.statut) ? t('messages_page.input_disabled') : t('messages_page.input_placeholder')}
                   className="bg-neutral-50 border-none focus-visible:ring-1 focus-visible:ring-neutral-200"
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleSend()}
-                  disabled={isSending || selectedChat.statut === 'refuse' || selectedChat.statut === 'termine'}
+                  disabled={isSending || ['refuse', 'termine', 'annule'].includes(selectedChat.statut)}
                 />
                 <Button 
                     onClick={handleSend} 
                     size="icon" 
                     className="bg-black text-white hover:bg-black/90 shrink-0"
-                    disabled={!messageText.trim() || isSending || selectedChat.statut === 'refuse' || selectedChat.statut === 'termine'}
+                    disabled={!messageText.trim() || isSending || ['refuse', 'termine', 'annule'].includes(selectedChat.statut)}
                 >
                   <Send className="h-5 w-5" />
                 </Button>

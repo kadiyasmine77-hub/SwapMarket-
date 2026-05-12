@@ -21,6 +21,7 @@ import { ManageCategories } from "./pages/admin/ManageCategories";
 import { AdminReports } from "./pages/admin/AdminReports";
 import { ActivityLogs } from "./pages/admin/ActivityLogs";
 import { PlatformSettings } from "./pages/admin/PlatformSettings";
+import { AdminExchanges } from "./pages/admin/AdminExchanges";
 import { NotFound } from "./pages/NotFound";
 import Home from "./pages/Home";
 
@@ -69,6 +70,7 @@ export const router = createBrowserRouter([
       { path: "users", element: <ManageUsers /> },
       { path: "items", element: <ManageItems /> },
       { path: "categories", element: <ManageCategories /> },
+      { path: "echanges", element: <AdminExchanges /> },
       { path: "reports", element: <AdminReports /> },
       { path: "logs", element: <ActivityLogs /> },
       { path: "settings", element: <PlatformSettings /> },

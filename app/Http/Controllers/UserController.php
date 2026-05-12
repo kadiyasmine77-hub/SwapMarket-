@@ -42,7 +42,7 @@ class UserController extends Controller
             $extension = $file->getClientOriginalExtension();
             // Nettoyer le nom pour le fichier (pas d'espaces ni caractères spéciaux)
             $safeName = str_replace(' ', '_', preg_replace('/[^A-Za-z0-9\- ]/', '', $user->nom_complet));
-            $filename = $safeName . '_ImgPrfl.' . $extension;
+            $filename = $safeName . '_profil_' . time() . '.' . $extension;
             
             $path = $file->storeAs('profiles', $filename, 'public');
             $data['photo_profil'] = $path;

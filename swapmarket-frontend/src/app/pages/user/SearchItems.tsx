@@ -21,54 +21,84 @@ export function SearchItems() {
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedAvailability, setSelectedAvailability] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+  const [total, setTotal] = useState(0);
 
-  useEffect(() => {
-    // Fetch categories
-    fetch(`${API_BASE_URL}/categories`)
-      .then(res => res.json())
-      .then(data => setCategories(data))
-      .catch(err => console.error("Error fetching categories:", err));
+  const fetchItems = (page = 1) => {
+    setLoading(true);
+    const params = new URLSearchParams({
+      page: String(page),
+      per_page: "12"
+    });
+    if (searchQuery) params.append("search", searchQuery);
+    if (selectedCategory !== "all") params.append("categorie", selectedCategory);
+    if (selectedStatus !== "all") params.append("etat", selectedStatus);
+    if (selectedAvailability !== "all") params.append("disponibilite", selectedAvailability);
 
-    // Fetch all items
-    fetch(`${API_BASE_URL}/objets`)
+    const token = localStorage.getItem('token');
+    const headers: Record<string, string> = {
+      "Accept": "application/json",
+    };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    fetch(`${API_BASE_URL}/objets?${params}`, { headers })
       .then(res => res.json())
       .then(data => {
-        // data might be paginated
-        setItems(data.data || data);
+        setItems(data.data || []);
+        setCurrentPage(data.current_page || 1);
+        setLastPage(data.last_page || 1);
+        setTotal(data.total || 0);
         setLoading(false);
       })
       .catch(err => {
         console.error("Error fetching items:", err);
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    // Fetch categories once
+    fetch(`${API_BASE_URL}/categories`)
+      .then(res => res.json())
+      .then(data => setCategories(data))
+      .catch(err => console.error("Error fetching categories:", err));
   }, []);
 
-  const filteredItems = items.filter((item) => {
-    const matchesSearch = 
-      (item.titre?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-       item.description?.toLowerCase().includes(searchQuery.toLowerCase()));
-    
-    const matchesCategory = selectedCategory === "all" || item.id_categorie?.toString() === selectedCategory;
-    const matchesStatus = selectedStatus === "all" || item.etat === selectedStatus;
-    const matchesAvailability = selectedAvailability === "all" || item.disponibilite === selectedAvailability;
-    
-    return matchesSearch && matchesCategory && matchesStatus && matchesAvailability;
-  });
+  // Effect to fetch items when filters or page changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchItems(1);
+    }, 400); // Small debounce for search
+    return () => clearTimeout(timer);
+  }, [searchQuery, selectedCategory, selectedStatus, selectedAvailability]);
+
+  const handlePageChange = (newPage: number) => {
+    fetchItems(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleToggleFavorite = async (e: React.MouseEvent, objetId: number) => {
     e.preventDefault();
     e.stopPropagation();
 
     const userStr = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
     const currentUser = userStr ? JSON.parse(userStr) : null;
 
-    if (currentUser?.role === 'admin') {
-      toast.info("Vous êtes connecté en tant qu'administrateur. Cette action est réservée aux comptes utilisateurs.");
+    if (!currentUser || !token) {
+      toast.info(t('items.must_be_logged_fav'));
+      return;
+    }
+
+    if (currentUser.role === 'admin') {
+      toast.info(t('items.admin_restricted'));
       return;
     }
 
     try {
-      const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/favoris/toggle`, {
         method: "POST",
         headers: {
@@ -79,16 +109,18 @@ export function SearchItems() {
         body: JSON.stringify({ id_objet: objetId })
       });
 
+      const data = await response.json();
       if (response.ok) {
-        const data = await response.json();
         setItems(prev => prev.map(item => 
           item.id_objet === objetId ? { ...item, is_favorited: data.status === 'added' } : item
         ));
         toast.success(data.message);
+      } else {
+        toast.error(data.message || t('admin.update_error'));
       }
     } catch (error) {
       console.error("Error toggling favorite:", error);
-      toast.error("Error");
+      toast.error(t('admin.update_error'));
     }
   };
 
@@ -98,7 +130,7 @@ export function SearchItems() {
       <div>
         <h1 className="mb-2 text-3xl font-bold">{t('search.title')}</h1>
         <p className="text-neutral-600">
-          {t('search.subtitle', { count: items.length })}
+          {t('search.subtitle', { count: total })}
         </p>
       </div>
 
@@ -201,16 +233,16 @@ export function SearchItems() {
       {/* Results */}
       <div>
         <p className="mb-4 text-sm text-neutral-600">
-          {filteredItems.length > 1 
-            ? t('search.results_found_plural', { count: filteredItems.length })
-            : t('search.results_found', { count: filteredItems.length })}
+          {total > 1 
+            ? t('search.results_found_plural', { count: total })
+            : t('search.results_found', { count: total })}
         </p>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {loading ? (
             <p className="col-span-full text-center py-12 text-neutral-500">{t('common.loading')}</p>
-          ) : filteredItems.length > 0 ? (
-            filteredItems.map((item) => (
+          ) : items.length > 0 ? (
+            items.map((item) => (
               <div key={item.id_objet} className="group overflow-hidden rounded-xl border bg-white transition-shadow hover:shadow-lg">
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <ImageSlider 
@@ -271,6 +303,35 @@ export function SearchItems() {
             <p className="col-span-full text-center py-12 text-neutral-500">{t('search.no_results')}</p>
           )}
         </div>
+
+        {/* Pagination */}
+        {lastPage > 1 && (
+          <div className="mt-12 flex items-center justify-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={currentPage === 1}
+              onClick={() => handlePageChange(currentPage - 1)}
+            >
+              {t('explore.previous')}
+            </Button>
+            
+            <div className="flex items-center gap-1 mx-4">
+              <span className="text-sm font-medium">{currentPage}</span>
+              <span className="text-sm text-neutral-400">/</span>
+              <span className="text-sm text-neutral-400">{lastPage}</span>
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={currentPage === lastPage}
+              onClick={() => handlePageChange(currentPage + 1)}
+            >
+              {t('explore.next')}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

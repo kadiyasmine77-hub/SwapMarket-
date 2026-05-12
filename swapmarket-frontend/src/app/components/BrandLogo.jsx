@@ -1,4 +1,4 @@
-import logoImage from './logo.png';
+import logoImage from '../../assets/logo.png';
 
 export default function BrandLogo({ compact = false }) {
   return (

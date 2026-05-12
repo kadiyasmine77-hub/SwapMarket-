@@ -98,7 +98,7 @@ export function ManageItems() {
     <div className="space-y-6">
       <div>
         <h1 className="mb-2 text-3xl font-bold">{t('admin.manage_items')}</h1>
-        <p className="text-neutral-600">{filtered.length} {t('items.objects_count', { count: filtered.length })}</p>
+        <p className="text-neutral-600">{t('items.objects_count', { count: filtered.length })}</p>
       </div>
 
       {/* Search */}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "../../components/ui/avatar";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -16,8 +16,11 @@ import { useLanguage } from "../../LanguageContext";
 
 export function UserProfile() {
   const { t } = useLanguage();
-  const userStr = localStorage.getItem('user');
-  const currentUser = userStr ? JSON.parse(userStr) : null;
+  const currentUser = useMemo(() => {
+    const userStr = localStorage.getItem('user');
+    return userStr ? JSON.parse(userStr) : null;
+  }, []);
+
   const navigate = useNavigate();
 
   const { id } = useParams();
@@ -309,8 +312,11 @@ export function UserProfile() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>{t('profile.phone')}</Label>
+                  <Label htmlFor="phone-input">{t('profile.phone')}</Label>
                   <Input
+                    id="phone-input"
+                    name="phone"
+                    type="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   />

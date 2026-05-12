@@ -29,8 +29,10 @@
     "reserved": "Reserved",
     "new": "New",
     "like_new": "Like new",
+    "very_good": "Very good condition",
     "good": "Good condition",
     "fair": "Fair condition",
+    "bad": "Bad condition",
     "propose_swap": "Propose a swap",
     "edit": "Edit",
     "delete": "Delete",
@@ -44,6 +46,13 @@
     "actions": "Actions",
     "user": "User",
     "back": "Back",
+    "details": "Details",
+    "pending": "Pending",
+    "validated": "Validated",
+    "finished": "Finished",
+    "refused": "Refused",
+    "cancelled": "Cancelled",
+    "error_loading": "Error during loading",
     "sending": "Sending...",
     "city": "City",
     "all_rights_reserved": "All rights reserved."
@@ -64,7 +73,23 @@
     "reports": "Reports",
     "logs": "Logs",
     "settings": "Settings",
+    "echanges": "Manage Swaps",
     "back": "Back to site"
+  },
+  "admin_exchanges": {
+    "title": "Swaps Management",
+    "subtitle": "Complete tracking of SwapMarket transactions",
+    "search_placeholder": "Search for a swap...",
+    "table_id": "ID",
+    "table_participants": "Participants",
+    "table_items": "Items",
+    "table_status": "Status",
+    "table_date": "Date",
+    "table_actions": "Actions",
+    "modal_title": "Swap Details",
+    "no_results": "No swaps found.",
+    "sender": "Sender",
+    "receiver": "Receiver"
   },
   "dashboard": {
     "welcome": "Welcome",
@@ -189,7 +214,9 @@
     "deactivate": "Deactivate",
     "demote": "Demote to User",
     "promote": "Promote to Admin",
-    "role_admin": "Administrator"
+    "role_admin": "Administrator",
+    "confirm_delete_user": "Are you sure you want to permanently delete user {{name}}? This action is irreversible.",
+    "user_deleted": "User {{name}} deleted successfully."
   },
   "items": {
     "posted_on": "Posted on",
@@ -226,7 +253,9 @@
     "view_annonce": "View listing",
     "confirm_delete_title": "Delete this listing?",
     "confirm_delete_desc": "You are about to delete \"{{title}}\". This action is irreversible.",
-    "message_interest_toast": "Your interest in {{title}} has been sent to the owner!"
+    "message_interest_toast": "Your interest in {{title}} has been sent to the owner!",
+    "must_be_logged_fav": "Please log in to add this item to your favorites.",
+    "admin_restricted": "Administrators cannot manage a favorites list."
   },
   "search": {
     "title": "Search for items",

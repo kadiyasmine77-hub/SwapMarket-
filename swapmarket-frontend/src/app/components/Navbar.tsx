@@ -1,5 +1,5 @@
 import { Search, Heart, MessageSquare, User, Menu } from 'lucide-react';
-import logoImage from './logo.png';
+import logoImage from '../../assets/logo.png';
 import { Button } from './Button';
 import { useState } from 'react';
 import { Link } from 'react-router';

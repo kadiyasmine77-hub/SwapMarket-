@@ -90,8 +90,10 @@ Route::middleware(['auth:sanctum', 'checkrole:admin'])->prefix('admin')->group(f
     Route::get('/stats', [AdminController::class, 'stats']);
 
     Route::get('/users', [AdminController::class, 'users']);
+    Route::get('/echanges', [AdminController::class, 'echanges']);
     Route::put('/users/{id}/statut', [AdminController::class, 'updateStatutUser']);
     Route::put('/users/{id}/role', [AdminController::class, 'updateRoleUser']);
+    Route::delete('/users/{id}', [AdminController::class, 'destroyUser']);
     Route::get('/users/{id}/stats', [AdminController::class, 'statsUser']);
 
     Route::get('/categories', [AdminController::class, 'categories']);
