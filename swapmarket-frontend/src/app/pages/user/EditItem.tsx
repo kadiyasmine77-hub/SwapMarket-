@@ -11,7 +11,7 @@ import { API_BASE_URL, getStorageUrl } from "../../config";
 import { useLanguage } from "../../LanguageContext";
 
 export function EditItem() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { id } = useParams();
   const navigate = useNavigate();
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -156,6 +156,7 @@ export function EditItem() {
         headers: {
           "Authorization": `Bearer ${token}`,
           "Accept": "application/json",
+          "Accept-Language": language,
         },
         body: data
       });

@@ -16,7 +16,7 @@ import {
 import { useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "../components/ui/avatar";
 import { Button } from "../components/ui/button";
-import { mockCurrentUser } from "../lib/mockData";
+
 import logoImage from "../../assets/logo.png";
 import { useLanguage } from "../LanguageContext";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
@@ -25,6 +25,7 @@ export function AdminLayout() {
   const location = useLocation();
   const { t } = useLanguage();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   const isActive = (path: string) => {
     if (path === "/admin") {
@@ -113,11 +114,11 @@ export function AdminLayout() {
           <div className="border-t p-4">
             <div className="flex items-center gap-3">
               <Avatar className="h-10 w-10">
-                <AvatarImage src={mockCurrentUser.avatar} alt={mockCurrentUser.name} />
-                <AvatarFallback>{mockCurrentUser.name[0]}</AvatarFallback>
+                <AvatarImage src={user.photo_profil ? `http://localhost:8000/storage/${user.photo_profil}` : undefined} alt={user.nom_complet || "Admin"} />
+                <AvatarFallback>{user.nom_complet ? user.nom_complet[0] : "A"}</AvatarFallback>
               </Avatar>
               <div className="flex-1 overflow-hidden">
-                <div className="truncate text-sm font-medium">{mockCurrentUser.name}</div>
+                <div className="truncate text-sm font-medium">{user.nom_complet || "Admin"}</div>
                 <div className="truncate text-xs text-neutral-500">{t('admin.role_admin')}</div>
               </div>
               <Link to="/">

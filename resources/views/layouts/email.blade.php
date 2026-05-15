@@ -2,31 +2,133 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <meta name="supported-color-schemes" content="light">
   <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f4f8; margin: 0; padding: 20px; }
-    .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    .header { background: @yield('color', '#2563eb'); padding: 40px 30px; text-align: center; }
-    .header h1 { color: white; margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
-    .body { padding: 40px 30px; }
-    .body p { color: #4b5563; line-height: 1.8; font-size: 15px; }
-    .card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin: 24px 0; }
-    .card-row { display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; }
-    .card-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-    .label { font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: 600; }
-    .value { font-size: 14px; font-weight: 600; color: #1e293b; }
-    .btn { display: inline-block; background: #2563eb; color: white !important; padding: 14px 32px; border-radius: 10px; text-decoration: none; font-weight: 600; margin-top: 20px; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2); }
-    .footer { text-align: center; padding: 30px; font-size: 12px; color: #94a3b8; border-top: 1px solid #f1f5f9; background: #fafafa; }
+    /* Force light mode background */
+    :root {
+      color-scheme: light;
+      supported-color-schemes: light;
+    }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+      background-color: #ffffff !important; 
+      margin: 0; 
+      padding: 0; 
+      color: #1a1a1a !important;
+    }
+    .container { 
+      max-width: 540px; 
+      margin: 0 auto; 
+      padding: 60px 20px;
+      background-color: #ffffff !important;
+    }
+    .logo {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0f172a !important;
+      text-decoration: none;
+      margin-bottom: 40px;
+      display: block;
+    }
+    .content h1 { 
+      font-size: 24px; 
+      font-weight: 700; 
+      letter-spacing: -0.02em; 
+      margin-bottom: 24px;
+      color: #000000 !important;
+    }
+    .content p { 
+      font-size: 16px; 
+      line-height: 1.6; 
+      color: #404040 !important;
+      margin-bottom: 24px;
+    }
+    .btn { 
+      display: inline-block; 
+      background-color: #0f172a !important; 
+      color: #ffffff !important; 
+      padding: 12px 24px; 
+      border-radius: 6px; 
+      text-decoration: none; 
+      font-weight: 500; 
+      font-size: 15px;
+      margin: 10px 0;
+    }
+    .footer { 
+      margin-top: 60px;
+      padding-top: 30px; 
+      border-top: 1px solid #eaeaea;
+      font-size: 13px; 
+      color: #888888 !important; 
+    }
+    .footer p {
+      margin: 5px 0;
+    }
+    .subtle-box {
+      background-color: #f9f9f9 !important;
+      border: 1px solid #efefef !important;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 30px 0;
+    }
+    .card { 
+      border: 1px solid #eaeaea; 
+      border-radius: 8px; 
+      padding: 24px; 
+      margin: 24px 0; 
+    }
+    .card-row { 
+      display: flex; 
+      justify-content: space-between; 
+      margin-bottom: 12px; 
+      border-bottom: 1px solid #f5f5f5; 
+      padding-bottom: 8px; 
+    }
+    .card-row:last-child { 
+      border-bottom: none; 
+      margin-bottom: 0; 
+      padding-bottom: 0; 
+    }
+    .label { 
+      font-size: 13px; 
+      color: #666666 !important; 
+    }
+    .value { 
+      font-size: 14px; 
+      font-weight: 500; 
+      color: #000000 !important; 
+    }
+    
+    /* Override dark mode for clients that support prefers-color-scheme */
+    @media (prefers-color-scheme: dark) {
+      body, .container { background-color: #ffffff !important; color: #1a1a1a !important; }
+      .content h1 { color: #000000 !important; }
+      .content p { color: #404040 !important; }
+      .btn { background-color: #0f172a !important; color: #ffffff !important; }
+      .logo { color: #0f172a !important; }
+      .subtle-box { background-color: #f9f9f9 !important; border-color: #efefef !important; }
+      .card { background-color: #ffffff !important; border-color: #eaeaea !important; }
+      .card-row { border-bottom-color: #f5f5f5 !important; }
+      .label { color: #666666 !important; }
+      .value { color: #000000 !important; }
+      .footer { color: #888888 !important; border-top-color: #eaeaea !important; }
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="header">
-      <h1>@yield('title')</h1>
-    </div>
-    <div class="body">
+    <a href="{{ env('FRONTEND_URL') }}" class="logo">SwapMarket</a>
+    
+    <div class="content">
       @yield('content')
     </div>
-    <div class="footer">SwapMarket — La plateforme d'échange marocaine</div>
+    
+    <div class="footer">
+      <p><strong>SwapMarket</strong> — Échangez intelligemment.</p>
+      <p>© 2026. Casablanca, Maroc.</p>
+    </div>
   </div>
 </body>
 </html>

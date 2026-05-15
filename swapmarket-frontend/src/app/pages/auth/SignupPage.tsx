@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, X } from "lucide-react";
 import logoImage from "../../../assets/logo.png";
 import { Link, useNavigate } from "react-router";
 import { Button } from "../../components/ui/button";
@@ -10,7 +10,7 @@ import { API_BASE_URL } from "../../config";
 import { useLanguage } from "../../LanguageContext";
 
 export function SignupPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
@@ -23,9 +23,21 @@ export function SignupPage() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    setErrors({});
+    setIsSubmitting(true);
+
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.name) newErrors.name = t('validation.required', { attribute: t('auth.full_name') });
+    if (!formData.email) newErrors.email = t('validation.required', { attribute: t('auth.email') });
+    if (!formData.city) newErrors.city = t('validation.required', { attribute: t('auth.city') });
+    if (!formData.password) newErrors.password = t('validation.required', { attribute: t('auth.password') });
 
     const isValidPassword = 
       formData.password.length >= 8 &&
@@ -33,13 +45,17 @@ export function SignupPage() {
       /[0-9]/.test(formData.password) &&
       /[@$!%*#?&_\-\+\=\(\)\[\]\{\}\.\,\;]/.test(formData.password);
 
-    if (!isValidPassword) {
-      toast.error(t('auth.error_password_invalid'));
-      return;
+    if (formData.password && !isValidPassword) {
+      newErrors.password = t('auth.error_password_invalid');
     }
 
     if (formData.password !== formData.confirmPassword) {
-      toast.error(t('auth.error_password_match'));
+      newErrors.confirmPassword = t('auth.error_password_match');
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setIsSubmitting(false);
       return;
     }
 
@@ -59,6 +75,7 @@ export function SignupPage() {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'Accept-Language': language,
         },
         body: JSON.stringify(payload),
       });
@@ -70,6 +87,22 @@ export function SignupPage() {
         localStorage.setItem('user', JSON.stringify(data.user));
         toast.success(t('auth.success_signup'));
         navigate("/user");
+      } else if (response.status === 422) {
+        const backendErrors: Record<string, string> = {};
+        if (data.errors) {
+          Object.keys(data.errors).forEach(key => {
+            let frontendKey = key;
+            if (key === 'nom_complet') frontendKey = 'name';
+            if (key === 'telephone') frontendKey = 'phone';
+            if (key === 'ville') frontendKey = 'city';
+            if (key === 'date_naissance') frontendKey = 'birthDate';
+            if (key === 'mot_de_passe') frontendKey = 'password';
+            
+            backendErrors[frontendKey] = data.errors[key][0];
+          });
+        }
+        setErrors(backendErrors);
+        toast.error(t('publish_edit.error_validation'));
       } else {
         const errorMessage = data.message || t('auth.error_server');
         toast.error(errorMessage);
@@ -77,11 +110,31 @@ export function SignupPage() {
     } catch (error) {
       toast.error(t('auth.error_server'));
       console.error(error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    if (errors[name]) {
+      const newErrors = { ...errors };
+      delete newErrors[name];
+      setErrors(newErrors);
+    }
+  };
+
+  const ErrorMessage = ({ message }: { message?: string }) => {
+    if (!message) return null;
+    return (
+      <div className="flex items-center gap-2 mt-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
+        <div className="bg-amber-500 rounded p-0.5">
+          <X className="h-3 w-3 text-white stroke-[3px]" />
+        </div>
+        <span className="text-xs font-medium text-amber-600">{message}</span>
+      </div>
+    );
   };
 
   return (
@@ -121,7 +174,7 @@ export function SignupPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSignup} className="space-y-6">
+          <form onSubmit={handleSignup} className="space-y-6" noValidate>
             <div className="space-y-2">
               <Label htmlFor="name">{t('auth.full_name')}</Label>
               <Input
@@ -131,8 +184,9 @@ export function SignupPage() {
                 placeholder={t('auth.placeholder_name')}
                 value={formData.name}
                 onChange={handleChange}
-                required
+                className={errors.name ? "border-amber-500 ring-amber-500/20" : ""}
               />
+              <ErrorMessage message={errors.name} />
             </div>
 
             <div className="space-y-2">
@@ -144,8 +198,9 @@ export function SignupPage() {
                 placeholder={t('auth.placeholder_email')}
                 value={formData.email}
                 onChange={handleChange}
-                required
+                className={errors.email ? "border-amber-500 ring-amber-500/20" : ""}
               />
+              <ErrorMessage message={errors.email} />
             </div>
 
             <div className="space-y-2">
@@ -157,8 +212,9 @@ export function SignupPage() {
                 placeholder={t('auth.placeholder_city')}
                 value={formData.city}
                 onChange={handleChange}
-                required
+                className={errors.city ? "border-amber-500 ring-amber-500/20" : ""}
               />
+              <ErrorMessage message={errors.city} />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -171,7 +227,9 @@ export function SignupPage() {
                   placeholder={t('auth.placeholder_phone')}
                   value={formData.phone}
                   onChange={handleChange}
+                  className={errors.phone ? "border-amber-500 ring-amber-500/20" : ""}
                 />
+                <ErrorMessage message={errors.phone} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="birthDate">{t('auth.birth_date')}</Label>
@@ -181,7 +239,9 @@ export function SignupPage() {
                   type="date"
                   value={formData.birthDate}
                   onChange={handleChange}
+                  className={errors.birthDate ? "border-amber-500 ring-amber-500/20" : ""}
                 />
+                <ErrorMessage message={errors.birthDate} />
               </div>
             </div>
 
@@ -195,7 +255,7 @@ export function SignupPage() {
                   placeholder={t('auth.placeholder_password')}
                   value={formData.password}
                   onChange={handleChange}
-                  required
+                  className={errors.password ? "border-amber-500 ring-amber-500/20 pr-10" : "pr-10"}
                 />
                 <button
                   type="button"
@@ -205,6 +265,7 @@ export function SignupPage() {
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
+              <ErrorMessage message={errors.password} />
             </div>
 
             <div className="space-y-2">
@@ -217,7 +278,7 @@ export function SignupPage() {
                   placeholder={t('auth.placeholder_password')}
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  required
+                  className={errors.confirmPassword ? "border-amber-500 ring-amber-500/20 pr-10" : "pr-10"}
                 />
                 <button
                   type="button"
@@ -227,10 +288,11 @@ export function SignupPage() {
                   {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
+              <ErrorMessage message={errors.confirmPassword} />
             </div>
 
-            <Button type="submit" className="w-full" size="lg">
-              {t('auth.signup_button')}
+            <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+              {isSubmitting ? t('common.loading') : t('auth.signup_button')}
             </Button>
 
             <div className="text-center text-sm text-neutral-600">

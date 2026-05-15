@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, X } from "lucide-react";
 import logoImage from "../../../assets/logo.png";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -8,7 +8,10 @@ import { Label } from "../../components/ui/label";
 import { toast } from "sonner";
 import { API_BASE_URL } from "../../config";
 
+import { useLanguage } from "../../LanguageContext";
+
 export function ResetPasswordPage() {
+  const { t, language } = useLanguage();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const token = searchParams.get("token") || "";
@@ -19,9 +22,15 @@ export function ResetPasswordPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    setErrors({});
+    const newErrors: Record<string, string> = {};
+
+    if (!password) newErrors.password = t('validation.required', { attribute: t('auth.password') });
 
     const isValidPassword = 
       password.length >= 8 &&
@@ -29,13 +38,16 @@ export function ResetPasswordPage() {
       /[0-9]/.test(password) &&
       /[@$!%*#?&_\-\+\=\(\)\[\]\{\}\.\,\;]/.test(password);
 
-    if (!isValidPassword) {
-      toast.error("Le mot de passe doit contenir au moins 8 caractères, dont une lettre majuscule, un chiffre et un caractère spécial.");
-      return;
+    if (password && !isValidPassword) {
+      newErrors.password = t('auth.error_password_invalid');
     }
 
     if (password !== confirmPassword) {
-      toast.error("Les mots de passe ne correspondent pas");
+      newErrors.confirmPassword = t('auth.error_password_match');
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
 
@@ -47,6 +59,7 @@ export function ResetPasswordPage() {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'Accept-Language': language,
         },
         body: JSON.stringify({
           email,
@@ -61,6 +74,17 @@ export function ResetPasswordPage() {
       if (response.ok) {
         toast.success(data.message || "Mot de passe réinitialisé avec succès.");
         navigate("/login");
+      } else if (response.status === 422) {
+        if (data.errors) {
+          const backendErrors: any = {};
+          Object.keys(data.errors).forEach(key => {
+            let frontendKey = key;
+            if (key === 'mot_de_passe') frontendKey = 'password';
+            if (key === 'mot_de_passe_confirmation') frontendKey = 'confirmPassword';
+            backendErrors[frontendKey] = data.errors[key][0];
+          });
+          setErrors(backendErrors);
+        }
       } else {
         toast.error(data.message || "Erreur lors de la réinitialisation.");
       }
@@ -70,6 +94,18 @@ export function ResetPasswordPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const ErrorMessage = ({ message }: { message?: string }) => {
+    if (!message) return null;
+    return (
+      <div className="flex items-center gap-2 mt-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
+        <div className="bg-amber-500 rounded p-0.5">
+          <X className="h-3 w-3 text-white stroke-[3px]" />
+        </div>
+        <span className="text-xs font-medium text-amber-600">{message}</span>
+      </div>
+    );
   };
 
   return (
@@ -109,7 +145,7 @@ export function ResetPasswordPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6" noValidate>
             <div className="space-y-2">
               <Label htmlFor="password">Nouveau mot de passe</Label>
               <div className="relative">
@@ -118,8 +154,11 @@ export function ResetPasswordPage() {
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (errors.password) setErrors({ ...errors, password: "" });
+                  }}
+                  className={errors.password ? "border-amber-500 ring-amber-500/20 pr-10" : "pr-10"}
                 />
                 <button
                   type="button"
@@ -129,6 +168,7 @@ export function ResetPasswordPage() {
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
+              <ErrorMessage message={errors.password} />
             </div>
 
             <div className="space-y-2">
@@ -139,8 +179,11 @@ export function ResetPasswordPage() {
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: "" });
+                  }}
+                  className={errors.confirmPassword ? "border-amber-500 ring-amber-500/20 pr-10" : "pr-10"}
                 />
                 <button
                   type="button"
@@ -150,6 +193,7 @@ export function ResetPasswordPage() {
                   {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
+              <ErrorMessage message={errors.confirmPassword} />
             </div>
 
             <Button type="submit" className="w-full" size="lg" disabled={loading || !token}>

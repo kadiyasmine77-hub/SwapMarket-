@@ -20,7 +20,7 @@ import {
 import { useLanguage } from "../../LanguageContext";
 
 export function ExchangeHistory() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [exchanges, setExchanges] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const userStr = localStorage.getItem('user');
@@ -61,6 +61,7 @@ export function ExchangeHistory() {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
           "Accept": "application/json",
+          "Accept-Language": language,
         },
         body: JSON.stringify({ statut: status })
       });
@@ -94,6 +95,7 @@ export function ExchangeHistory() {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'Accept-Language': language,
         },
         body: JSON.stringify({
           note: rating,

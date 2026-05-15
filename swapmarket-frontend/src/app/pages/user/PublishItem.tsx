@@ -11,7 +11,7 @@ import { API_BASE_URL } from "../../config";
 import { useLanguage } from "../../LanguageContext";
 
 export function PublishItem() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
@@ -96,6 +96,7 @@ export function PublishItem() {
         headers: {
           "Authorization": `Bearer ${token}`,
           "Accept": "application/json",
+          "Accept-Language": language,
         },
         body: data
       });

@@ -69,8 +69,12 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->mot_de_passe, $user->mot_de_passe)) {
-            return response()->json(['message' => 'Identifiants invalides'], 401);
+        if (!$user) {
+            return response()->json(['message' => trans('auth.failed')], 401);
+        }
+
+        if (!Hash::check($request->mot_de_passe, $user->mot_de_passe)) {
+            return response()->json(['message' => trans('auth.password')], 401);
         }
 
         if (!$user->is_verifie) {

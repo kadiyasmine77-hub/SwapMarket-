@@ -173,6 +173,17 @@ class EchangeController extends Controller
             } else if ($request->statut === 'refuse') {
                 Mail::to($echange->demandeur->email)
                     ->send(new EchangeRefuse($echange));
+            } else if ($request->statut === 'annule') {
+                $userAuthId = Auth::user()->id_user;
+                if ($userAuthId === $echange->id_demandeur) {
+                    // Le demandeur annule => on notifie le destinataire
+                    Mail::to($echange->destinataire->email)
+                        ->send(new \App\Mail\EchangeAnnule($echange, false));
+                } else if ($userAuthId === $echange->id_destinataire) {
+                    // Le destinataire annule => on notifie le demandeur
+                    Mail::to($echange->demandeur->email)
+                        ->send(new \App\Mail\EchangeAnnule($echange, true));
+                }
             }
 
             return response()->json($echange);

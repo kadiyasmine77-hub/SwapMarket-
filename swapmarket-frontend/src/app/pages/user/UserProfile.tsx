@@ -15,7 +15,7 @@ import { API_BASE_URL, getStorageUrl } from "../../config";
 import { useLanguage } from "../../LanguageContext";
 
 export function UserProfile() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const currentUser = useMemo(() => {
     const userStr = localStorage.getItem('user');
     return userStr ? JSON.parse(userStr) : null;
@@ -147,6 +147,7 @@ export function UserProfile() {
         headers: {
           "Authorization": `Bearer ${token}`,
           "Accept": "application/json",
+          "Accept-Language": language,
         },
         body: data
       });
@@ -226,7 +227,8 @@ export function UserProfile() {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          "Authorization": `Bearer ${token}`,
+          "Accept-Language": language,
         },
         body: JSON.stringify({
           current_password: currentPassword,

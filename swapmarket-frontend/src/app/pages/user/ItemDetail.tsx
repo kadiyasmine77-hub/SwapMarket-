@@ -20,7 +20,7 @@ import { ScrollArea } from "../../components/ui/scroll-area";
 import { useLanguage } from "../../LanguageContext";
 
 export function ItemDetail() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { id } = useParams();
   const navigate = useNavigate();
   const [item, setItem] = useState<any>(null);
@@ -108,6 +108,7 @@ export function ItemDetail() {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
           "Accept": "application/json",
+          "Accept-Language": language,
         },
         body: JSON.stringify({
           id_objet1: selectedItemId, // Mon objet
@@ -166,6 +167,7 @@ export function ItemDetail() {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
           "Accept": "application/json",
+          "Accept-Language": language,
         },
         body: JSON.stringify({ id_objet: item.id_objet })
       });
@@ -213,6 +215,7 @@ export function ItemDetail() {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
           "Accept": "application/json",
+          "Accept-Language": language,
         },
         body: JSON.stringify({
           id_objet: item.id_objet,

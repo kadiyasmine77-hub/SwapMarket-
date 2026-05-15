@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { X } from "lucide-react";
 import logoImage from "../../../assets/logo.png";
 import { Link } from "react-router";
 import { Button } from "../../components/ui/button";
@@ -7,13 +8,24 @@ import { Label } from "../../components/ui/label";
 import { toast } from "sonner";
 import { API_BASE_URL } from "../../config";
 
+import { useLanguage } from "../../LanguageContext";
+
 export function ForgotPasswordPage() {
+  const { t, language } = useLanguage();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    setErrors({});
+    if (!email) {
+      setErrors({ email: t('validation.required', { attribute: t('auth.email') }) });
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await fetch(`${API_BASE_URL}/forgot-password`, {
@@ -21,6 +33,7 @@ export function ForgotPasswordPage() {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'Accept-Language': language,
         },
         body: JSON.stringify({ email }),
       });
@@ -30,6 +43,14 @@ export function ForgotPasswordPage() {
       if (response.ok) {
         toast.success(data.message || "Email envoyé avec succès.");
         setEmail(""); // Reset input
+      } else if (response.status === 422) {
+        if (data.errors) {
+          const backendErrors: any = {};
+          Object.keys(data.errors).forEach(key => {
+            backendErrors[key] = data.errors[key][0];
+          });
+          setErrors(backendErrors);
+        }
       } else {
         toast.error(data.message || "Erreur lors de l'envoi de l'email.");
       }
@@ -39,6 +60,18 @@ export function ForgotPasswordPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const ErrorMessage = ({ message }: { message?: string }) => {
+    if (!message) return null;
+    return (
+      <div className="flex items-center gap-2 mt-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
+        <div className="bg-amber-500 rounded p-0.5">
+          <X className="h-3 w-3 text-white stroke-[3px]" />
+        </div>
+        <span className="text-xs font-medium text-amber-600">{message}</span>
+      </div>
+    );
   };
 
   return (
@@ -78,7 +111,7 @@ export function ForgotPasswordPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6" noValidate>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -86,9 +119,13 @@ export function ForgotPasswordPage() {
                 type="email"
                 placeholder="vous@exemple.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (errors.email) setErrors({ ...errors, email: "" });
+                }}
+                className={errors.email ? "border-amber-500 ring-amber-500/20" : ""}
               />
+              <ErrorMessage message={errors.email} />
             </div>
 
             <Button type="submit" className="w-full" size="lg" disabled={loading}>

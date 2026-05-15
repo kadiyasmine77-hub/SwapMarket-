@@ -141,5 +141,16 @@ return [
     'uuid'        => 'Le champ :attribute doit être un UUID valide.',
 
     'custom'     => ['attribute-name' => ['rule-name' => 'custom-message']],
-    'attributes' => [],
+    'attributes' => [
+        'titre' => 'titre',
+        'description' => 'description',
+        'id_categorie' => 'catégorie',
+        'etat' => 'état',
+        'image' => 'image',
+        'telephone' => 'téléphone',
+        'nom_complet' => 'nom complet',
+        'ville' => 'ville',
+        'date_naissance' => 'date de naissance',
+        'mot_de_passe' => 'mot de passe',
+    ],
 ];

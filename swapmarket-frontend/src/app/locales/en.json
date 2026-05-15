@@ -384,12 +384,15 @@
     "phone": "Phone",
     "birth_date": "Birth Date",
     "placeholder_city": "New York",
-    "placeholder_phone": "1234567890",
+    "placeholder_phone": "0XXXXXXXXX",
     "error_password_match": "Passwords do not match",
     "error_password_invalid": "Password must be at least 8 characters long, including an uppercase letter, a number, and a special character.",
     "success_signup": "Account created successfully!",
     "hero_signup_title": "Start trading today",
     "hero_signup_subtitle": "Create your free account and discover thousands of items to trade near you."
+  },
+  "validation": {
+    "required": "The {{attribute}} field is required."
   },
   "footer": {
     "description": "Swap with confidence. Exchange items directly with your community.",

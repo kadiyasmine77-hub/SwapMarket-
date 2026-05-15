@@ -384,12 +384,15 @@
     "phone": "Téléphone",
     "birth_date": "Date de naissance",
     "placeholder_city": "casablanca",
-    "placeholder_phone": "0612345678",
+    "placeholder_phone": "0XXXXXXXXX",
     "error_password_match": "Les mots de passe ne correspondent pas",
     "error_password_invalid": "Le mot de passe doit contenir au moins 8 caractères, dont une lettre majuscule, un chiffre et un caractère spécial.",
     "success_signup": "Compte créé avec succès !",
     "hero_signup_title": "Commencez à troquer dès aujourd'hui",
     "hero_signup_subtitle": "Créez votre compte gratuitement et découvrez des milliers d'objets à échanger près de chez vous."
+  },
+  "validation": {
+    "required": "Le champ {{attribute}} est obligatoire."
   },
   "footer": {
     "description": "Échangez en toute confiance. Échangez des objets directement avec votre communauté.",
@@ -550,7 +553,7 @@
     "details_desc": "Objets concernés par cette discussion",
     "your_item": "Votre objet",
     "their_item": "Son objet",
-    "request_date": "Date de demande",
+    "request_date": "Date de   demande",
     "loading_msg": "Chargement des messages...",
     "first_msg": "Soyez le premier à envoyer un message !",
     "input_placeholder": "Écrivez votre message...",

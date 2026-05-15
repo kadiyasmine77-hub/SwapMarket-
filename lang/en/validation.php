@@ -179,6 +179,17 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'titre' => 'title',
+        'description' => 'description',
+        'id_categorie' => 'category',
+        'etat' => 'condition',
+        'image' => 'image',
+        'telephone' => 'phone',
+        'nom_complet' => 'full name',
+        'ville' => 'city',
+        'date_naissance' => 'birth date',
+        'mot_de_passe' => 'password',
+    ],
 
 ];

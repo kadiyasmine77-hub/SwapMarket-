@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, X } from "lucide-react";
 import logoImage from "../../../assets/logo.png";
 import { Link, useNavigate } from "react-router";
 import { Button } from "../../components/ui/button";
@@ -10,14 +10,28 @@ import { API_BASE_URL } from "../../config";
 import { useLanguage } from "../../LanguageContext";
 
 export function LoginPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors({});
+    setIsSubmitting(true);
+
+    const newErrors: Record<string, string> = {};
+    if (!email) newErrors.email = t('validation.required', { attribute: t('auth.email') });
+    if (!password) newErrors.password = t('validation.required', { attribute: t('auth.password') });
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       const response = await fetch(`${API_BASE_URL}/login`, {
@@ -25,6 +39,7 @@ export function LoginPage() {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'Accept-Language': language,
         },
         body: JSON.stringify({ email, mot_de_passe: password }),
       });
@@ -42,13 +57,39 @@ export function LoginPage() {
           toast.success(t('auth.success_user'));
           navigate("/user");
         }
+      } else if (response.status === 422) {
+        const backendErrors: Record<string, string> = {};
+        if (data.errors) {
+          Object.keys(data.errors).forEach(key => {
+            let frontendKey = key;
+            if (key === 'mot_de_passe') frontendKey = 'password';
+            backendErrors[frontendKey] = data.errors[key][0];
+          });
+        }
+        setErrors(backendErrors);
+      } else if (response.status === 401) {
+        setErrors({ password: data.message || t('auth.error_login') });
       } else {
         toast.error(data.message || t('auth.error_login'));
       }
     } catch (error) {
       toast.error(t('auth.error_server'));
       console.error(error);
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+
+  const ErrorMessage = ({ message }: { message?: string }) => {
+    if (!message) return null;
+    return (
+      <div className="flex items-center gap-2 mt-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
+        <div className="bg-amber-500 rounded p-0.5">
+          <X className="h-3 w-3 text-white stroke-[3px]" />
+        </div>
+        <span className="text-xs font-medium text-amber-600">{message}</span>
+      </div>
+    );
   };
 
   return (
@@ -88,7 +129,7 @@ export function LoginPage() {
             </p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleLogin} className="space-y-6" noValidate>
             <div className="space-y-2">
               <Label htmlFor="email">{t('auth.email')}</Label>
               <Input
@@ -96,9 +137,13 @@ export function LoginPage() {
                 type="email"
                 placeholder={t('auth.placeholder_email')}
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (errors.email) setErrors({ ...errors, email: "" });
+                }}
+                className={errors.email ? "border-amber-500 ring-amber-500/20" : ""}
               />
+              <ErrorMessage message={errors.email} />
             </div>
 
             <div className="space-y-2">
@@ -114,8 +159,11 @@ export function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   placeholder={t('auth.placeholder_password')}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (errors.password) setErrors({ ...errors, password: "" });
+                  }}
+                  className={errors.password ? "border-amber-500 ring-amber-500/20 pr-10" : "pr-10"}
                 />
                 <button
                   type="button"
@@ -125,10 +173,11 @@ export function LoginPage() {
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
+              <ErrorMessage message={errors.password} />
             </div>
 
-            <Button type="submit" className="w-full" size="lg">
-              {t('auth.login_button')}
+            <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+              {isSubmitting ? t('common.loading') : t('auth.login_button')}
             </Button>
 
             <div className="text-center text-sm text-neutral-600">

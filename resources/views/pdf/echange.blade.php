@@ -6,22 +6,21 @@
     <style>
         @page { margin: 0; }
         body { 
-            font-family: 'Helvetica', Arial, sans-serif; 
-            color: #030213; 
-            line-height: 1.4; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            color: #1a1a1a; 
+            line-height: 1.5; 
             margin: 0;
             padding: 0;
             background-color: #ffffff;
         }
         .header { 
-            background-color: #14213d; 
-            color: #ffffff; 
-            padding: 25px 40px; 
-            text-align: center;
+            padding: 40px 40px 20px 40px; 
+            text-align: left;
+            border-bottom: 1px solid #eaeaea;
         }
-        .logo { height: 35px; margin-bottom: 10px; }
-        .header h1 { margin: 0; font-size: 22px; letter-spacing: 1px; font-weight: 500; }
-        .header p { margin: 5px 0 0; opacity: 0.8; font-size: 13px; font-weight: 300; }
+        .logo { height: 28px; margin-bottom: 20px; }
+        .header h1 { margin: 0; font-size: 24px; font-weight: 700; color: #000000; letter-spacing: -0.02em; }
+        .header p { margin: 5px 0 0; color: #666666; font-size: 14px; }
         
         .container {
             padding: 30px 40px;
@@ -32,61 +31,59 @@
         .section { margin-bottom: 25px; page-break-inside: avoid; }
         .section-title { 
             font-size: 14px; 
-            text-transform: uppercase; 
-            color: #14213d; 
-            font-weight: bold; 
-            letter-spacing: 1px;
-            border-bottom: 2px solid #e9ebef;
-            padding-bottom: 5px;
-            margin-bottom: 15px;
+            color: #000000; 
+            font-weight: 700; 
+            border-bottom: 1px solid #eaeaea;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
         }
 
         .info-grid { width: 100%; border-collapse: collapse; table-layout: fixed; }
         .info-grid td { width: 50%; vertical-align: top; padding: 5px 0; }
         .info-grid td:nth-child(2) { padding-left: 20px; }
         
-        .label { font-size: 11px; color: #717182; text-transform: uppercase; margin-bottom: 3px; display: block; font-weight: bold; }
-        .value { font-size: 14px; color: #030213; display: block; margin-bottom: 5px; }
+        .label { font-size: 12px; color: #666666; margin-bottom: 4px; display: block; }
+        .value { font-size: 14px; color: #1a1a1a; display: block; margin-bottom: 8px; font-weight: 500; }
         
         .item-box {
-            background-color: #f3f3f5;
-            border-radius: 8px;
-            padding: 15px;
-            border-left: 4px solid #2d80d3;
+            background-color: #fafafa;
+            border: 1px solid #eaeaea;
+            border-radius: 6px;
+            padding: 20px;
         }
 
         .status-badge {
             display: inline-block;
-            padding: 5px 12px;
-            border-radius: 6px;
+            padding: 4px 10px;
+            border-radius: 4px;
             font-size: 12px;
-            font-weight: bold;
+            font-weight: 500;
+            background-color: #0f172a;
+            color: #ffffff;
+            border: 1px solid #0f172a;
             text-transform: uppercase;
-            background-color: rgba(45, 128, 211, 0.12);
-            color: #2d80d3;
-            border: 1px solid rgba(45, 128, 211, 0.2);
         }
 
         .footer {
-            text-align: center;
-            padding: 20px;
-            color: #717182;
-            font-size: 11px;
-            border-top: 1px solid #ececf0;
-            margin-top: 10px;
-            background-color: #fcfcfd;
+            padding: 20px 40px;
+            color: #888888;
+            font-size: 12px;
+            border-top: 1px solid #eaeaea;
+            margin-top: 30px;
+            background-color: #ffffff;
             position: absolute;
             bottom: 0;
             width: 100%;
+            box-sizing: border-box;
         }
         
-        .footer p { margin: 3px 0; }
+        .footer p { margin: 4px 0; }
 
         .date-box {
             background: #ffffff;
-            border: 1px solid #ececf0;
-            border-radius: 8px;
-            padding: 12px;
+            border: 1px solid #eaeaea;
+            border-radius: 6px;
+            padding: 15px;
             display: inline-block;
         }
     </style>
@@ -109,7 +106,7 @@
         @if($gdEnabled && $base64)
             <img src="{{ $base64 }}" class="logo" alt="SwapMarket">
         @else
-            <h2 style="margin: 0; margin-bottom: 10px; font-size: 24px; color: #7f9dcb;">SWAPMARKET</h2>
+            <h2 style="margin: 0; margin-bottom: 20px; font-size: 20px; color: #000000; font-weight: 700;">SwapMarket</h2>
         @endif
         
         <h1>Bon d'Échange Officiel</h1>
@@ -124,7 +121,7 @@
                 <td>
                     <div class="date-box">
                         <span class="label">Numéro d'échange</span>
-                        <span class="value" style="font-weight: bold; color: #2d80d3;">#SWAP-{{ str_pad($echange->id_echange, 5, '0', STR_PAD_LEFT) }}</span>
+                        <span class="value" style="font-weight: 700; color: #000000; font-size: 16px;">#SWAP-{{ str_pad($echange->id_echange, 5, '0', STR_PAD_LEFT) }}</span>
                     </div>
                 </td>
                 <td style="text-align: right;">
@@ -144,17 +141,17 @@
                 <tr>
                     <td>
                         <span class="label">Demandeur</span>
-                        <span class="value" style="font-weight: bold;">{{ $echange->demandeur->nom_complet }}</span>
-                        <span class="value" style="font-size: 13px; color: #717182;">{{ $echange->demandeur->email }}</span>
-                        <span class="value" style="font-size: 13px; color: #717182;">{{ $echange->demandeur->telephone }}</span>
-                        <span class="value" style="font-size: 13px; color: #717182;">{{ $echange->demandeur->ville }}</span>
+                        <span class="value">{{ $echange->demandeur->nom_complet }}</span>
+                        <span style="font-size: 13px; color: #666666; display: block; margin-bottom: 3px;">{{ $echange->demandeur->email }}</span>
+                        <span style="font-size: 13px; color: #666666; display: block; margin-bottom: 3px;">{{ $echange->demandeur->telephone }}</span>
+                        <span style="font-size: 13px; color: #666666; display: block;">{{ $echange->demandeur->ville }}</span>
                     </td>
                     <td>
                         <span class="label">Destinataire</span>
-                        <span class="value" style="font-weight: bold;">{{ $echange->destinataire->nom_complet }}</span>
-                        <span class="value" style="font-size: 13px; color: #717182;">{{ $echange->destinataire->email }}</span>
-                        <span class="value" style="font-size: 13px; color: #717182;">{{ $echange->destinataire->telephone }}</span>
-                        <span class="value" style="font-size: 13px; color: #717182;">{{ $echange->destinataire->ville }}</span>
+                        <span class="value">{{ $echange->destinataire->nom_complet }}</span>
+                        <span style="font-size: 13px; color: #666666; display: block; margin-bottom: 3px;">{{ $echange->destinataire->email }}</span>
+                        <span style="font-size: 13px; color: #666666; display: block; margin-bottom: 3px;">{{ $echange->destinataire->telephone }}</span>
+                        <span style="font-size: 13px; color: #666666; display: block;">{{ $echange->destinataire->ville }}</span>
                     </td>
                 </tr>
             </table>
@@ -167,18 +164,18 @@
                 <tr>
                     <td>
                         <div class="item-box">
-                            <span class="label" style="color: #2d80d3;">Objet proposé par le demandeur</span>
-                            <span class="value" style="font-weight: bold; margin-bottom: 5px;">{{ $echange->objet1->titre }}</span>
-                            <span style="font-size: 13px; color: #717182; display: block;">Catégorie: {{ $echange->objet1->categorie->nom ?? 'N/A' }}</span>
-                            <span style="font-size: 13px; color: #717182; display: block;">État: {{ ucfirst($echange->objet1->etat) }}</span>
+                            <span class="label">Objet proposé par le demandeur</span>
+                            <span class="value" style="margin-bottom: 8px;">{{ $echange->objet1->titre }}</span>
+                            <span style="font-size: 13px; color: #666666; display: block; margin-bottom: 3px;">Catégorie : {{ $echange->objet1->categorie->nom ?? 'N/A' }}</span>
+                            <span style="font-size: 13px; color: #666666; display: block;">État : {{ ucfirst($echange->objet1->etat) }}</span>
                         </div>
                     </td>
                     <td>
                         <div class="item-box">
-                            <span class="label" style="color: #2d80d3;">Objet reçu du destinataire</span>
-                            <span class="value" style="font-weight: bold; margin-bottom: 5px;">{{ $echange->objet2->titre }}</span>
-                            <span style="font-size: 13px; color: #717182; display: block;">Catégorie: {{ $echange->objet2->categorie->nom ?? 'N/A' }}</span>
-                            <span style="font-size: 13px; color: #717182; display: block;">État: {{ ucfirst($echange->objet2->etat) }}</span>
+                            <span class="label">Objet reçu du destinataire</span>
+                            <span class="value" style="margin-bottom: 8px;">{{ $echange->objet2->titre }}</span>
+                            <span style="font-size: 13px; color: #666666; display: block; margin-bottom: 3px;">Catégorie : {{ $echange->objet2->categorie->nom ?? 'N/A' }}</span>
+                            <span style="font-size: 13px; color: #666666; display: block;">État : {{ ucfirst($echange->objet2->etat) }}</span>
                         </div>
                     </td>
                 </tr>
@@ -205,9 +202,9 @@
     </div>
 
     <div class="footer">
-        <p><strong style="color: #14213d;">SwapMarket</strong> - La plateforme de troc communautaire</p>
+        <p><strong style="color: #000000;">SwapMarket</strong> — La plateforme de troc communautaire</p>
         <p>Ce document est généré de manière automatique et a valeur de preuve d'accord mutuel entre les parties concernées.</p>
-        <p>&copy; {{ date('Y') }} Tous droits réservés.</p>
+        <p>© {{ date('Y') }} Tous droits réservés.</p>
     </div>
 </body>
 </html>

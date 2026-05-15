@@ -91,120 +91,134 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>{{ $copy['title'] }}</title>
     <style>
+        @page { margin: 0; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: DejaVu Sans, sans-serif;
-            font-size: 11px;
-            color: #1f2937;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-size: 10px;
+            color: #1a1a1a;
             background: #ffffff;
+            line-height: 1.5;
         }
         .header {
-            background: #1d4ed8;
-            color: white;
-            padding: 20px 30px;
-            margin-bottom: 24px;
+            padding: 30px 30px 20px 30px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eaeaea;
         }
         .header h1 {
-            font-size: 22px;
+            color: #000000;
+            font-size: 24px;
             font-weight: bold;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
+            letter-spacing: -0.5px;
         }
         .header p {
             font-size: 11px;
-            opacity: 0.85;
+            color: #666666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .stats-grid {
             width: 100%;
-            margin-bottom: 24px;
+            margin-bottom: 30px;
             padding: 0 30px;
         }
         .stats-grid table {
             width: 100%;
             border-collapse: separate;
-            border-spacing: 8px;
+            border-spacing: 15px 0;
         }
         .stat-box {
-            background: #f0f9ff;
-            border: 1px solid #bae6fd;
+            background: #fafafa;
+            border: 1px solid #eaeaea;
             border-radius: 8px;
-            padding: 14px 10px;
+            padding: 20px 15px;
             text-align: center;
             width: 25%;
         }
         .stat-number {
-            font-size: 26px;
-            font-weight: bold;
-            color: #1d4ed8;
+            font-size: 24px;
+            font-weight: 700;
+            color: #000000;
             display: block;
             margin-bottom: 4px;
         }
         .stat-label {
             font-size: 10px;
-            color: #6b7280;
+            color: #666666;
             text-transform: uppercase;
+            font-weight: 500;
             letter-spacing: 0.5px;
         }
         .section-title {
-            font-size: 13px;
-            font-weight: bold;
-            color: #1d4ed8;
-            padding: 0 30px 8px 30px;
-            border-bottom: 2px solid #1d4ed8;
-            margin-bottom: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #000000;
+            padding: 0 30px 10px 30px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eaeaea;
         }
-        .table-wrap { padding: 0 30px; margin-bottom: 28px; }
+        .table-wrap { padding: 0 30px; margin-bottom: 40px; }
         table.data {
             width: 100%;
             border-collapse: collapse;
             font-size: 10px;
         }
         table.data thead tr {
-            background: #1d4ed8;
-            color: white;
+            background: #fafafa;
+            border-top: 1px solid #eaeaea;
+            border-bottom: 1px solid #eaeaea;
         }
         table.data thead th {
-            padding: 8px 10px;
+            padding: 12px 15px;
             text-align: left;
-            font-weight: bold;
-            font-size: 10px;
+            font-weight: 600;
+            color: #333333;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        table.data tbody tr {
+            border-bottom: 1px solid #f5f5f5;
         }
         table.data tbody tr:nth-child(even) {
-            background: #f9fafb;
-        }
-        table.data tbody tr:nth-child(odd) {
             background: #ffffff;
         }
         table.data tbody td {
-            padding: 7px 10px;
-            border-bottom: 1px solid #e5e7eb;
-            color: #374151;
+            padding: 10px 15px;
+            color: #1a1a1a;
+            vertical-align: middle;
         }
         .badge {
-            padding: 2px 8px;
-            border-radius: 10px;
+            padding: 4px 8px;
+            border-radius: 4px;
             font-size: 9px;
-            font-weight: bold;
+            font-weight: 500;
             display: inline-block;
+            text-transform: uppercase;
         }
-        .badge-actif, .badge-active { background: #dcfce7; color: #166534; }
-        .badge-suspendu, .badge-suspended { background: #fef9c3; color: #854d0e; }
-        .badge-desactive, .badge-disabled { background: #fee2e2; color: #991b1b; }
-        .badge-valide, .badge-accepted { background: #dbeafe; color: #1e40af; }
-        .badge-refuse, .badge-refused { background: #fee2e2; color: #991b1b; }
-        .badge-en_attente, .badge-pending { background: #fef9c3; color: #854d0e; }
-        .badge-termine, .badge-completed { background: #f3f4f6; color: #374151; }
-        .badge-admin { background: #ede9fe; color: #5b21b6; }
-        .badge-user { background: #e0f2fe; color: #0369a1; }
+        /* Elegant Minimalist Badges (Notion style) */
+        .badge-actif, .badge-active { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+        .badge-suspendu, .badge-suspended { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+        .badge-desactive, .badge-disabled { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; }
+        
+        .badge-valide, .badge-accepted { background: #f0f9ff; color: #0369a1; border: 1px solid #bae6fd; }
+        .badge-refuse, .badge-refused { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+        .badge-en_attente, .badge-pending { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+        .badge-termine, .badge-completed { background: #f8fafc; color: #334155; border: 1px solid #e2e8f0; }
+        
+        .badge-admin { background: #0f172a; color: #ffffff; border: 1px solid #0f172a; }
+        .badge-user { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+        
         .footer {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 10px 30px;
-            background: #f9fafb;
-            border-top: 1px solid #e5e7eb;
+            padding: 15px 30px;
+            background: #ffffff;
+            border-top: 1px solid #eaeaea;
             font-size: 9px;
-            color: #9ca3af;
+            color: #888888;
             text-align: center;
         }
     </style>
@@ -304,8 +318,8 @@
                 <td>{{ $e->id_echange }}</td>
                 <td>{{ $e->demandeur->nom_complet ?? '-' }}</td>
                 <td>{{ $e->destinataire->nom_complet ?? '-' }}</td>
-                <td>{{ Str::limit($e->objet1->titre ?? '-', 25) }}</td>
-                <td>{{ Str::limit($e->objet2->titre ?? '-', 25) }}</td>
+                <td>{{ Str::limit($e->objet1->titre ?? '-', 40) }}</td>
+                <td>{{ Str::limit($e->objet2->titre ?? '-', 40) }}</td>
                 <td>
                     <span class="badge badge-{{ $e->statut }}">
                         {{ $statusLabels[$e->statut] ?? ucfirst(str_replace('_', ' ', $e->statut)) }}
