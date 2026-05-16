@@ -15,6 +15,7 @@ class ObjetController extends Controller
         $this->middleware('auth:sanctum')->except(['index', 'show']);
     }
 
+    // Had l-fonction kat-jib ga3 les objets (annonces) li hatin les users f-site o t-filterihom
     public function index(Request $request)
     {
         $perPage = (int) $request->get('per_page', 10);
@@ -61,6 +62,7 @@ class ObjetController extends Controller
         return response()->json($objets);
     }
 
+    // Had l-fonction kat-khalli l-user i-hat annonce jdida d-shi objet dyalo b-t-swira principale o galerie
     public function store(Request $request)
     {
         $request->validate([
@@ -117,6 +119,7 @@ class ObjetController extends Controller
         return response()->json($objet->load('images'), 201);
     }
 
+    // Had l-fonction kat-jib les details dyal objet wahed b-ga3 t-swar o l-categorie dyalo
     public function show($id)
     {
         $objet = Objet::with(['user', 'categorie', 'images', 'avis'])->findOrFail($id);
@@ -131,6 +134,7 @@ class ObjetController extends Controller
         return response()->json($objet);
     }
 
+    // Had l-fonction kat-khalli l-user i-beddel les informations dyal l-objet dyalo (titre, desc, t-swar...)
     public function update(Request $request, $id)
     {
         $obj = Objet::findOrFail($id);
@@ -210,6 +214,7 @@ class ObjetController extends Controller
         return response()->json($obj->load('images'));
     }
 
+    // Had l-fonction kat-msah l-objet b-merra m-base de donnee o mn l-files dyal l-serveur
     public function destroy($id)
     {
         $obj = Objet::findOrFail($id);
@@ -234,6 +239,7 @@ class ObjetController extends Controller
         return response()->json(['message' => 'Objet supprime']);
     }
 
+    // Had l-fonction kat-khalli l-user i-zid t-swar jdad f-l-galerie d-l-objet dyalo
     public function addImages(Request $request, $id)
     {
         $obj = Objet::findOrFail($id);

@@ -39,6 +39,14 @@ export function SignupPage() {
     if (!formData.city) newErrors.city = t('validation.required', { attribute: t('auth.city') });
     if (!formData.password) newErrors.password = t('validation.required', { attribute: t('auth.password') });
 
+    if (formData.city && /[0-9]/.test(formData.city)) {
+      newErrors.city = t('auth.error_city_numbers');
+    }
+
+    if (formData.phone && !/^[0-9]{10}$/.test(formData.phone)) {
+      newErrors.phone = t('auth.error_phone_invalid');
+    }
+
     const isValidPassword = 
       formData.password.length >= 8 &&
       /[A-Z]/.test(formData.password) &&

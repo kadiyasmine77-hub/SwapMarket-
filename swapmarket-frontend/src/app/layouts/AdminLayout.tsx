@@ -21,12 +21,14 @@ import logoImage from "../../assets/logo.png";
 import { useLanguage } from "../LanguageContext";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
 
+// Had l-layout howa l-ghila dyal l-admin fih s-sidebar o l-menu dyal ga3 l-fonctions dyal l-admin
 export function AdminLayout() {
   const location = useLocation();
   const { t } = useLanguage();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
+  // Had l-fonction kat-chof wash l-page li l-admin fiha hiya li f-link bash t-biynha active
   const isActive = (path: string) => {
     if (path === "/admin") {
       return location.pathname === "/admin";

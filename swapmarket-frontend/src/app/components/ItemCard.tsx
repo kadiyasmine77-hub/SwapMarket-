@@ -18,6 +18,7 @@ interface ItemCardProps {
   disponibilite?: 'disponible' | 'echange' | 'reserve';
 }
 
+// Had l-composant howa l-card (l-war9a) li fiha l-ma3loumat d-objet (annonce) bash n-biynouh f-site
 export function ItemCard({
   title,
   category,

@@ -14,11 +14,13 @@ class UserController extends Controller
         $this->middleware('auth:sanctum');
     }
 
+    // Had l-fonction kat-jib les informations dyal l-user li m-connecti db
     public function profil(Request $request)
     {
         return response()->json($request->user());
     }
 
+    // Had l-fonction kat-khalli l-user i-beddel l-profile dyalo (smia, t-lifon, t-swira...)
     public function update(Request $request)
     {
         $user = $request->user();
@@ -26,8 +28,8 @@ class UserController extends Controller
 
         $data = $request->validate([
             'nom_complet'    => 'nullable|string|max:200',
-            'telephone'      => 'nullable|string|max:30',
-            'ville'          => 'nullable|string|max:100',
+            'telephone'      => 'nullable|regex:/^[0-9]{10}$/',
+            'ville'          => 'nullable|string|max:100|regex:/^([^0-9]*)$/',
             'date_naissance' => 'nullable',
             'photo_profil'   => 'nullable|image|max:5120'
         ]);
@@ -54,6 +56,7 @@ class UserController extends Controller
     }
 
     // ✅ جديد — Procédure stockée
+    // Had l-fonction kat-jib les statistiques dyal l-user (ch-7al mn echange dar...) b-Procedure Stockee
     public function stats(Request $request)
     {
         $userId = $request->user()->id_user;
@@ -86,6 +89,7 @@ class UserController extends Controller
     }
 
     // Consommation Api externe (Point 15)
+    // Had l-fonction kat-jib l-liste dyal ga3 l-boldan mn wahed l-API externe (RestCountries)
     public function getCountries()
     {
         try {
@@ -109,6 +113,7 @@ class UserController extends Controller
         }
     }
 
+    // Had l-fonction kat-khalli l-user i-beddel modepasse dyalo b-wahed jdid
     public function changePassword(Request $request)
     {
         $request->validate([

@@ -20,6 +20,7 @@ class EchangeController extends Controller
     }
 
     // GET /echanges
+    // Had l-fonction kat-jib ga3 les echanges dyal l-user li m-connecti (li sayft o li jaweh)
     public function index()
     {
         $id = Auth::user()->id_user;
@@ -40,6 +41,7 @@ class EchangeController extends Controller
     }
 
     // POST /echanges
+    // Had l-fonction kat-creer demande d-tabadoul (swap) jdida o kat-sift email l-destinataire
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -103,6 +105,7 @@ class EchangeController extends Controller
     }
 
     // PUT /echanges/{id}/statut
+    // Had l-fonction kat-beddel l-statut dyal swap (Accepter/Refuser...) o kat-dir la mise a jour dyal l-objets
     public function updateStatut(Request $request, $id)
     {
         $echange = Echange::findOrFail($id);
@@ -198,6 +201,7 @@ class EchangeController extends Controller
     }
 
     // GET /echanges/{id}
+    // Had l-fonction kat-jib les details dyal swap wahed b-ga3 l-mayssajat dyalo
     public function show($id)
     {
         $echange = Echange::with(['objet1', 'objet2', 'demandeur', 'destinataire', 'messages'])
@@ -211,12 +215,14 @@ class EchangeController extends Controller
     }
 
     // GET /echanges/{id}/historique — Admin
+    // Had l-fonction kat-jib l-historique dyal les etapes li daz menhom l-echange
     public function historique($id)
     {
         $echange = Echange::with('historique')->findOrFail($id);
         return response()->json($echange->historique);
     }
 
+    // Had l-fonction kat-generi fichier PDF (Bon d'échange) bash l-users i-printiwh
     public function generatePDF($id)
     {
         $echange = Echange::with(['objet1', 'objet2', 'demandeur', 'destinataire'])->findOrFail($id);

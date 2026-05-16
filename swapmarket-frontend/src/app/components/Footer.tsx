@@ -1,15 +1,25 @@
 import { Link } from 'react-router';
-import { Github, Twitter, Instagram, Mail, ShieldCheck, MapPin, Phone, Scale, Lock, ShieldAlert, FileText, Search, Plus, Tag, User, MessageSquare, Heart, History } from 'lucide-react';
+import { Github, Search, Plus, Tag, User, MessageSquare, Heart, History, MapPin, Phone, Mail } from 'lucide-react';
 import logoImage from '../../assets/logo.png';
 import { useLanguage } from '../LanguageContext';
+import { toast } from 'sonner';
 
+// Had l-composant fih l-partie l-tahtania d-site (Footer) fih l-links d-social media o les infos d-contact
 export function Footer() {
   const { t } = useLanguage();
   const currentYear = new Date().getFullYear();
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   const socialLinks = [
     { icon: Github, href: 'https://github.com/kadiyasmine77-hub', label: 'Github' },
   ];
+
+  const handleAdminClick = (e: React.MouseEvent) => {
+    if (user.role === 'admin') {
+      e.preventDefault();
+      toast.error(t('items.admin_restriction'));
+    }
+  };
 
   return (
     <footer className="bg-neutral-100 text-neutral-900 pt-12 pb-6 border-t border-neutral-200">
@@ -49,7 +59,7 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-2 text-neutral-600 hover:text-olive transition-colors group">
                 <Plus className="w-4 h-4 text-neutral-400 group-hover:text-olive" />
-                <Link to="/user/publish">{t('user_nav.publish')}</Link>
+                <Link to="/user/publish" onClick={handleAdminClick}>{t('user_nav.publish')}</Link>
               </li>
               <li className="flex items-center gap-2 text-neutral-600 hover:text-olive transition-colors group">
                 <Tag className="w-4 h-4 text-neutral-400 group-hover:text-olive" />
@@ -70,15 +80,15 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-2 hover:text-olive transition-colors group">
                 <MessageSquare className="w-4 h-4 text-neutral-400 group-hover:text-olive" />
-                <Link to="/user/messages">{t('user_nav.messages')}</Link>
+                <Link to="/user/messages" onClick={handleAdminClick}>{t('user_nav.messages')}</Link>
               </li>
               <li className="flex items-center gap-2 hover:text-olive transition-colors group">
                 <Heart className="w-4 h-4 text-neutral-400 group-hover:text-olive" />
-                <Link to="/user/favorites">{t('user_nav.favorites')}</Link>
+                <Link to="/user/favorites" onClick={handleAdminClick}>{t('user_nav.favorites')}</Link>
               </li>
               <li className="flex items-center gap-2 hover:text-olive transition-colors group">
                 <History className="w-4 h-4 text-neutral-400 group-hover:text-olive" />
-                <Link to="/user/history">{t('user_nav.history')}</Link>
+                <Link to="/user/history" onClick={handleAdminClick}>{t('user_nav.history')}</Link>
               </li>
             </ul>
           </div>

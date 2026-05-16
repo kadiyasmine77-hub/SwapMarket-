@@ -13,12 +13,13 @@ use Illuminate\Support\Str;
 class AuthController extends Controller
 {
 
+    // Had lfonction katcreer compte jdid luser o katsift lih token
     public function register(Request $request)
     {
         $data = $request->validate([
             'nom_complet'    => 'required|string|max:200',
             'email'          => 'required|email|unique:users,email',
-            'telephone'      => 'nullable|string|max:20',
+            'telephone'      => 'nullable|regex:/^[0-9]{10}$/',
             'mot_de_passe'   => [
                 'required',
                 'string',
@@ -28,7 +29,7 @@ class AuthController extends Controller
                 'regex:/[@$!%*#?&_\-\+\=\(\)\[\]\{\}\.\,\;]/',
                 'confirmed'
             ],
-            'ville'          => 'required|string|max:100',
+            'ville'          => 'required|string|max:100|regex:/^([^0-9]*)$/',
             'date_naissance' => 'nullable|date',
             'photo_profil'   => 'nullable|image|max:2048',
         ]);
@@ -60,6 +61,7 @@ class AuthController extends Controller
     }
 
 
+    // Had l-fonction kat-verifier email o modepasse bash l-user idkhol l-compte dyalo
     public function login(Request $request)
     {
         $request->validate([
@@ -90,6 +92,7 @@ class AuthController extends Controller
     }
 
 
+    // Had lfonction katmsah gae les tokens dyal luser bash ikhrej (Logout)
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();
@@ -99,6 +102,7 @@ class AuthController extends Controller
         ]);
     }
 
+    // Had lfonction katsift lien email dyal luser bash ibeddel mdp ila nsah
     public function forgotPassword(Request $request)
     {
         $request->validate(['email' => 'required|email']);
@@ -122,6 +126,7 @@ class AuthController extends Controller
         return response()->json(['message' => 'Un lien de réinitialisation a été envoyé à votre adresse email.']);
     }
 
+    // Had lfonction katakhd token jdid o mdp jdid o katupdati lbase de donnee
     public function resetPassword(Request $request)
     {
         $request->validate([
@@ -159,18 +164,19 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter.']);
     }
+    // Had lfonction katjib gae les informations dyal profile dyal shi user b id dyalo
     public function getProfile($id)
     {
         $user = \App\Models\User::withCount('objets')->findOrFail($id);
         
-        // Count completed exchanges (where user is either demandeur or destinataire)
+        // Count completed exchanges ( demandeur ola destinataire)
         $user->echanges_count = \App\Models\Echange::where('statut', 'termine')
             ->where(function($q) use ($id) {
                 $q->where('id_demandeur', $id)
                   ->orWhere('id_destinataire', $id);
             })->count();
 
-        // Calculate average rating from reviews received on their objects
+        // katCalculer shhal mn echange termine o kathsb shhal mn avis dar l user ela les objet dyalo 
         $avgRating = \App\Models\Avis::whereHas('objet', function($q) use ($id) {
             $q->where('id_user', $id);
         })->avg('note');

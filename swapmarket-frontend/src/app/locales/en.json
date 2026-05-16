@@ -255,7 +255,7 @@
     "confirm_delete_desc": "You are about to delete \"{{title}}\". This action is irreversible.",
     "message_interest_toast": "Your interest in {{title}} has been sent to the owner!",
     "must_be_logged_fav": "Please log in to add this item to your favorites.",
-    "admin_restricted": "Administrators cannot manage a favorites list."
+    "admin_restriction": "You are logged in as an administrator. This action is reserved for user accounts."
   },
   "search": {
     "title": "Search for items",
@@ -269,7 +269,8 @@
     "all_availabilities": "All",
     "results_found": "{{count}} result found",
     "results_found_plural": "{{count}} results found",
-    "no_results": "No items found for this search."
+    "no_results": "No items found for this search.",
+    "search_placeholder": "Search an item..."
   },
   "hero": {
     "trusted": "Trusted by {{count}}+ community members",
@@ -387,6 +388,8 @@
     "placeholder_phone": "0XXXXXXXXX",
     "error_password_match": "Passwords do not match",
     "error_password_invalid": "Password must be at least 8 characters long, including an uppercase letter, a number, and a special character.",
+    "error_city_numbers": "City should not contain numbers.",
+    "error_phone_invalid": "Phone number must contain exactly 10 digits.",
     "success_signup": "Account created successfully!",
     "hero_signup_title": "Start trading today",
     "hero_signup_subtitle": "Create your free account and discover thousands of items to trade near you."

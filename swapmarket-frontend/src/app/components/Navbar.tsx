@@ -12,6 +12,7 @@ interface NavbarProps {
   currentPage?: string;
 }
 
+// Had l-composant fih l-menu l-fo9ani d-site (Navbar) li fih ga3 l-links o l-infos d-user li m-connecti
 export function Navbar({ variant = 'public', currentPage }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { t } = useLanguage();

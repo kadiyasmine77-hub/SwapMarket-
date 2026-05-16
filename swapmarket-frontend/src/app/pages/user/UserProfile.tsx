@@ -128,6 +128,16 @@ export function UserProfile() {
       return;
     }
 
+    if (formData.city && /[0-9]/.test(formData.city)) {
+      toast.error(t('auth.error_city_numbers'));
+      return;
+    }
+
+    if (formData.phone && !/^[0-9]{10}$/.test(formData.phone)) {
+      toast.error(t('auth.error_phone_invalid'));
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       const data = new FormData();

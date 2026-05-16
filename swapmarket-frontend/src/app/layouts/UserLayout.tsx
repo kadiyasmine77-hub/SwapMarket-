@@ -8,12 +8,14 @@ import { useLanguage } from "../LanguageContext";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
 import { toast } from "sonner";
 
+// Had l-layouthowa li kay-dir s-smiya o l-menu d-navigation dyal l-utilisateur (User)
 export function UserLayout() {
   const location = useLocation();
   const { t } = useLanguage();
   const userStr = localStorage.getItem('user');
   const currentUser = userStr ? JSON.parse(userStr) : { nom_complet: 'Utilisateur', photo_profil: null };
 
+  // Had l-fonction kat-chof wash l-page li l-user fiha db hiya l-page d-link bash t-biynha active
   const isActive = (path: string) => {
     if (path === "/user") {
       return location.pathname === "/user";
@@ -30,6 +32,7 @@ export function UserLayout() {
     { path: "/user/history", icon: History, label: t('user_nav.history') },
   ];
 
+    // Had l-fonction kat-khwi l-localStorage o kat-khrej l-user mn site
     const handleLogout = () => {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -79,6 +82,7 @@ export function UserLayout() {
               const active = isActive(item.path);
               const isBlockedForAdmin = currentUser?.role === 'admin' && ['/user/publish', '/user/messages', '/user/favorites', '/user/history'].includes(item.path);
 
+              // Had l-fonction kat-blokki l-admin bash ma-ydirsh shi hwayej d-users 3adiyin
               const handleClick = (e: React.MouseEvent) => {
                 if (isBlockedForAdmin) {
                   e.preventDefault();

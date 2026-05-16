@@ -14,6 +14,7 @@ class MessageController extends Controller
         $this->middleware('auth:sanctum');
     }
 
+    // Had l-fonction kat-7seb ch-7al mn mayssaj jdid ja l-user o ba9i ma-9rahsh
     public function unreadCount()
     {
         $userId = Auth::user()->id_user;
@@ -26,6 +27,7 @@ class MessageController extends Controller
     }
 
     // GET /echanges/{id}/messages
+    // Had l-fonction kat-jib ga3 l-mayssajat li trayin f-wahed l-echange o t-marquihom b-lu
     public function index($echangeId)
     {
         $echange = Echange::findOrFail($echangeId);
@@ -47,6 +49,7 @@ class MessageController extends Controller
     }
 
     // POST /echanges/{id}/messages
+    // Had l-fonction kat-khalli l-user i-sift mayssaj l-user l-akhor o t-uploadie hta les fichiers
     public function store(Request $request, $echangeId)
     {
         $echange = Echange::findOrFail($echangeId);
