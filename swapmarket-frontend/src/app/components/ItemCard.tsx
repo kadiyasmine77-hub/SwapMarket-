@@ -18,7 +18,7 @@ interface ItemCardProps {
   disponibilite?: 'disponible' | 'echange' | 'reserve';
 }
 
-// Had l-composant howa l-card (l-war9a) li fiha l-ma3loumat d-objet (annonce) bash n-biynouh f-site
+// Had lcomposant howa lcard wla lwar9a li fiha lma3loumat dial lobjet wla lannonce bach nbiynouh f lsite
 export function ItemCard({
   title,
   category,
@@ -91,7 +91,7 @@ export function ItemCard({
       {/* Content */}
       <div className="p-4">
         {/* Category */}
-        <p className="text-xs text-muted-foreground mb-1">{category}</p>
+        <p className="text-xs text-muted-foreground mb-1">{t(`categories_list.${category}`, category)}</p>
 
         {/* Title */}
         <h3 className="font-semibold mb-2 text-foreground line-clamp-2 group-hover:text-olive transition-colors">

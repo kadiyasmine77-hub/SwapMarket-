@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { API_BASE_URL } from "../../config";
 import { useLanguage } from "../../LanguageContext";
 
+// Had lpage fiha lformulaire dial linscription bach luser ydir compte jdid
 export function SignupPage() {
   const { t, language } = useLanguage();
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ export function SignupPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Had lfonction katverifié les donnees dial lformulaire w katsifethom lbackend bach tsjel luser
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
 

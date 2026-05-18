@@ -14,13 +14,13 @@ class UserController extends Controller
         $this->middleware('auth:sanctum');
     }
 
-    // Had l-fonction kat-jib les informations dyal l-user li m-connecti db
+    // Had lfonction katjib les informations dyal luser li mconnecti db
     public function profil(Request $request)
     {
         return response()->json($request->user());
     }
 
-    // Had l-fonction kat-khalli l-user i-beddel l-profile dyalo (smia, t-lifon, t-swira...)
+    // Had lfonction katkhalli luser ibeddel lprofile dyalo (smia, tel, tswira...)
     public function update(Request $request)
     {
         $user = $request->user();
@@ -55,8 +55,8 @@ class UserController extends Controller
         return response()->json($user->fresh());
     }
 
-    // ✅ جديد — Procédure stockée
-    // Had l-fonction kat-jib les statistiques dyal l-user (ch-7al mn echange dar...) b-Procedure Stockee
+    // — Procédure stockée
+    // Had lfonction katjib les statistiques dyal luser (chhal mn echange dar...) bProcedure Stockee
     public function stats(Request $request)
     {
         $userId = $request->user()->id_user;
@@ -88,32 +88,8 @@ class UserController extends Controller
         }
     }
 
-    // Consommation Api externe (Point 15)
-    // Had l-fonction kat-jib l-liste dyal ga3 l-boldan mn wahed l-API externe (RestCountries)
-    public function getCountries()
-    {
-        try {
-            // Appel à une API publique pour récupérer la liste des pays (très utile pour l'inscription)
-            $response = Http::get('https://restcountries.com/v3.1/all?fields=name,cca2');
-            
-            if ($response->successful()) {
-                $countries = collect($response->json())->map(function ($country) {
-                    return [
-                        'code' => $country['cca2'],
-                        'name' => $country['name']['common']
-                    ];
-                })->sortBy('name')->values();
-                
-                return response()->json($countries);
-            }
-            
-            return response()->json(['message' => 'Erreur lors de la recuperation des pays'], 500);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Erreur de connexion a l API', 'error' => $e->getMessage()], 500);
-        }
-    }
 
-    // Had l-fonction kat-khalli l-user i-beddel modepasse dyalo b-wahed jdid
+    // Had l-fonction katkhalli luser ibeddel modepasse dyalo b-wahed jdid
     public function changePassword(Request $request)
     {
         $request->validate([

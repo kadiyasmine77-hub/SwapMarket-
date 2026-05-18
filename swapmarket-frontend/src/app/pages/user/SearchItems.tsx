@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { ImageSlider } from "../../components/ImageSlider";
 import { API_BASE_URL, getStorageUrl } from "../../config";
 import { useLanguage } from "../../LanguageContext";
-
+// Had lpage hiya lpage d'exploration (Explorer) fin kaychouf luser ga3 les annonces w yqder ydir recherche wla yfiltri b les categories wla l'etat
 export function SearchItems() {
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
@@ -168,7 +168,7 @@ export function SearchItems() {
                   <SelectItem value="all">{t('search.all_categories')}</SelectItem>
                   {categories.map((cat) => (
                     <SelectItem key={cat.id_categorie} value={cat.id_categorie.toString()}>
-                      {cat.nom}
+                      {t(`categories_list.${cat.nom}`, cat.nom)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -225,7 +225,7 @@ export function SearchItems() {
             size="sm"
             onClick={() => setSelectedCategory(cat.id_categorie.toString())}
           >
-            {cat.nom}
+            {t(`categories_list.${cat.nom}`, cat.nom)}
           </Button>
         ))}
       </div>

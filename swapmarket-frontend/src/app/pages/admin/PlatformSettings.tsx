@@ -1,6 +1,5 @@
 import { Button } from "../../components/ui/button";
-import { Switch } from "../../components/ui/switch";
-import { Download, FileText, ShieldAlert } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { API_BASE_URL } from "../../config";
 import { useState } from "react";
@@ -8,7 +7,6 @@ import { useLanguage } from "../../LanguageContext";
 
 export function PlatformSettings() {
   const { t } = useLanguage();
-  const [maintenanceMode, setMaintenanceMode] = useState(false);
 
   const handleExportPDF = async () => {
     const token = localStorage.getItem("token");
@@ -80,31 +78,7 @@ export function PlatformSettings() {
           </div>
         </div>
 
-        {/* Global Controls - Simplified */}
-        <div className="rounded-2xl border bg-white p-8 shadow-sm">
-          <h2 className="mb-6 text-xl font-bold text-neutral-900">{t('settings.system_controls')}</h2>
-          
-          <div className="space-y-6">
-            <div className="flex items-center justify-between rounded-xl bg-neutral-50 p-6">
-              <div className="flex gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600">
-                  <ShieldAlert className="h-6 w-6" />
-                </div>
-                <div>
-                  <p className="font-bold text-neutral-900">{t('settings.maintenance_mode')}</p>
-                  <p className="text-sm text-neutral-500">{t('settings.maintenance_desc')}</p>
-                </div>
-              </div>
-              <Switch 
-                checked={maintenanceMode} 
-                onCheckedChange={(checked) => {
-                  setMaintenanceMode(checked);
-                  toast.info(checked ? t('settings.maintenance_on') : t('settings.maintenance_off'));
-                }} 
-              />
-            </div>
-          </div>
-        </div>
+
       </div>
     </div>
   );

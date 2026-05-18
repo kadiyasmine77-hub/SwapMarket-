@@ -21,14 +21,14 @@ import logoImage from "../../assets/logo.png";
 import { useLanguage } from "../LanguageContext";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
 
-// Had l-layout howa l-ghila dyal l-admin fih s-sidebar o l-menu dyal ga3 l-fonctions dyal l-admin
+// Had layout  dyal ladmin fih sidebar o lmenu dyal ga3 lfonctions dyal ladmin
 export function AdminLayout() {
   const location = useLocation();
   const { t } = useLanguage();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-  // Had l-fonction kat-chof wash l-page li l-admin fiha hiya li f-link bash t-biynha active
+  // Had lfonction katchof wash lpage admin fiha hiya li flink bash tbiynha active
   const isActive = (path: string) => {
     if (path === "/admin") {
       return location.pathname === "/admin";
@@ -48,7 +48,7 @@ export function AdminLayout() {
   ];
 
   return (
-    <div className="min-h-screen bg-neutral-50 lg:flex">
+    <div className="min-h-screen bg-background lg:flex">
       {/* Mobile Toggle Overlay */}
       {isSidebarOpen && (
         <div

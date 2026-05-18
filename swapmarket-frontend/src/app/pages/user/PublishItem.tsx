@@ -237,7 +237,7 @@ export function PublishItem() {
               <SelectContent>
                 {categories.map((cat) => (
                   <SelectItem key={cat.id_categorie} value={cat.id_categorie.toString()}>
-                    {cat.nom}
+                    {t(`categories_list.${cat.nom}`, cat.nom)}
                   </SelectItem>
                 ))}
               </SelectContent>

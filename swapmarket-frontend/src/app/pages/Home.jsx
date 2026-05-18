@@ -5,11 +5,12 @@ import { Navbar } from '../components/Navbar';
 import { API_BASE_URL, getStorageUrl } from '../config';
 import { useLanguage } from '../LanguageContext';
 import { ItemCard } from '../components/ItemCard';
-
+// Had lpage hiya lpage daccueil (Home) li katban l ayi wahed yalah dkhel lsite
 function Home() {
   const [featuredItems, setFeaturedItems] = useState([]);
   const { t } = useLanguage();
 
+  // Had useEffect kayjib 3 dyal les annonces jdad mn lbase de données bach nbiynohom f lpage daccueil
   useEffect(() => {
     fetch(`${API_BASE_URL}/objets?per_page=3`)
       .then((res) => res.json())
@@ -46,6 +47,7 @@ function Home() {
       <Navbar variant="public" />
 
       <main>
+        {/* Lpartie lfouqania (Hero Section) li fiha ltitre lkbir w les boutons dial tsjal w dkhoul */}
         <section className="relative overflow-hidden border-b border-border bg-primary text-white">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.18),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(181,166,66,0.22),transparent_28%)]" />
           <div className="relative mx-auto flex max-w-7xl flex-col gap-10 px-4 py-20 sm:px-6 lg:items-center lg:px-8 lg:py-28">
@@ -78,6 +80,7 @@ function Home() {
           </div>
         </section>
 
+        {/* Lpartie dial les objets li yalah thto (Featured Items) */}
         <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
           <div className="mb-10 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -107,6 +110,7 @@ function Home() {
           </div>
         </section>
 
+        {/* Lpartie dial les statistiques (Chhal mn user w chhal mn echange darou) */}
         <section className="bg-accent">
           <div className="mx-auto grid max-w-7xl gap-6 px-4 py-16 sm:px-6 lg:grid-cols-3 lg:px-8">
             <div className="rounded-2xl border border-border bg-card p-6">

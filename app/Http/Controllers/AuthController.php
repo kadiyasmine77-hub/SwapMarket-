@@ -61,7 +61,7 @@ class AuthController extends Controller
     }
 
 
-    // Had l-fonction kat-verifier email o modepasse bash l-user idkhol l-compte dyalo
+    // Had lfonction katverifier email o modepasse bash luser idkhol lcompte dyalo
     public function login(Request $request)
     {
         $request->validate([

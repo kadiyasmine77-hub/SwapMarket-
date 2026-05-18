@@ -1,6 +1,7 @@
 import { useLanguage } from '../LanguageContext';
 import { Globe } from 'lucide-react';
 
+// Had lcomposant dial switch dial les langues bin lfrançais (FR) w langlais (EN) f navbar wla f ayi blassa
 export function LanguageSwitcher() {
   const { language, setLanguage } = useLanguage();
 

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 
+// Had lcomposant dial slide dial tsawer dyal l'objet, ila kan fih ktar mn tsouira wahda kaybiyn les fleches bash tglissi binathom
 interface ImageSliderProps {
   images: string[];
   alt: string;

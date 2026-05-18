@@ -22,7 +22,7 @@ class AdminController extends Controller
         $this->middleware(['auth:sanctum', 'checkrole:admin']);
     }
 
-    // Had lfonction katjib ga3 les statistiques dyal lapp (users, objets, echanges...) bash it-affichaw f-dashboard
+    // Had lfonction katjib ga3 les statistiques dyal lapp (users, objets, echanges...) bash itaffichaw fdashboard
     public function stats()
     {
         return response()->json([
@@ -77,7 +77,7 @@ class AdminController extends Controller
         return response()->json($query->latest('id_user')->paginate(15));
     }
 
-    // Had l-fonction kat-khalli l-admin ibeddel l-statut dyal user (i-suspendih ola i-activih)
+    // Had lfonction katkhalli ladmin ibeddel lstatut dyal user (ysuspendih ola yactivih)
     public function updateStatutUser(Request $request, $id)
     {
         $request->validate([
@@ -107,7 +107,7 @@ class AdminController extends Controller
         ]);
     }
 
-    // Had l-fonction kat-jib ga3 les operations d-tabadoul (echanges) li trayin f-site
+    // Had lfonction katjib ga3 les operations dtabadoul (echanges) li trayin fsite
     public function echanges(Request $request)
     {
         $query = Echange::with(['demandeur', 'destinataire', 'objet1', 'objet2']);

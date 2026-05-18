@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { API_BASE_URL } from "../../config";
 import { useLanguage } from "../../LanguageContext";
 
-// Had l-page kat-khalli l-user idkhol l-compte dyalo (Se connecter)
+// Had lpage katkhali luser ydkhol lcompte dialo (Se connecter)
 export function LoginPage() {
   const { t, language } = useLanguage();
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ export function LoginPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Had l-fonction kat-verify email o modepasse o kat-sift request l-backend bash l-user idkhol
+  // Had lfonction katverifié email w mot de passe w katsifet request lbackend bach ydkhol luser
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
@@ -82,7 +82,7 @@ export function LoginPage() {
     }
   };
 
-  // Had l-composant kat-affichie l-message d-erreur ila nsa user shi haja ola khlat
+  // Had lcomposant kaybiyn les messages derreur l luser ila nsa chi haja aw ghalet fiha
   const ErrorMessage = ({ message }: { message?: string }) => {
     if (!message) return null;
     return (

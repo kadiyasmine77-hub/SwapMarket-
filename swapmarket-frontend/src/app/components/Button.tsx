@@ -1,5 +1,6 @@
 import { ButtonHTMLAttributes, forwardRef } from 'react';
 
+// Had lcomposant dial les boutons f site kaml, fih les styles primary, secondary, danger... dial les actions dial luser
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'olive';
   size?: 'sm' | 'md' | 'lg';

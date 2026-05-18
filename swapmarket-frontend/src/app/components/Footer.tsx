@@ -4,11 +4,11 @@ import logoImage from '../../assets/logo.png';
 import { useLanguage } from '../LanguageContext';
 import { toast } from 'sonner';
 
-// Had l-composant fih l-partie l-tahtania d-site (Footer) fih l-links d-social media o les infos d-contact
+// Had lcomposant fih lpartie ltahtania dial lsite (Footer) fih les liens dial navigation w les infos dial contact
 export function Footer() {
   const { t } = useLanguage();
-  const currentYear = new Date().getFullYear();
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const currentYear = new Date().getFullYear(); // hada l3am lriadi bach yban dynamic f ltaht dial lpage
+  const user = JSON.parse(localStorage.getItem('user') || '{}'); // hada kayjib luser li connecté mkhzn f localstorage
 
   const socialLinks = [
     { icon: Github, href: 'https://github.com/kadiyasmine77-hub', label: 'Github' },

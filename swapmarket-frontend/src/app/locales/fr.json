@@ -1,4 +1,13 @@
 {
+  "categories_list": {
+    "Art & Décoration": "Art & Décoration",
+    "Cuisine": "Cuisine",
+    "Électronique": "Électronique",
+    "Jeux": "Jeux",
+    "Livres": "Livres",
+    "Maison": "Maison",
+    "Animaux": "Animaux"
+  },
   "nav": {
     "explore": "Explorer",
     "my_swaps": "Mes Trocs",

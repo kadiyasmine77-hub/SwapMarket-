@@ -10,7 +10,7 @@ import { ImageSlider } from "../../components/ImageSlider";
 import { useLanguage } from "../../LanguageContext";
 import { Footer } from "../../components/Footer";
 import { toast } from "sonner";
-
+// Had lpage hiya tableau de bord (Dashboard) dial luser fin kaychouf lkhlassa dial compte dialo (les messages jdad, les echanges w les recommandations)
 export function UserDashboard() {
   const { t } = useLanguage();
   const userStr = localStorage.getItem('user');

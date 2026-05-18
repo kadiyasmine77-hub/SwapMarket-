@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up()
     {
-        // جدول الـ historique
+        // historique
         Schema::create('historique_echanges', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_echange')->constrained('echanges', 'id_echange')->onDelete('cascade');
@@ -17,7 +17,7 @@ return new class extends Migration
             $table->timestamp('changed_at')->useCurrent();
         });
 
-        // الـ Trigger
+        // Trigger
         DB::unprepared('
             CREATE TRIGGER after_echange_statut_update
             AFTER UPDATE ON echanges

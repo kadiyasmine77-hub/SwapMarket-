@@ -39,7 +39,7 @@ export function UserLayout() {
     };
 
     return (
-      <div className="min-h-screen bg-neutral-50">
+      <div className="min-h-screen bg-background">
         {/* Header */}
         <header className="sticky top-0 z-50 border-b bg-white">
           <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">

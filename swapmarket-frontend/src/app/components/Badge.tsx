@@ -1,3 +1,4 @@
+// Had lcomposant kaybiyn les badges wla labels sghar b lwan mkhtalfa (bhal disponible, reserve, echange) 3la hssab lvariant li ghadi nkhdmo bih
 interface BadgeProps {
   children: React.ReactNode;
   variant?: 'default' | 'success' | 'warning' | 'danger' | 'olive' | 'trust';

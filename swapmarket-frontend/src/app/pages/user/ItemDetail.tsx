@@ -18,7 +18,7 @@ import {
 } from "../../components/ui/dialog";
 import { ScrollArea } from "../../components/ui/scroll-area";
 import { useLanguage } from "../../LanguageContext";
-
+// Had lpage hiya page de detail dial objet li kaychouf fiha luser ga3 tsawer w les infos dial l'annonce w yqder ycliqui 3la proposer un echange
 export function ItemDetail() {
   const { t, language } = useLanguage();
   const { id } = useParams();
@@ -283,7 +283,7 @@ export function ItemDetail() {
 
           <div className="flex flex-wrap gap-2">
             <Badge variant="secondary" className="text-sm">
-              {item.categorie?.nom || "—"}
+              {item.categorie ? t(`categories_list.${item.categorie.nom}`, item.categorie.nom) : "—"}
             </Badge>
             <Badge variant="outline" className="text-sm">
               {item.etat}
@@ -406,7 +406,9 @@ export function ItemDetail() {
                     </div>
                     <div className="flex-1">
                       <p className="font-medium text-sm line-clamp-1">{myObj.titre}</p>
-                      <p className="text-xs text-neutral-500">{myObj.categorie?.nom || "—"}</p>
+                      <p className="text-xs text-neutral-500">
+                        {myObj.categorie ? t(`categories_list.${myObj.categorie.nom}`, myObj.categorie.nom) : "—"}
+                      </p>
                     </div>
                     {selectedItemId === myObj.id_objet.toString() && (
                       <div className="h-5 w-5 rounded-full bg-olive flex items-center justify-center">
