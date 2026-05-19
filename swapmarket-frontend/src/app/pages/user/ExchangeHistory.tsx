@@ -32,10 +32,12 @@ export function ExchangeHistory() {
   const [comment, setComment] = useState("");
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
+  // --- Had l-hook useEffect kay-jib les échanges mli la page kat-ch3el ---
   useEffect(() => {
     fetchExchanges();
   }, []);
 
+  // --- Had l-fonction kat-sifet requête l Laravel API bash tjib ga3 historique dial les trocs (échanges) ---
   const fetchExchanges = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -43,12 +45,12 @@ export function ExchangeHistory() {
         headers: { "Authorization": `Bearer ${token}` }
       });
       const data = await response.json();
-      setExchanges(data);
+      setExchanges(data); // N-khzno les echanges l-qyin f l-state
     } catch (error) {
       console.error("Error fetching exchanges:", error);
       toast.error(t('auth.error_server'));
     } finally {
-      setLoading(false);
+      setLoading(false); // Chargement tsala
     }
   };
 

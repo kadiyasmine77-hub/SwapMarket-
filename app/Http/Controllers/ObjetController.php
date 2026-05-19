@@ -21,7 +21,12 @@ class ObjetController extends Controller
         $perPage = (int) $request->get('per_page', 10);
         $perPage = $perPage > 0 ? min($perPage, 100) : 10;
 
-        $query = Objet::with(['user', 'categorie', 'images'])->latest('id_objet');
+        // Katfilterer les objets bash tffichi ghir dyal les utilisateurs li mactiviyin
+        $query = Objet::with(['user', 'categorie', 'images'])
+            ->whereHas('user', function ($q) {
+                $q->where('statut_compte', 'actif');
+            })
+            ->latest('id_objet');
 
         if ($request->user_id) {
             $query->where('id_user', $request->user_id);

@@ -92,7 +92,17 @@ class AdminController extends Controller
             ], 403);
         }
 
+        // Lcompte kaytbedel status dyalo
         $user->update(['statut_compte' => $request->statut]);
+
+        // Katannuler ootomatiquement ga3 les echanges en attente dyal user ila tdesactiva lcompte dyalo
+        if ($request->statut === 'desactive') {
+            \App\Models\Echange::where(function($query) use ($id) {
+                $query->where('id_demandeur', $id)
+                      ->orWhere('id_destinataire', $id);
+            })->where('statut', 'en_attente')
+              ->update(['statut' => 'annule']);
+        }
 
         ActivityLog::create([
             'admin_id' => Auth::id(),

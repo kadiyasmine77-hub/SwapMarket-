@@ -79,6 +79,11 @@ class AuthController extends Controller
             return response()->json(['message' => trans('auth.password')], 401);
         }
 
+        // Katverifi wesh lcompte mbloki ola desactive bash ytmn3 mno ddkhoul
+        if ($user->statut_compte === 'suspendu' || $user->statut_compte === 'desactive') {
+            return response()->json(['message' => 'Ce compte a été suspendu ou désactivé.'], 403);
+        }
+
         if (!$user->is_verifie) {
             return response()->json(['message' => 'Compte non vérifié'], 403);
         }
