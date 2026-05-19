@@ -1,4 +1,4 @@
-import { Outlet, Link, useLocation } from "react-router";
+import { Outlet, Link, useLocation, Navigate } from "react-router";
 import {
   LayoutDashboard,
   Users,
@@ -28,7 +28,23 @@ export function AdminLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-  // Had lfonction katchof wash lpage admin fiha hiya li flink bash tbiynha active
+  // Hna kanchofo wash l-user raah admin, ila mshih kankhrjoh
+  if (user.role !== 'admin') {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="text-center p-8 bg-card border rounded-lg shadow-sm">
+          <h1 className="text-6xl font-bold text-destructive mb-4">403</h1>
+          <p className="text-xl text-muted-foreground mb-2">Accès refusé</p>
+          <p className="text-sm text-muted-foreground mb-4">Vous n'avez pas les autorisations nécessaires pour accéder à cet espace.</p>
+          <Link to="/" className="text-primary hover:underline">
+            Retour à l'accueil
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Had lfonction katchof wash lpage admin fiha hiya li flink bash t-biynha active
   const isActive = (path: string) => {
     if (path === "/admin") {
       return location.pathname === "/admin";

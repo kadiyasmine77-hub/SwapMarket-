@@ -9,13 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class CategorieController extends Controller
 {
-    public function __construct()
-    {
-        // $this->middleware('auth:sanctum')->except(['index', 'show']);
-        // $this->middleware('checkrole:admin')->except(['index', 'show']);
-    }
-
-    public function index()
+    public function index() // biha bash kanjib la lsite categorie
     {
         return response()->json(
             Categorie::orderByRaw("CASE WHEN LOWER(nom) IN ('autre', 'autres', 'other', 'others') THEN 1 ELSE 0 END ASC")
@@ -24,6 +18,7 @@ class CategorieController extends Controller
         );
     }
 
+    // stoe o update : zid ola modifier categorie admin yqdr ydir hadshi (hadshi kaytqyd f activitylog)
     public function store(Request $request)
     {
         $data = $request->validate([

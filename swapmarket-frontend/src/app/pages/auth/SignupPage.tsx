@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { API_BASE_URL } from "../../config";
 import { useLanguage } from "../../LanguageContext";
 
-// Had lpage fiha lformulaire dial linscription bach luser ydir compte jdid
 export function SignupPage() {
   const { t, language } = useLanguage();
   const navigate = useNavigate();
@@ -27,7 +26,6 @@ export function SignupPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Had lfonction katverifié les donnees dial lformulaire w katsifethom lbackend bach tsjel luser
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -38,6 +36,11 @@ export function SignupPage() {
 
     if (!formData.name) newErrors.name = t('validation.required', { attribute: t('auth.full_name') });
     if (!formData.email) newErrors.email = t('validation.required', { attribute: t('auth.email') });
+    
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = t('auth.error_email_invalid');
+    }
+
     if (!formData.city) newErrors.city = t('validation.required', { attribute: t('auth.city') });
     if (!formData.password) newErrors.password = t('validation.required', { attribute: t('auth.password') });
 
@@ -139,10 +142,10 @@ export function SignupPage() {
     if (!message) return null;
     return (
       <div className="flex items-center gap-2 mt-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
-        <div className="bg-amber-500 rounded p-0.5">
+        <div className="bg-red-500 rounded p-0.5">
           <X className="h-3 w-3 text-white stroke-[3px]" />
         </div>
-        <span className="text-xs font-medium text-amber-600">{message}</span>
+        <span className="text-xs font-medium text-red-600">{message}</span>
       </div>
     );
   };
@@ -194,7 +197,7 @@ export function SignupPage() {
                 placeholder={t('auth.placeholder_name')}
                 value={formData.name}
                 onChange={handleChange}
-                className={errors.name ? "border-amber-500 ring-amber-500/20" : ""}
+                className={errors.name ? "border-red-500 ring-red-500/20" : ""}
               />
               <ErrorMessage message={errors.name} />
             </div>
@@ -208,7 +211,7 @@ export function SignupPage() {
                 placeholder={t('auth.placeholder_email')}
                 value={formData.email}
                 onChange={handleChange}
-                className={errors.email ? "border-amber-500 ring-amber-500/20" : ""}
+                className={errors.email ? "border-red-500 ring-red-500/20" : ""}
               />
               <ErrorMessage message={errors.email} />
             </div>
@@ -222,7 +225,7 @@ export function SignupPage() {
                 placeholder={t('auth.placeholder_city')}
                 value={formData.city}
                 onChange={handleChange}
-                className={errors.city ? "border-amber-500 ring-amber-500/20" : ""}
+                className={errors.city ? "border-red-500 ring-red-500/20" : ""}
               />
               <ErrorMessage message={errors.city} />
             </div>
@@ -237,7 +240,7 @@ export function SignupPage() {
                   placeholder={t('auth.placeholder_phone')}
                   value={formData.phone}
                   onChange={handleChange}
-                  className={errors.phone ? "border-amber-500 ring-amber-500/20" : ""}
+                  className={errors.phone ? "border-red-500 ring-red-500/20" : ""}
                 />
                 <ErrorMessage message={errors.phone} />
               </div>
@@ -249,7 +252,7 @@ export function SignupPage() {
                   type="date"
                   value={formData.birthDate}
                   onChange={handleChange}
-                  className={errors.birthDate ? "border-amber-500 ring-amber-500/20" : ""}
+                  className={errors.birthDate ? "border-red-500 ring-red-500/20" : ""}
                 />
                 <ErrorMessage message={errors.birthDate} />
               </div>
@@ -265,7 +268,7 @@ export function SignupPage() {
                   placeholder={t('auth.placeholder_password')}
                   value={formData.password}
                   onChange={handleChange}
-                  className={errors.password ? "border-amber-500 ring-amber-500/20 pr-10" : "pr-10"}
+                  className={errors.password ? "border-red-500 ring-red-500/20 pr-10" : "pr-10"}
                 />
                 <button
                   type="button"
@@ -288,7 +291,7 @@ export function SignupPage() {
                   placeholder={t('auth.placeholder_password')}
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className={errors.confirmPassword ? "border-amber-500 ring-amber-500/20 pr-10" : "pr-10"}
+                  className={errors.confirmPassword ? "border-red-500 ring-red-500/20 pr-10" : "pr-10"}
                 />
                 <button
                   type="button"

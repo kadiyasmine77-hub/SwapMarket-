@@ -13,7 +13,7 @@ class AvisController extends Controller
         $this->middleware('auth:sanctum')->except(['index', 'userReviews']);
     }
 
-    // GET /objets/{id}/avis
+    // GET /objets/{id}/avis : jib avis dyal shi objets
     public function index($objetId)
     {
         Objet::findOrFail($objetId);
@@ -25,7 +25,7 @@ class AvisController extends Controller
         );
     }
 
-    public function userReviews($userId)
+    public function userReviews($userId) // biha bash kayjib avis dyal shi user
     {
         return response()->json(
             Avis::with(['user', 'objet'])
@@ -38,6 +38,7 @@ class AvisController extends Controller
     }
 
     // POST /objets/{id}/avis
+    // fach user kaydir Publier lAvis dyalo
     public function store(Request $request, $objetId)
     {
         $objet = Objet::findOrFail($objetId);
@@ -60,15 +61,4 @@ class AvisController extends Controller
         return response()->json($avis->load('user'), 201);
     }
 
-    // DELETE /avis/{id}
-    public function destroy($id)
-    {
-        $avis = Avis::findOrFail($id);
-
-        if ($avis->id_user !== Auth::user()->id_user)
-            return response()->json(['message' => 'Non autorisé'], 403);
-
-        $avis->delete();
-        return response()->json(['message' => 'Avis supprimé']);
-    }
 }

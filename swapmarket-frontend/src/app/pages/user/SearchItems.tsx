@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { ImageSlider } from "../../components/ImageSlider";
 import { API_BASE_URL, getStorageUrl } from "../../config";
 import { useLanguage } from "../../LanguageContext";
-// Had lpage hiya lpage d'exploration (Explorer) fin kaychouf luser ga3 les annonces w yqder ydir recherche wla yfiltri b les categories wla l'etat
+
 export function SearchItems() {
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");

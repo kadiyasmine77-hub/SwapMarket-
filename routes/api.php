@@ -54,9 +54,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/objets/{id}/images/{imageId}', [ObjetImageController::class, 'destroy']);
 
     Route::post('/objets/{id}/avis', [AvisController::class, 'store']);
-    Route::delete('/avis/{id}', [AvisController::class, 'destroy']);
     Route::post('/items/{id}/reviews', [AvisController::class, 'store']);
-    Route::delete('/reviews/{id}', [AvisController::class, 'destroy']);
 
     Route::get('/echanges', [EchangeController::class, 'index']);
     Route::post('/echanges', [EchangeController::class, 'store']);

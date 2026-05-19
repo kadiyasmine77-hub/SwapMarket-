@@ -87,10 +87,10 @@ export function LoginPage() {
     if (!message) return null;
     return (
       <div className="flex items-center gap-2 mt-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
-        <div className="bg-amber-500 rounded p-0.5">
+        <div className="bg-red-500 rounded p-0.5">
           <X className="h-3 w-3 text-white stroke-[3px]" />
         </div>
-        <span className="text-xs font-medium text-amber-600">{message}</span>
+        <span className="text-xs font-medium text-red-600">{message}</span>
       </div>
     );
   };
@@ -144,7 +144,7 @@ export function LoginPage() {
                   setEmail(e.target.value);
                   if (errors.email) setErrors({ ...errors, email: "" });
                 }}
-                className={errors.email ? "border-amber-500 ring-amber-500/20" : ""}
+                className={errors.email ? "border-red-500 ring-red-500/20" : ""}
               />
               <ErrorMessage message={errors.email} />
             </div>
@@ -166,7 +166,7 @@ export function LoginPage() {
                     setPassword(e.target.value);
                     if (errors.password) setErrors({ ...errors, password: "" });
                   }}
-                  className={errors.password ? "border-amber-500 ring-amber-500/20 pr-10" : "pr-10"}
+                  className={errors.password ? "border-red-500 ring-red-500/20 pr-10" : "pr-10"}
                 />
                 <button
                   type="button"

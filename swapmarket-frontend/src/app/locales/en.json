@@ -6,7 +6,10 @@
     "Jeux": "Games",
     "Livres": "Books",
     "Maison": "Home",
-    "Animaux": "Animal"
+    "Animaux": "Animal",
+    "Sport": "Sports",
+    "Vêtements": "Clothing",
+    "Autres": "Others"
   },
   "nav": {
     "explore": "Explore",
@@ -395,6 +398,7 @@
     "birth_date": "Birth Date",
     "placeholder_city": "New York",
     "placeholder_phone": "0XXXXXXXXX",
+    "error_email_invalid": "The email address is not valid.",
     "error_password_match": "Passwords do not match",
     "error_password_invalid": "Password must be at least 8 characters long, including an uppercase letter, a number, and a special character.",
     "error_city_numbers": "City should not contain numbers.",

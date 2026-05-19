@@ -205,10 +205,10 @@ export function EditItem() {
     if (!message) return null;
     return (
       <div className="flex items-center gap-2 mt-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
-        <div className="bg-amber-500 rounded p-0.5">
+        <div className="bg-red-500 rounded p-0.5">
           <X className="h-3 w-3 text-white stroke-[3px]" />
         </div>
-        <span className="text-xs font-medium text-amber-600">{message}</span>
+        <span className="text-xs font-medium text-red-600">{message}</span>
       </div>
     );
   };
@@ -271,7 +271,7 @@ export function EditItem() {
             id="title"
             value={formData.title}
             onChange={(e) => handleChange("title", e.target.value)}
-            className={errors.title ? "border-amber-500 ring-amber-500/20" : ""}
+            className={errors.title ? "border-red-500 ring-red-500/20" : ""}
           />
           <ErrorMessage message={errors.title} />
         </div>
@@ -283,7 +283,7 @@ export function EditItem() {
             rows={5}
             value={formData.description}
             onChange={(e) => handleChange("description", e.target.value)}
-            className={errors.description ? "border-amber-500 ring-amber-500/20" : ""}
+            className={errors.description ? "border-red-500 ring-red-500/20" : ""}
           />
           <ErrorMessage message={errors.description} />
         </div>
@@ -292,7 +292,7 @@ export function EditItem() {
           <div className="space-y-2">
             <Label htmlFor="category">{t('publish_edit.category_label')}</Label>
             <Select value={formData.category} onValueChange={(value) => handleChange("category", value)}>
-              <SelectTrigger className={errors.category ? "border-amber-500 ring-amber-500/20" : ""}>
+              <SelectTrigger className={errors.category ? "border-red-500 ring-red-500/20" : ""}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -309,7 +309,7 @@ export function EditItem() {
           <div className="space-y-2">
             <Label htmlFor="condition">{t('publish_edit.condition_label')}</Label>
             <Select value={formData.condition} onValueChange={(value) => handleChange("condition", value)}>
-              <SelectTrigger className={errors.condition ? "border-amber-500 ring-amber-500/20" : ""}>
+              <SelectTrigger className={errors.condition ? "border-red-500 ring-red-500/20" : ""}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
