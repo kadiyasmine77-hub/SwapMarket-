@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, Navigate } from "react-router";
 import { UserLayout } from "./layouts/UserLayout";
 import { AdminLayout } from "./layouts/AdminLayout";
 import { LoginPage } from "./pages/auth/LoginPage";
@@ -25,6 +25,25 @@ import { AdminExchanges } from "./pages/admin/AdminExchanges";
 import { NotFound } from "./pages/NotFound";
 import Home from "./pages/Home";
 
+// Composant de protection intégré pour ne pas créer un fichier séparé
+const RequireAuth = ({ children, requireAdmin = false }: { children: React.ReactNode, requireAdmin?: boolean }) => {
+  const token = localStorage.getItem("token");
+  const userString = localStorage.getItem("user");
+
+  if (!token || !userString) return <Navigate to="/login" replace />;
+
+  if (requireAdmin) {
+    try {
+      const user = JSON.parse(userString);
+      if (user.role !== 'admin') return <Navigate to="/user" replace />;
+    } catch {
+      return <Navigate to="/login" replace />;
+    }
+  }
+
+  return <>{children}</>;
+};
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -48,7 +67,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "/user",
-    element: <UserLayout />,
+    element: <RequireAuth><UserLayout /></RequireAuth>,
     children: [
       { index: true, element: <UserDashboard /> },
       { path: "publish", element: <PublishItem /> },
@@ -64,7 +83,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "/admin",
-    element: <AdminLayout />,
+    element: <RequireAuth requireAdmin><AdminLayout /></RequireAuth>,
     children: [
       { index: true, element: <AdminDashboard /> },
       { path: "users", element: <ManageUsers /> },

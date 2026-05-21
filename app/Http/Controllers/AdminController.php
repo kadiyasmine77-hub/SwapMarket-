@@ -358,7 +358,7 @@ class AdminController extends Controller
         return response()->json($stats[0] ?? []);
     }
 
-    // Exportation XML (Point 16)
+    // Exportation XML 
     // Had l-fonction kat-generi fichier XML fih ga3 l-liste dyal les utilisateurs
     public function exportXml()
     {
@@ -380,7 +380,7 @@ class AdminController extends Controller
             ->header('Content-Disposition', 'attachment; filename="users.xml"');
     }
 
-    // Importation XML (Point 16)
+    // Importation XML 
     // Had l-fonction kat-akhod fichier XML o kat-creer biha les users f-base de donnee
     public function importXml(Request $request)
     {

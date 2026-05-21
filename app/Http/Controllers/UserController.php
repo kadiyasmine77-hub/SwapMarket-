@@ -55,7 +55,7 @@ class UserController extends Controller
         return response()->json($user->fresh());
     }
 
-    // — Procédure stockée
+    //  Procédure stockée
     // Had lfonction katjib les statistiques dyal luser (chhal mn echange dar...) bProcedure Stockee
     public function stats(Request $request)
     {

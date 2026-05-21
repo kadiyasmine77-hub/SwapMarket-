@@ -38,7 +38,7 @@ class AvisController extends Controller
     }
 
     // POST /objets/{id}/avis
-    // fach user kaydir Publier lAvis dyalo
+    // fach user kaydir Avis elash shi objet d user akhur
     public function store(Request $request, $objetId)
     {
         $objet = Objet::findOrFail($objetId);

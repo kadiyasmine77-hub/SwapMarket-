@@ -9,7 +9,7 @@ class Authenticate extends Middleware
     protected function redirectTo($request)
     {
         if (! $request->expectsJson()) {
-            // API fqt — mashi lazem redirect
+            // API  mashi lazem redirect
             return null;
         }
     }
