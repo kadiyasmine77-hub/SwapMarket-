@@ -107,8 +107,21 @@ export function ManageUsers() {
       },
       body: JSON.stringify({ role }),
     });
+    
     if (res.ok) {
       toast.success(t('admin.role_updated', { name: userName, role: role }));
+      
+      const currentUserStr = localStorage.getItem('user');
+      if (currentUserStr) {
+        const currentUser = JSON.parse(currentUserStr);
+        if (currentUser.id_user === userId) {
+          currentUser.role = role;
+          localStorage.setItem('user', JSON.stringify(currentUser));
+          window.location.href = '/user';
+          return;
+        }
+      }
+      
       fetchUsers(currentPage);
     } else {
       const data = await res.json();

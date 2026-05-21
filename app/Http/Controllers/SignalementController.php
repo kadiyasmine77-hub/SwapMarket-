@@ -9,9 +9,8 @@ use Illuminate\Support\Facades\Auth;
 
 class SignalementController extends Controller
 {
-    /**
-     * Store a newly created resource in storage.
-     */
+    
+     // katkhli user ydir signaler lshi annonce
     public function store(Request $request)
     {
         $request->validate([
@@ -20,7 +19,7 @@ class SignalementController extends Controller
             'description' => 'nullable|string|max:1000',
         ]);
 
-        // Vérifier si l'utilisateur n'a pas déjà signalé cet objet (en attente)
+        // Vérifier si l'utilisateur n'a pas déjà signalé cet objet 
         $existing = Signalement::where('id_utilisateur', Auth::id())
             ->where('id_objet', $request->id_objet)
             ->where('statut', 'en_attente')
@@ -44,9 +43,8 @@ class SignalementController extends Controller
         ], 201);
     }
 
-    /**
-     * Display a listing of the resource for admin.
-     */
+    // katjib ladmin signalements li msyftin lih gae users  
+  
     public function indexAdmin()
     {
         $signalements = Signalement::with(['user:id_user,nom_complet,email,photo_profil', 'objet:id_objet,titre,image'])
@@ -57,9 +55,8 @@ class SignalementController extends Controller
         return response()->json($signalements);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    
+    //update statu dyal signalement
     public function updateStatut(Request $request, $id)
     {
         $request->validate([

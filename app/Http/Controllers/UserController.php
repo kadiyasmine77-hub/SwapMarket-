@@ -20,7 +20,7 @@ class UserController extends Controller
         return response()->json($request->user());
     }
 
-    // Had lfonction katkhalli luser ibeddel lprofile dyalo (smia, tel, tswira...)
+    // Had lfonction katkhalli luser ibeddel info dyal lprofile dyalo 
     public function update(Request $request)
     {
         $user = $request->user();
@@ -89,7 +89,7 @@ class UserController extends Controller
     }
 
 
-    // Had l-fonction katkhalli luser ibeddel modepasse dyalo b-wahed jdid
+    // Had l-fonction katkhalli luser ibeddel modepasse dyalo bwahed jdid
     public function changePassword(Request $request)
     {
         $request->validate([

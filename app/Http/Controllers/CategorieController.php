@@ -18,7 +18,7 @@ class CategorieController extends Controller
         );
     }
 
-    // stoe o update : zid ola modifier categorie admin yqdr ydir hadshi (hadshi kaytqyd f activitylog)
+    // store o update : zid ola modifier categorie admin yqdr ydir hadshi (hadshi kaytqyd f activitylog)
     public function store(Request $request)
     {
         $data = $request->validate([

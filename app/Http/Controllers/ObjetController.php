@@ -15,7 +15,7 @@ class ObjetController extends Controller
         $this->middleware('auth:sanctum')->except(['index', 'show']);
     }
 
-    // Had l-fonction kat-jib ga3 les objets (annonces) li hatin les users f-site o t-filterihom
+    // Had fonction katjib ga3 les objets (annonces) li hatin les users fsite o katfilterihom
     public function index(Request $request)
     {
         $perPage = (int) $request->get('per_page', 10);
@@ -53,7 +53,7 @@ class ObjetController extends Controller
 
         $objets = $query->paginate($perPage);
 
-        // Check favorites for logged in user
+        // Check 
         if (Auth::guard('sanctum')->check()) {
             $userId = Auth::guard('sanctum')->id();
             $favorisIds = \App\Models\Favori::where('id_user', $userId)->pluck('id_objet')->toArray();

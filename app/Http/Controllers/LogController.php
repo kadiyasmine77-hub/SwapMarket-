@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class LogController extends Controller
 {
-    public function index()
+    public function index() // katjib log dyal admin 
     {
         $logs = ActivityLog::with('admin:id_user,nom_complet')
             ->orderBy('created_at', 'desc')

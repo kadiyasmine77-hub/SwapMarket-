@@ -46,7 +46,7 @@ class AvisController extends Controller
         if ($objet->id_user === Auth::user()->id_user)
             return response()->json(['message' => 'Vous ne pouvez pas noter votre propre objet'], 403);
 
-        // Un seul avis par user par objet
+        // Katvalidé données o katcreer l'Avis
         $exists = Avis::where('id_objet', $objetId)
                       ->where('id_user', Auth::user()->id_user)
                       ->exists();

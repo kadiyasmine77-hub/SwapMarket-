@@ -139,7 +139,7 @@ class AdminController extends Controller
         return response()->json($query->latest('id_echange')->paginate(15));
     }
 
-    // Had l-fonction kat-beddel r-role dyal user (t-reddo admin ola user 3adi)
+    // Had lfonction kat beddel rrole dyal user (treddo admin ola user 3adi)
     public function updateRoleUser(Request $request, $id)
     {
         $request->validate([
@@ -148,11 +148,7 @@ class AdminController extends Controller
 
         $user = User::findOrFail($id);
 
-        if ($user->id_user === $request->user()->id_user) {
-            return response()->json([
-                'message' => 'Vous ne pouvez pas modifier votre propre role',
-            ], 403);
-        }
+
 
         $user->update(['role' => $request->role]);
 
@@ -169,7 +165,7 @@ class AdminController extends Controller
         ]);
     }
 
-    // Had l-fonction kat-msah user b-merra mn l-base de donnee o kat-msah m3ah ga3 t-swar o l-annonces dyalo
+    // Had lfonction katmsah user bmerra mn lbase de donnee o katmsah m3ah ga3 tswar o lannonces dyalo
     public function destroyUser($id)
     {
         $user = User::with('objets.images')->findOrFail($id);
@@ -214,7 +210,7 @@ class AdminController extends Controller
         return response()->json(['message' => 'Utilisateur et ses annonces supprimés avec succès']);
     }
 
-    // Had l-fonction kat-jib ga3 les categories li kaynin o t-7seb ch-7al mn objet f-kola wehda
+    // Had lfonction katjib ga3 les categories li kaynin o t7seb ch7al mn objet fkola wehda
     public function categories()
     {
         return response()->json(
@@ -225,7 +221,7 @@ class AdminController extends Controller
         );
     }
 
-    // Had l-fonction kat-jib ga3 les objets (annonces) li hatin les users f-site
+    // Had lfonction katjib ga3 les objets (annonces) li hatin les users fsite
     public function objets()
     {
         return response()->json(
@@ -233,7 +229,7 @@ class AdminController extends Controller
         );
     }
 
-    // Had l-fonction kat-msah shi annonce o kat-msah ga3 les photos dyalha m-serveur (storage)
+    // Had lfonction katmsah shi annonce o katmsah ga3 les photos dyalha mn storage
     public function destroyObjet($id)
     {
         $objet = Objet::with('images')->findOrFail($id);
@@ -262,7 +258,7 @@ class AdminController extends Controller
         return response()->json(['message' => 'Objet supprime']);
     }
 
-    // Had l-fonction kat-khalli l-admin i-modifi l-statut d-shi echange (i-validih ola i-refuzih)
+    // Had lfonction katkhalli ladmin modifi lstatut dshi echange validih ola refuzih
     public function updateStatutEchange(Request $request, $id)
     {
         $request->validate([
@@ -298,7 +294,7 @@ class AdminController extends Controller
         ]);
     }
 
-    // Had l-fonction kat-jib ga3 les avis (commentaires + notes) li daro les users
+    // Had lfonction katjib ga3 les avis (commentaires + notes) li daro les users
     public function avis()
     {
         return response()->json(
@@ -306,7 +302,7 @@ class AdminController extends Controller
         );
     }
 
-    // Had l-fonction kat-msah shi avis mn site
+    // Had lfonction katmsah shi avis mn site
     public function destroyAvis($id)
     {
         $avis = Avis::findOrFail($id);
@@ -322,7 +318,7 @@ class AdminController extends Controller
         return response()->json(['message' => 'Avis supprime']);
     }
 
-    // Had l-fonction kat-generi wahed l-rapport PDF fih ga3 les donnees dyal l-admin (stats, echanges...)
+    // Had lfonction katgeneri wahed lrapport PDF fih ga3 les donnees dyal ladmin (stats, echanges...)
     public function exportPdf(Request $request)
     {
         $lang = strtolower((string) $request->query('lang', 'fr'));
@@ -350,7 +346,7 @@ class AdminController extends Controller
         return $pdf->download('rapport-swapmarket-' . $lang . '-' . now()->format('Y-m-d') . '.pdf');
     }
 
-    // Had l-fonction kat-3ayat l-wahed l-Procedure Stockee f-SQL bash t-jib stats d-user wahed
+    // Had lfonction kat3ayat lwahed Procedure Stockee f SQL bash tjib stats d user wahed
     public function statsUser($id)
     {
         $stats = DB::select('CALL GetUserStats(?)', [$id]);
@@ -359,7 +355,7 @@ class AdminController extends Controller
     }
 
     // Exportation XML 
-    // Had l-fonction kat-generi fichier XML fih ga3 l-liste dyal les utilisateurs
+    // Had fonction katgeneri fichier XML fih ga3 liste dyal les utilisateurs
     public function exportXml()
     {
         $users = User::all();
@@ -381,7 +377,7 @@ class AdminController extends Controller
     }
 
     // Importation XML 
-    // Had l-fonction kat-akhod fichier XML o kat-creer biha les users f-base de donnee
+    // Had fonction katakhod fichier XML o katcreer biha les users f base de donnee
     public function importXml(Request $request)
     {
         $request->validate(['fichier_xml' => 'required|file|mimes:xml']);

@@ -14,13 +14,13 @@ class ObjetImageController extends Controller
         $this->middleware('auth:sanctum');
     }
 
-    // GET /objets/{id}/images
+    // jib image 
     public function index($objetId)
     {
         return response()->json(Objet::findOrFail($objetId)->images);
     }
 
-    // POST /objets/{id}/images
+    // zid image
     public function store(Request $request, $objetId)
     {
         $objet = Objet::findOrFail($objetId);
@@ -53,7 +53,7 @@ class ObjetImageController extends Controller
         return response()->json($saved, 201);
     }
 
-    // DELETE /objets/{objetId}/images/{imageId}
+    //delete image dyal objet
     public function destroy($objetId, $imageId)
     {
         $objet = Objet::findOrFail($objetId);

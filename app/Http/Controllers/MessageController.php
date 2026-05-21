@@ -14,10 +14,10 @@ class MessageController extends Controller
         $this->middleware('auth:sanctum');
     }
 
-    // Had l-fonction kat-7seb ch-7al mn mayssaj jdid ja l-user o ba9i ma-9rahsh
+    // Had lfonction kat7seb ch-7al mn msg jdid ja luser o ba9i ma9rahsh
     public function unreadCount()
     {
-        $userId = Auth::user()->id_user;
+        $userId = Auth::id();
 
         $count = Message::where('id_destinataire', $userId)
             ->where('lu', false)
@@ -27,11 +27,11 @@ class MessageController extends Controller
     }
 
     // GET /echanges/{id}/messages
-    // Had l-fonction kat-jib ga3 l-mayssajat li trayin f-wahed l-echange o t-marquihom b-lu
+    // Had lfonction katjib ga3 lmsgt li taryin fwahed lechange o katmarquihom blu
     public function index($echangeId)
     {
         $echange = Echange::findOrFail($echangeId);
-        $userId = Auth::user()->id_user;
+        $userId = Auth::id();
 
         if ($echange->id_demandeur !== $userId && $echange->id_destinataire !== $userId)
             return response()->json(['message' => 'Non autorisé'], 403);
@@ -49,7 +49,7 @@ class MessageController extends Controller
     }
 
     // POST /echanges/{id}/messages
-    // Had l-fonction kat-khalli l-user i-sift mayssaj l-user l-akhor o t-uploadie hta les fichiers
+    // Had fonction katkhalli luser isift msg luser lakhor o katuploadie hta les fichiers
     public function store(Request $request, $echangeId)
     {
         $echange = Echange::findOrFail($echangeId);

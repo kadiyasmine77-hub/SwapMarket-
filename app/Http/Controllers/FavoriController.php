@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class FavoriController extends Controller
 {
-    public function index()
+    public function index() // katjib les favoris dyal luser
     {
         $id = Auth::user()->id_user;
         $favoris = Favori::with(['objet.user', 'objet.categorie', 'objet.images'])
@@ -20,7 +20,7 @@ class FavoriController extends Controller
         return response()->json($favoris);
     }
 
-    public function toggle(Request $request)
+    public function toggle(Request $request) // katzid o katnsa9ss l objets men favoris
     {
         $request->validate([
             'id_objet' => 'required|exists:objets,id_objet',
@@ -45,7 +45,7 @@ class FavoriController extends Controller
         }
     }
 
-    public function check($id_objet)
+    public function check($id_objet)  // check wash lobjet tzad
     {
         $userId = Auth::user()->id_user;
         $exists = Favori::where('id_user', $userId)

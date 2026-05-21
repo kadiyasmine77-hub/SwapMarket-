@@ -184,7 +184,7 @@ export function AdminReports() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
                         {report.objet && (
-                          <Link to={`/item/${report.id_objet}`} target="_blank">
+                          <Link to={`/user/item/${report.id_objet}`} target="_blank">
                             <DropdownMenuItem className="cursor-pointer">
                               <Eye className="mr-2 h-4 w-4" />
                               {t('items.view_annonce')}

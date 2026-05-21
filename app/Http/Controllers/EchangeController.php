@@ -20,7 +20,7 @@ class EchangeController extends Controller
     }
 
     // GET /echanges
-    // Had l-fonction kat-jib ga3 les echanges dyal l-user li m-connecti (li sayft o li jaweh)
+    // Had lfonction katjib ga3 les echanges dyal luser li m-connecti (li sayft o li jaweh)
     public function index()
     {
         $id = Auth::user()->id_user;
@@ -41,7 +41,7 @@ class EchangeController extends Controller
     }
 
     // POST /echanges
-    // Had l-fonction kat-creer demande d-tabadoul (swap) jdida o kat-sift email l-destinataire
+    // Had lfonction katcreer demande dechange jdida o katsif email ldestinataire
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -59,7 +59,7 @@ class EchangeController extends Controller
 
         $userId = Auth::user()->id_user;
 
-        // Check if there's already a pending request for THIS object from THIS user
+        // Check wash kayn request en attente 
         $pendingCount = Echange::where('id_demandeur', $userId)
             ->where('id_objet2', $data['id_objet2'])
             ->where('statut', 'en_attente')
@@ -69,7 +69,7 @@ class EchangeController extends Controller
             return response()->json(['message' => 'Vous avez déjà une demande en attente pour cet objet.'], 400);
         }
 
-        // Count TOTAL attempts (including refuse and annule) for this user to this specific object
+        // Count TOTAL dyal les echanges dyal user m3a had objet (refuse o annule)
         $totalAttempts = Echange::where('id_demandeur', $userId)
             ->where('id_objet2', $data['id_objet2'])
             ->count();
@@ -90,7 +90,7 @@ class EchangeController extends Controller
 
             $echange->load(['objet1', 'objet2', 'demandeur', 'destinataire']);
 
-            // Email للـ destinataire
+            // Email destinataire
             Mail::to($echange->destinataire->email)
                 ->send(new NouvelEchange($echange));
 
@@ -105,7 +105,7 @@ class EchangeController extends Controller
     }
 
     // PUT /echanges/{id}/statut
-    // Had l-fonction kat-beddel l-statut dyal swap (Accepter/Refuser...) o kat-dir la mise a jour dyal l-objets
+    // Had lfonction katbeddel statut dyal swap (Accepter/Refuser...) o katdir mise a jour dyal objets
     public function updateStatut(Request $request, $id)
     {
         $echange = Echange::findOrFail($id);
